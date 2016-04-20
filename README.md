@@ -1,1 +1,2 @@
-# mrgb
+# quetzal
+Multi-reference genome browser
