@@ -5,6 +5,28 @@
   <artifactId>mrgb</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>multi-reference genome browser</name>
+
+  <developers>
+    <developer>
+      <id>daniel</id>
+      <name>Daniel Ettema</name>
+      <email>daniel@defsoftware.nl</email>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+        <role>creator</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git@github.com:AbeelLab/quetzal.git</connection>
+    <developerConnection>scm:git:git@github.com:AbeelLab/quetzal.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/AbeelLab/quetzal</url>
+  </scm>
+
+
   <build>
     <plugins>
       <plugin>
@@ -34,4 +56,14 @@
       </plugin>
     </plugins>
   </build>
+  
+  
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.4</version>
+    </dependency>
+  </dependencies>
 </project>
