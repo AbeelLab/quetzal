@@ -5,18 +5,18 @@ import java.util.List;
 /**
  * 
  * @author D.L. Ettema
- *
+ * 22 May 2016
  */
 public class Sequence {
 
 	private Integer nodeNumber;
-	private String sequence;
+	private char[] sequence;
 	private List<String> ori;
 	private List<String> crd;
 	private List<String> crdctg;
 	private List<String> ctg;
 	
-	public Sequence(Integer nodeNumber, String sequence, List<String> ori, List<String> crd, List<String> crdctg,
+	public Sequence(Integer nodeNumber, char[] sequence, List<String> ori, List<String> crd, List<String> crdctg,
 			List<String> ctg) {
 		super();
 		this.nodeNumber = nodeNumber;
@@ -33,10 +33,10 @@ public class Sequence {
 	public void setNodeNumber(Integer nodeNumber) {
 		this.nodeNumber = nodeNumber;
 	}
-	public String getSequence() {
+	public char[] getSequence() {
 		return sequence;
 	}
-	public void setSequence(String sequence) {
+	public void setSequence(char[] sequence) {
 		this.sequence = sequence;
 	}
 	public List<String> getOri() {

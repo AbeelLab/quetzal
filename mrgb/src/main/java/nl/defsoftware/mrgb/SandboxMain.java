@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 import nl.defsoftware.mrgb.services.GraphDataParser;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.fxml.FXMLLoader;
 
 /**
@@ -19,15 +18,15 @@ import javafx.fxml.FXMLLoader;
  * @author D.L. Ettema
  * 22 May 2016
  */
-public class Main extends Application {
+public class SandboxMain extends Application {
 	
 	private static String RESOURCES_PREFIX_PATH = "src/main/resources/";
 	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			VBox root = (VBox)FXMLLoader.load(getClass().getResource("Mrgb.fxml"));
-			Scene scene = new Scene(root,1024,768);
+			BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("Main.fxml"));
+			Scene scene = new Scene(root,400,400);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			
@@ -52,6 +51,17 @@ public class Main extends Application {
 	}
 	
 	public static void main(String[] args) {
-		launch(args);
+		
+		int id = summation();
+		System.out.println("id=" + id + " Integertype="+ Integer.class.isInstance(id));
+//		launch(args);
+		System.exit(0);
+	}
+	
+	private static int summation() {
+		short id = 2;
+		short offset = 5;
+		short arrayOffset = 10;
+		return (id + offset) * arrayOffset;
 	}
 }

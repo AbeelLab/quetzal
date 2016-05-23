@@ -12,15 +12,23 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import nl.defsoftware.mrgb.Constants;
 import nl.defsoftware.mrgb.models.Sequence;
 
+/**
+ * 
+ * @author D.L. Ettema
+ * 22 May 2016
+ */
 public class GraphDataParser implements Parser {
+	Logger logger = LoggerFactory.getLogger(GraphDataParser.class);
 	
 	/* Local Main only */
 	private Properties properties = new Properties();
-	private static String PREFIX_PATH = "src/main/resources/";
-	private static String GRAPH_DATA = "data.graph.aligned.gfa";
+
 	
 	/* Reader for the datasource */
 	private BufferedReader reader = null;
@@ -37,25 +45,25 @@ public class GraphDataParser implements Parser {
 	private static int GFA_CTG = 7;
 	private static int GFA_START = 8;
 	
-	private HashMap<Short, short[]> links;
-	private HashMap<Short, Sequence> sequences;
+	private HashMap<Short, short[]> links = new HashMap<>();
+	private HashMap<Short, Sequence> sequences = new HashMap<>();
 	
-	public static void main(String [] args) throws Exception {
-		GraphDataParser p = new GraphDataParser();
-		p.loadProperties();
-		p.loadResource();
-		p.parseData();
-		
-	}
-	
-	/* Local Main only */
-	private void loadProperties() throws IOException {
-		properties.load(new FileInputStream(PREFIX_PATH.concat("application.properties")));
-	}
+//	public static void main(String [] args) throws Exception {
+//		GraphDataParser p = new GraphDataParser();
+//		p.loadProperties();
+//		p.loadResource();
+//		p.parseData();
+//		
+//	}
+//	
+//	/* Local Main only */
+//	private void loadProperties() throws IOException {
+//		properties.load(new FileInputStream(Constants.PREFIX_PATH.concat("application.properties")));
+//	}
 	
 	@Override
 	public void loadResource() throws UnsupportedEncodingException, FileNotFoundException {
-		String dataPath = PREFIX_PATH.concat(properties.getProperty(GRAPH_DATA));
+		String dataPath = Constants.PREFIX_PATH.concat(System.getProperties().getProperty(Constants.GRAPH_DATA));
 		reader = new BufferedReader(new InputStreamReader(new FileInputStream(dataPath), "UTF-8"));
 	}
 	
@@ -64,6 +72,7 @@ public class GraphDataParser implements Parser {
 	}
 	
 	public void parseData() {
+		logger.info("Parsing data");
 		Scanner scanner = new Scanner(reader);
 		Pattern pattern = Pattern.compile("\t");
 		while( scanner.hasNextLine() ) {
@@ -74,6 +83,7 @@ public class GraphDataParser implements Parser {
 				processLink(aLine);
 			}
 		}
+		logger.info("Finished parsing graph data");
 		scanner.close();
 	}
 
@@ -81,8 +91,8 @@ public class GraphDataParser implements Parser {
 	
 	private void processSequence(String [] aLine) {
 		for (int i = 0; i < aLine.length; i++) {
-			Sequence aSequence = new Sequence(Integer.parseInt(aLine[GFA_FROM_NODE]), aLine[GFA_SEQUENCE] , null, null, null, null);
-			sequences.put(Short.valueOf(aLine[GFA_FROM_NODE]), aSequence);
+			Sequence aSequence = new Sequence(Integer.parseInt(aLine[GFA_FROM_NODE]), aLine[GFA_SEQUENCE].toCharArray() , null, null, null, null);
+			sequences.put(Short.parseShort(aLine[GFA_FROM_NODE]), aSequence);
 		}
 	}
 

@@ -1,4 +1,4 @@
-package nl.defsoftware.mrgb.models.graph;
+package nl.defsoftware.mrgb.models.graph.old;
 import java.util.Collection;
 
 /**
