@@ -26,15 +26,18 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			VBox root = (VBox)FXMLLoader.load(getClass().getResource("Mrgb.fxml"));
-			Scene scene = new Scene(root,1024,768);
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Mrgb.fxml"));
+			fxmlLoader.setController(new MrgbController());
+			VBox root = (VBox)fxmlLoader.load();
+			Scene scene = new Scene(root, 1024, 768);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			
-			loadProperties();
-			initialiseParser();
+//			loadProperties();
+//			initialiseParser();
 			
 			primaryStage.show();
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
