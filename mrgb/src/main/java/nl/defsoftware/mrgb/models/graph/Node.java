@@ -64,6 +64,13 @@ public class Node {
 	private char[] crdctg;
 	private char[] ctg;
 	
+	/**
+	 * @TODO finish short to integer implementation
+	 * @return
+	 * 
+	 * int[]
+	 *
+	 */
 	public int[] getEdgesIdentifiers() {
 		int [] identifiers = new int[edgesIdentifiers.length];
 		for (int i = 0; i < edgesIdentifiers.length; i++) {

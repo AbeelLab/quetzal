@@ -23,8 +23,8 @@ import nl.defsoftware.mrgb.models.Sequence;
  * @author D.L. Ettema
  * 22 May 2016
  */
-public class GraphDataParser implements Parser {
-	Logger logger = LoggerFactory.getLogger(GraphDataParser.class);
+public class GraphGFAParser implements Parser {
+	Logger logger = LoggerFactory.getLogger(GraphGFAParser.class);
 	
 	/* Local Main only */
 	private Properties properties = new Properties();
@@ -45,8 +45,8 @@ public class GraphDataParser implements Parser {
 	private static int GFA_CTG = 7;
 	private static int GFA_START = 8;
 	
-	private HashMap<Short, short[]> links = new HashMap<>();
-	private HashMap<Short, Sequence> sequences = new HashMap<>();
+	private HashMap<Short, short[]> edgesMap = new HashMap<>();
+	private HashMap<Short, Sequence> sequencesMap = new HashMap<>();
 	
 //	public static void main(String [] args) throws Exception {
 //		GraphDataParser p = new GraphDataParser();
@@ -92,20 +92,23 @@ public class GraphDataParser implements Parser {
 	private void processSequence(String [] aLine) {
 		for (int i = 0; i < aLine.length; i++) {
 			Sequence aSequence = new Sequence(Integer.parseInt(aLine[GFA_FROM_NODE]), aLine[GFA_SEQUENCE].toCharArray() , null, null, null, null);
-			sequences.put(Short.parseShort(aLine[GFA_FROM_NODE]), aSequence);
+			sequencesMap.put(Short.parseShort(aLine[GFA_FROM_NODE]), aSequence);
 		}
 	}
-
 	
 	private void processLink(String [] aLine) {
 		for (int i = 0; i < aLine.length; i++) {
-			if (links.containsKey(aLine[GFA_FROM_NODE])) {
-				short [] l = links.get(aLine[1]);
-				l[l.length] = Short.valueOf(aLine[GFA_TO_NODE]);
+			if (edgesMap.containsKey(aLine[GFA_FROM_NODE])) {
+				short [] link = edgesMap.get(aLine[1]);
+				link[link.length] = Short.valueOf(aLine[GFA_TO_NODE]);
 			} else {
-				links.put(Short.valueOf(aLine[GFA_FROM_NODE]), new short[]{ Short.valueOf(aLine[GFA_TO_NODE]) });
+				edgesMap.put(Short.valueOf(aLine[GFA_FROM_NODE]), new short[]{ Short.valueOf(aLine[GFA_TO_NODE]) });
 			}
 		}
 	}
 
+	public HashMap<Short, short[]> getParsedEdges() {
+		return edgesMap;
+		
+	}
 }

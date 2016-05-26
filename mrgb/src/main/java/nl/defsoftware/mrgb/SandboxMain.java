@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import nl.defsoftware.mrgb.services.GraphDataParser;
+import nl.defsoftware.mrgb.services.GraphGFAParser;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.fxml.FXMLLoader;
@@ -40,7 +40,7 @@ public class SandboxMain extends Application {
 	}
 
 	private void initialiseParser() throws UnsupportedEncodingException, FileNotFoundException {
-		GraphDataParser p = new GraphDataParser();
+		GraphGFAParser p = new GraphGFAParser();
 		p.loadResource();
 		p.parseData();
 	}

@@ -8,4 +8,6 @@ public interface Parser {
 	void loadResource() throws UnsupportedEncodingException, FileNotFoundException;
 
 	void parseData();
+	
+//	void storeParsedData(Object store);
 }
