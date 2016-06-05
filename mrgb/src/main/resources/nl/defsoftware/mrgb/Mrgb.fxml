@@ -8,9 +8,8 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToolBar?>
 
-<VBox fx:id="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -51,14 +50,10 @@
         </Menu>
       </menus>
     </MenuBar>
-    <ToolBar VBox.vgrow="NEVER">
-      <Button text="x" />
-      <Button text="y" />
-      <Button text="z" />
-    </ToolBar>
+    <ToolBarController fx:id="toolbar" />
     <ScrollPane fx:id="scrollPane" prefHeight="768.0" prefWidth="1280.0"
        fitToHeight="true" fitToWidth="true">
       <GridPane fx:id="graphPane" prefHeight="768.0" prefWidth="1280.0" />
     </ScrollPane>
   </children>
-</VBox>
+</fx:root>

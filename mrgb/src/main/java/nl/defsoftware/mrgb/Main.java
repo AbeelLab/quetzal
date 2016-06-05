@@ -1,5 +1,5 @@
 package nl.defsoftware.mrgb;
-	
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,78 +8,54 @@ import java.util.Properties;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.stage.Stage;
-import nl.defsoftware.mrgb.services.GraphGFAParser;
-import nl.defsoftware.mrgb.services.ParserService;
-import nl.defsoftware.mrgb.services.ParserServiceImpl;
-import nl.defsoftware.mrgb.view.controllers.MrgbController;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import nl.defsoftware.mrgb.services.ParserServiceImpl;
+import nl.defsoftware.mrgb.view.controllers.RootController;
 
 /**
  * 
- * @author D.L. Ettema
- * 22 May 2016
+ * @author D.L. Ettema 22 May 2016
  */
 public class Main extends Application {
-	
-	private static String RESOURCES_PREFIX_PATH = "src/main/resources/";
-	
-	private MrgbController mrgbController = new MrgbController();
-	
-	@Override
-	public void start(Stage primaryStage) {
-		try {
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Mrgb.fxml"));
-			fxmlLoader.setController(mrgbController);
-			VBox root = (VBox)fxmlLoader.load();
-//			root.getChildren().add(addHBox());
-			Scene scene = new Scene(root, 1024, 768);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			primaryStage.setScene(scene);
-			
-			
-			loadProperties();
-			initialiseParser();
 
-			
-			primaryStage.show();
-			
-		} catch(Exception e) {
+	private static String RESOURCES_PREFIX_PATH = "src/main/resources/";
+
+	private RootController rootController;
+
+	@Override
+	public void start(Stage mainStage) {
+		try {
+			loadProperties();
+
+			rootController = new RootController();
+			createStage(mainStage, rootController);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	
-	/**
-	 * @TODO refactor to be user initiated, not at startup
-	 * @throws UnsupportedEncodingException
-	 * @throws FileNotFoundException
-	 * 
-	 */
-	private void initialiseParser() throws UnsupportedEncodingException, FileNotFoundException {
-		ParserServiceImpl parserService = new ParserServiceImpl();
-		parserService.loadGraphData();
-		mrgbController.setGraphMap(parserService.getParsedEdges());
-//		mrgbController.setGraphMapForNodeLabels(parserService.getParsedEdges());
+	private void createStage(Stage mainWindow, Parent root) {
+		Scene container = new Scene(root, 1024, 768);
+		container.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		mainWindow.setScene(container);
+		mainWindow.setTitle("Multi-reference comparative genome browser");
+		mainWindow.show();
 	}
 
 	private void loadProperties() throws IOException, FileNotFoundException {
-		Properties properties = System.getProperties();
 		FileInputStream fis = new FileInputStream(RESOURCES_PREFIX_PATH.concat("application.properties"));
-		properties.load(fis);
+		System.getProperties().load(fis);
 		fis.close();
 	}
-	
+
 	private void exit() {
 		Platform.exit();
 	}
-	
+
 	public static void main(String[] args) {
 		launch(args);
 	}
