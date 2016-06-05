@@ -12,20 +12,25 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
+import javafx.scene.layout.HBox;
 import nl.defsoftware.mrgb.services.ParserServiceImpl;
 
-public class ToolBarController extends ToolBar {
+public class ToolBarController extends HBox {
 	private static final Logger log = LoggerFactory.getLogger(ToolBarController.class);
 
 	private ParserServiceImpl parserService;
 	private RootController parentContoller;
 
 	@FXML
+	private ToolBar toolbar;
+	
+	@FXML
 	private Button loadDataButton;
 
 	public ToolBarController() {
 		log.info("init action toolbar Controller");
 		parserService = new ParserServiceImpl();
+		System.out.println(getClass().getResource("toolbar.fxml"));
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("toolbar.fxml"));
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Button?>
+<fx:root type="javafx.scene.layout.HBox" xmlns:fx="http://javafx.com/fxml">
+  <ToolBar>
+    <Button fx:id="loadDataButton" text="Load GFA Data" />
+    <Button text="y" />
+    <Button text="z" />
+  </ToolBar>
+</fx:root>

@@ -3,17 +3,12 @@ package nl.defsoftware.mrgb;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Properties;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import nl.defsoftware.mrgb.services.ParserServiceImpl;
 import nl.defsoftware.mrgb.view.controllers.RootController;
 
 /**
@@ -40,7 +35,7 @@ public class Main extends Application {
 
 	private void createStage(Stage mainWindow, Parent root) {
 		Scene container = new Scene(root, 1024, 768);
-		container.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		container.getStylesheets().add(getClass().getResource(RESOURCES_PREFIX_PATH.concat("css/application.css")).toExternalForm());
 		mainWindow.setScene(container);
 		mainWindow.setTitle("Multi-reference comparative genome browser");
 		mainWindow.show();
