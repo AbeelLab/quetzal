@@ -5,6 +5,11 @@
   <artifactId>mrgb</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>multi-reference genome browser</name>
+  <packaging>jar</packaging>
+
+  <organization>
+    <name>Delft University of Technology</name>
+  </organization>
 
   <developers>
     <developer>

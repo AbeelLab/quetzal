@@ -12,10 +12,14 @@ import javafx.stage.Stage;
 import nl.defsoftware.mrgb.services.GraphGFAParser;
 import nl.defsoftware.mrgb.services.ParserService;
 import nl.defsoftware.mrgb.services.ParserServiceImpl;
+import nl.defsoftware.mrgb.view.controllers.MrgbController;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 
 /**
  * 
@@ -34,6 +38,7 @@ public class Main extends Application {
 			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Mrgb.fxml"));
 			fxmlLoader.setController(mrgbController);
 			VBox root = (VBox)fxmlLoader.load();
+//			root.getChildren().add(addHBox());
 			Scene scene = new Scene(root, 1024, 768);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
@@ -49,6 +54,7 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 	}
+
 	
 	/**
 	 * @TODO refactor to be user initiated, not at startup
@@ -60,6 +66,7 @@ public class Main extends Application {
 		ParserServiceImpl parserService = new ParserServiceImpl();
 		parserService.loadGraphData();
 		mrgbController.setGraphMap(parserService.getParsedEdges());
+//		mrgbController.setGraphMapForNodeLabels(parserService.getParsedEdges());
 	}
 
 	private void loadProperties() throws IOException, FileNotFoundException {

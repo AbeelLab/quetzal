@@ -8,8 +8,9 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
 
-<VBox fx:id="root" prefHeight="768.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <MenuBar VBox.vgrow="NEVER">
       <menus>
@@ -50,28 +51,14 @@
         </Menu>
       </menus>
     </MenuBar>
-    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
-      <children>
-        <Label alignment="CENTER" layoutX="155.0" layoutY="177.0" style="&#10;" text="Drag components from Library here…" textAlignment="CENTER" textFill="#9f9f9f" wrapText="false">
-          <font>
-            <Font size="18.0" />
-          </font>
-        </Label>
-            <TabPane layoutX="7.0" prefHeight="768.0" prefWidth="1280.0" tabClosingPolicy="UNAVAILABLE">
-              <tabs>
-                <Tab text="Graph">
-                     <content>
-                        <ScrollPane fx:id="graphPane" prefHeight="200.0" prefWidth="200.0">
-                          <content>
-                            <AnchorPane fx:id="graphAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="768.0" prefWidth="1280.0" />
-                          </content>
-                        </ScrollPane>
-                     </content>
-                  </Tab>
-                <Tab text="Untitled Tab 2" />
-              </tabs>
-            </TabPane>
-      </children>
-    </AnchorPane>
+    <ToolBar VBox.vgrow="NEVER">
+      <Button text="x" />
+      <Button text="y" />
+      <Button text="z" />
+    </ToolBar>
+    <ScrollPane fx:id="scrollPane" prefHeight="768.0" prefWidth="1280.0"
+       fitToHeight="true" fitToWidth="true">
+      <GridPane fx:id="graphPane" prefHeight="768.0" prefWidth="1280.0" />
+    </ScrollPane>
   </children>
 </VBox>
