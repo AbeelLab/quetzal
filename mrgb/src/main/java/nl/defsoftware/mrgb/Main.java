@@ -19,15 +19,12 @@ public class Main extends Application {
 
 	private static String RESOURCES_PREFIX_PATH = "src/main/resources/";
 
-	private RootController rootController;
 
 	@Override
 	public void start(Stage mainStage) {
 		try {
 			loadProperties();
-
-			rootController = new RootController();
-			createStage(mainStage, rootController);
+			createStage(mainStage, new RootController());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -35,7 +32,7 @@ public class Main extends Application {
 
 	private void createStage(Stage mainWindow, Parent root) {
 		Scene container = new Scene(root, 1024, 768);
-		container.getStylesheets().add(getClass().getResource(RESOURCES_PREFIX_PATH.concat("css/application.css")).toExternalForm());
+		container.getStylesheets().add(getClass().getResource("/css/application.css").toExternalForm());
 		mainWindow.setScene(container);
 		mainWindow.setTitle("Multi-reference comparative genome browser");
 		mainWindow.show();
@@ -45,10 +42,6 @@ public class Main extends Application {
 		FileInputStream fis = new FileInputStream(RESOURCES_PREFIX_PATH.concat("application.properties"));
 		System.getProperties().load(fis);
 		fis.close();
-	}
-
-	private void exit() {
-		Platform.exit();
 	}
 
 	public static void main(String[] args) {

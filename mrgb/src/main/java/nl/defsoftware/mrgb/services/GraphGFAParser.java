@@ -110,6 +110,5 @@ public class GraphGFAParser implements Parser {
 
 	public HashMap<Short, short[]> getParsedEdges() {
 		return edgesMap;
-
 	}
 }

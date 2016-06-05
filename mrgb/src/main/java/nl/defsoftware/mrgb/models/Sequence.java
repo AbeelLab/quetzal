@@ -18,7 +18,6 @@ public class Sequence {
 	
 	public Sequence(Integer nodeNumber, char[] sequence, List<String> ori, List<String> crd, List<String> crdctg,
 			List<String> ctg) {
-		super();
 		this.nodeNumber = nodeNumber;
 		this.sequence = sequence;
 		this.ori = ori;

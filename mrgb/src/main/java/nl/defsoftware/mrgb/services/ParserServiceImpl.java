@@ -3,11 +3,7 @@
  */
 package nl.defsoftware.mrgb.services;
 
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
-
-import nl.defsoftware.mrgb.view.controllers.RootController;
 
 /**
  *

@@ -3,6 +3,8 @@ package nl.defsoftware.mrgb.view.controllers;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,12 +12,13 @@ import org.slf4j.LoggerFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.HBox;
 import nl.defsoftware.mrgb.services.ParserServiceImpl;
 
-public class ToolBarController extends HBox {
+public class ToolBarController extends HBox implements Initializable {
 	private static final Logger log = LoggerFactory.getLogger(ToolBarController.class);
 
 	private ParserServiceImpl parserService;
@@ -30,15 +33,20 @@ public class ToolBarController extends HBox {
 	public ToolBarController() {
 		log.info("init action toolbar Controller");
 		parserService = new ParserServiceImpl();
-		System.out.println(getClass().getResource("toolbar.fxml"));
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("toolbar.fxml"));
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);
 		try {
 			fxmlLoader.load();
 		} catch (IOException exception) {
+			log.error("Could not load resource related to toolbar.fxml" + exception.getMessage());
 			throw new RuntimeException(exception);
 		}
+	}
+	
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		//
 	}
 
 	public void setRootController(RootController parentContoller) {
@@ -47,13 +55,10 @@ public class ToolBarController extends HBox {
 
 	@FXML
 	private void loadDataButtonAction(ActionEvent event) {
-		System.out.println("You clicked me!");
 		initialiseParser();
 	}
 
 	/**
-	 * @throws UnsupportedEncodingException
-	 * @throws FileNotFoundException
 	 * 
 	 */
 	private void initialiseParser() {
@@ -61,4 +66,5 @@ public class ToolBarController extends HBox {
 		parentContoller.setGraphMap(parserService.getParsedEdges());
 		// setGraphMapForNodeLabels(parserService.getParsedEdges());
 	}
+
 }

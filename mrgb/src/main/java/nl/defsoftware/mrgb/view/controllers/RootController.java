@@ -1,15 +1,18 @@
 package nl.defsoftware.mrgb.view.controllers;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -21,7 +24,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import nl.defsoftware.mrgb.view.models.NodeLabel;
 
-public class RootController extends VBox {
+public class RootController extends VBox implements Initializable {
 	private static final Logger log = LoggerFactory.getLogger(RootController.class);
 
 	@FXML
@@ -45,8 +48,6 @@ public class RootController extends VBox {
 
 	public RootController() {
 		log.info("init Root Controller");
-		toolbar = new ToolBarController();
-		toolbar.setRootController(this);
 
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("mrgb.fxml"));
 		fxmlLoader.setRoot(this);
@@ -64,7 +65,15 @@ public class RootController extends VBox {
 		graphPane.setHgap(5);
 		graphPane.setVgap(5);
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see javafx.fxml.Initializable#initialize(java.net.URL, java.util.ResourceBundle)
+	 */
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		toolbar.setRootController(this);		
+	}
+	
 	public void setGraphMap(HashMap<Short, short[]> graphMap) {
 		this.graphMap = graphMap;
 
@@ -140,5 +149,4 @@ public class RootController extends VBox {
 		c.setId(Short.toString(id));
 		return c;
 	}
-
 }
