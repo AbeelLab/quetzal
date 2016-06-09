@@ -9,10 +9,12 @@
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.TextField?>
 <?import nl.defsoftware.mrgb.view.controllers.ToolBarController?>
+<?import nl.defsoftware.mrgb.view.controllers.GraphController?>
+<?import javafx.scene.layout.StackPane?>
 
-<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
+<fx:root type="javafx.scene.layout.VBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml">
   <children>
-    <MenuBar VBox.vgrow="NEVER">
+    <MenuBar fx:id="menubar" VBox.vgrow="NEVER">
       <menus>
         <Menu mnemonicParsing="false" text="File">
           <items>
@@ -51,10 +53,8 @@
         </Menu>
       </menus>
     </MenuBar>
-    <ToolBarController  fx:id="toolbar" />
-    <ScrollPane fx:id="scrollPane" prefHeight="768.0" prefWidth="1280.0"
-       fitToHeight="true" fitToWidth="true">
-      <GridPane fx:id="graphPane" prefHeight="768.0" prefWidth="1280.0" />
-    </ScrollPane>
+    <ToolBarController fx:id="toolbar" minWidth="400.0" />
+    <!-- <GraphController fx:id="graphController" />-->
+    <!-- <Pane fx:id="graphPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" /> -->
   </children>
 </fx:root>

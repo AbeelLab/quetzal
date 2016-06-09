@@ -5,7 +5,7 @@ package nl.defsoftware.mrgb.view.models;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import nl.defsoftware.mrgb.view.models.Graph;
+import nl.defsoftware.mrgb.models.graph.Graph;
 
 /**
  *

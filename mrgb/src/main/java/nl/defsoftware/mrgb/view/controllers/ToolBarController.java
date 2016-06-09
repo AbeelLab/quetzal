@@ -58,9 +58,6 @@ public class ToolBarController extends HBox implements Initializable {
 		initialiseParser();
 	}
 
-	/**
-	 * 
-	 */
 	private void initialiseParser() {
 		parserService.loadGraphData();
 		parentContoller.setGraphMap(parserService.getParsedEdges());
