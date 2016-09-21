@@ -3,13 +3,20 @@
  */
 package nl.defsoftware.mrgb.view.controllers;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
@@ -26,7 +33,7 @@ import nl.defsoftware.mrgb.view.models.Sequence;
  * @author D.L. Ettema
  * @date 7 Jun 2016
  */
-public class GraphController {
+public class GraphController extends Group implements Initializable, Observer {
 
     private static final Logger log = LoggerFactory.getLogger(GraphController.class);
 
@@ -48,7 +55,17 @@ public class GraphController {
     CellLayer cellLayer;
 
     public GraphController() {
-        this.model = new GraphModel();
+//        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("fff.fxml"));
+//        fxmlLoader.setRoot(this);
+//        fxmlLoader.setController(this);
+//        try {
+//            fxmlLoader.load();
+//        } catch (IOException exception) {
+//            log.error("Could not load resource related to toolbar.fxml" + exception.getMessage());
+//            throw new RuntimeException(exception);
+//        }
+        
+        model = new GraphModel();
         groupedNodes = new Group();
         cellLayer = new CellLayer();
         graphHandler = new GraphHandler();
@@ -63,6 +80,12 @@ public class GraphController {
         scrollPane.setFitToHeight(true);
         scrollPane.setHbarPolicy(ScrollBarPolicy.ALWAYS);
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+    }
+    
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // TODO Auto-generated method stub
+        
     }
 
     public ScrollPane getScrollPane() {
@@ -126,4 +149,11 @@ public class GraphController {
     public class CellLayer extends Pane {
 
     }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

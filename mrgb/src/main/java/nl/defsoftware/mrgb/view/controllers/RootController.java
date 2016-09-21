@@ -48,6 +48,7 @@ public class RootController extends VBox implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		log.info("Root Controller init");
 		toolbar.setRootController(this);
+		
 	}
 	
 	/** @TODO refactor to listener construction **/
