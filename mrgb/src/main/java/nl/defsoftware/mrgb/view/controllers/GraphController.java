@@ -4,11 +4,7 @@
 package nl.defsoftware.mrgb.view.controllers;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -23,7 +19,9 @@ import nl.defsoftware.mrgb.view.models.GraphModel;
 import nl.defsoftware.mrgb.view.models.Sequence;
 
 /**
- *
+ * This controller ensures that the layers are set for interacting with the
+ * graph. A graphHandler class will ensure the loading of the graph model and is
+ * responsible for the layout algorithm.
  *
  * @author D.L. Ettema
  * @date 7 Jun 2016
@@ -37,6 +35,8 @@ public class GraphController {
 
 	private static final int VER_NODE_BASELINE = 200;
 
+	private GraphHandler graphHandler;
+
 	private GraphModel model;
 
 	private Group groupedNodes;
@@ -46,9 +46,9 @@ public class GraphController {
 	private MouseGestures mouseGestures;
 
 	/**
-	 * the pane wrapper is necessary or else the scrollpane would always align the
-	 * top-most and left-most child to the top and left eg when you drag the top
-	 * child down, the entire scrollpane would move down
+	 * the pane wrapper is necessary or else the scrollpane would always align
+	 * the top-most and left-most child to the top and left eg when you drag the
+	 * top child down, the entire scrollpane would move down
 	 */
 	CellLayer cellLayer;
 
@@ -90,13 +90,13 @@ public class GraphController {
 			int yCoord = VER_NODE_BASELINE;
 
 			// @TODO do check if node is already placed and which coords
-//			Sequence prevPlacedSequence = model.findSequenceById(fromKey);
-//			if (prevPlacedSequence != null) {
-//				// set new y baseline
-//				yCoord = (int) prevPlacedSequence.getCenterY();
-//			} else {
-//				model.addSequence(fromKey, xCoord, yCoord);
-//			}
+			// Sequence prevPlacedSequence = model.findSequenceById(fromKey);
+			// if (prevPlacedSequence != null) {
+			// // set new y baseline
+			// yCoord = (int) prevPlacedSequence.getCenterY();
+			// } else {
+			// model.addSequence(fromKey, xCoord, yCoord);
+			// }
 			model.addSequence(fromKey, xCoord, yCoord);
 			HORIZONTAL_NODE_CURSOR++;
 
@@ -104,33 +104,35 @@ public class GraphController {
 			// @TODO do topological sort first
 			short[] connectedSequences = graphMap.get(fromKey);
 			for (int i = 0; i < connectedSequences.length; i++) {
-//				Sequence prevPlacedSequence = model.findSequenceById(connectedSequences[i]);
-//				if (prevPlacedSequence != null) {
-//					int avgYCoord = calculateAverageYCoordinate(prevPlacedSequence.getSequenceParents());
-//					prevPlacedSequence.setCenterY(avgYCoord);
-//					
-//				} else {
-					if (prevFollowUpNodeId + 1 == Short.toUnsignedInt(connectedSequences[i])) {
-						if (i == 0) { // backbone vertical position
-							xCoord = HORIZONTAL_NODE_CURSOR * HOR_NODE_SPACING;
-							HORIZONTAL_NODE_CURSOR++;
-						}
-						yCoord = VER_NODE_BASELINE
-						    + (VERTICAL_NODE_CURSOR * VER_NODE_SPACING);
-						model.addSequence(connectedSequences[i], xCoord, yCoord);
-						VERTICAL_NODE_CURSOR++;
-						prevFollowUpNodeId = connectedSequences[i];
-					} else {
-						xCoord = (HORIZONTAL_NODE_CURSOR * HOR_NODE_SPACING);
-						yCoord = VER_NODE_BASELINE;
-						model.addSequence(connectedSequences[i], xCoord, yCoord);
+				// Sequence prevPlacedSequence =
+				// model.findSequenceById(connectedSequences[i]);
+				// if (prevPlacedSequence != null) {
+				// int avgYCoord =
+				// calculateAverageYCoordinate(prevPlacedSequence.getSequenceParents());
+				// prevPlacedSequence.setCenterY(avgYCoord);
+				//
+				// } else {
+				if (prevFollowUpNodeId + 1 == Short.toUnsignedInt(connectedSequences[i])) {
+					if (i == 0) { // backbone vertical position
+						xCoord = HORIZONTAL_NODE_CURSOR * HOR_NODE_SPACING;
 						HORIZONTAL_NODE_CURSOR++;
 					}
-					// add edge @TODO add weight and know if we need to go around other
-					// nodes when drawing
-					model.addEdge(fromKey, connectedSequences[i]);
+					yCoord = VER_NODE_BASELINE + (VERTICAL_NODE_CURSOR * VER_NODE_SPACING);
+					model.addSequence(connectedSequences[i], xCoord, yCoord);
+					VERTICAL_NODE_CURSOR++;
+					prevFollowUpNodeId = connectedSequences[i];
+				} else {
+					xCoord = (HORIZONTAL_NODE_CURSOR * HOR_NODE_SPACING);
+					yCoord = VER_NODE_BASELINE;
+					model.addSequence(connectedSequences[i], xCoord, yCoord);
+					HORIZONTAL_NODE_CURSOR++;
 				}
-//			}
+				// add edge @TODO add weight and know if we need to go around
+				// other
+				// nodes when drawing
+				model.addEdge(fromKey, connectedSequences[i]);
+			}
+			// }
 		}
 		endUpdate();
 	}
@@ -139,7 +141,7 @@ public class GraphController {
 	 * @param sequenceParents
 	 * @return
 	 * 
-	 * int
+	 *         int
 	 *
 	 */
 	private int calculateAverageYCoordinate(List<Sequence> sequenceParents) {
