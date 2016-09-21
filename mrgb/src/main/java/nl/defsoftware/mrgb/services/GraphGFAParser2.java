@@ -6,10 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -21,16 +19,13 @@ import nl.defsoftware.mrgb.Constants;
 import nl.defsoftware.mrgb.models.Sequence;
 
 /**
- * A GFA parser that takes the GFA file and finds the links and sequences and
- * stores these separate in different hashmaps.
- * 
- * @author D.L. Ettema 22 May 2016
+ * A parser that as a result delivers one data structure that contains the links, nodes, sequences and the strains.
+ *  
+ * @author D.L. Ettema
+ * @date 21 September 2016
  */
-public class GraphGFAParser implements Parser {
-    private static final Logger log = LoggerFactory.getLogger(GraphGFAParser.class);
-
-    /* Local Main only */
-    private Properties properties = new Properties();
+public class GraphGFAParser2 implements Parser {
+    private static final Logger log = LoggerFactory.getLogger(GraphGFAParser2.class);
 
     /* Reader for the datasource */
     private BufferedReader reader = null;
@@ -50,20 +45,6 @@ public class GraphGFAParser implements Parser {
     private HashMap<Short, short[]> edgesMap = new HashMap<>();
     private HashMap<Short, Sequence> sequencesMap = new HashMap<>();
 
-    // public static void main(String [] args) throws Exception {
-    // GraphDataParser p = new GraphDataParser();
-    // p.loadProperties();
-    // p.loadResource();
-    // p.parseData();
-    //
-    // }
-    //
-    // /* Local Main only */
-    // private void loadProperties() throws IOException {
-    // properties.load(new
-    // FileInputStream(Constants.PREFIX_PATH.concat("application.properties")));
-    // }
-
     @Override
     public void loadResource() throws UnsupportedEncodingException, FileNotFoundException {
         String dataPath = Constants.PREFIX_PATH.concat(System.getProperties().getProperty(Constants.GRAPH_DATA));
@@ -78,7 +59,8 @@ public class GraphGFAParser implements Parser {
         log.info("Parsing data");
         Scanner scanner = new Scanner(reader);
         Pattern pattern = Pattern.compile("\t");
-        for (int i = 0; scanner.hasNextLine() /* && i < 20 */; i++) {
+        for (int i = 0; i < 1000 ; i++) {
+        //for (int i = 0; scanner.hasNextLine(); i++) {
             String[] aLine = pattern.split(scanner.nextLine(), 0);
             if (StringUtils.equals(SEQUENCE, aLine[GFA_LINE_INDICATOR])) {
                 processSequence(aLine);
