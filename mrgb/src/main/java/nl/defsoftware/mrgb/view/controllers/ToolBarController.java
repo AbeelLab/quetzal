@@ -10,8 +10,7 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
+import javafx.collections.MapChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,12 +19,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.HBox;
 import nl.defsoftware.mrgb.services.ParserServiceImpl;
+import nl.defsoftware.mrgb.view.models.ActionStateEnums;
+import nl.defsoftware.mrgb.view.models.ActionStates;
 
-public class ToolBarController extends HBox implements Initializable, Observable {
+public class ToolBarController extends HBox implements Initializable {
 	private static final Logger log = LoggerFactory.getLogger(ToolBarController.class);
 
 	private ParserServiceImpl parserService;
 	private RootController parentContoller;
+	private ActionStates<ActionStateEnums, Boolean> actionStates;
 	private List<Observer> o = new ArrayList<>();
 
 	@FXML
@@ -50,7 +52,7 @@ public class ToolBarController extends HBox implements Initializable, Observable
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		//
+		actionStates = new ActionStates<>();
 	}
 
 	public void setRootController(RootController parentContoller) {
@@ -68,23 +70,11 @@ public class ToolBarController extends HBox implements Initializable, Observable
 		// setGraphMapForNodeLabels(parserService.getParsedEdges());
 	}
 
-    @Override
-    public void addListener(InvalidationListener listener) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void removeListener(InvalidationListener listener) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void addObserver(Observer o) {
-        this.o.add(o);
+    public void addObserver(MapChangeListener<ActionStateEnums, Boolean> o) {
+        actionStates.addListener(o);
     }
     
-    public void removeObserver(Observer o) {
-        this.o.remove(o);
+    public void removeObserver(MapChangeListener<ActionStateEnums, Boolean> o) {
+        actionStates.removeListener(o);
     }
 }
