@@ -3,25 +3,21 @@
  */
 package nl.defsoftware.mrgb.view.controllers;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.fxml.FXMLLoader;
+import javafx.collections.MapChangeListener;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.Pane;
 import nl.defsoftware.mrgb.view.GraphScrollPane;
+import nl.defsoftware.mrgb.view.models.ActionStateEnums;
 import nl.defsoftware.mrgb.view.models.GraphModel;
 import nl.defsoftware.mrgb.view.models.Sequence;
 
@@ -33,7 +29,7 @@ import nl.defsoftware.mrgb.view.models.Sequence;
  * @author D.L. Ettema
  * @date 7 Jun 2016
  */
-public class GraphController extends Group implements Initializable, Observer {
+public class GraphController extends Group implements Initializable, MapChangeListener<ActionStateEnums, Boolean> {
 
     private static final Logger log = LoggerFactory.getLogger(GraphController.class);
 
@@ -88,6 +84,14 @@ public class GraphController extends Group implements Initializable, Observer {
         
     }
 
+    @Override
+    public void onChanged(MapChangeListener.Change<? extends ActionStateEnums, ? extends Boolean> change) {
+        if (change.getKey() instanceof ActionStateEnums.PARSE_DATA) {
+            
+        }
+        
+    }
+    
     public ScrollPane getScrollPane() {
         return this.scrollPane;
     }
@@ -149,11 +153,4 @@ public class GraphController extends Group implements Initializable, Observer {
     public class CellLayer extends Pane {
 
     }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        // TODO Auto-generated method stub
-        
-    }
-
 }
