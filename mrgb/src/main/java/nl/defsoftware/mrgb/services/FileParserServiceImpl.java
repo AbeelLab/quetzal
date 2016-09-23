@@ -5,6 +5,9 @@ package nl.defsoftware.mrgb.services;
 
 import java.util.HashMap;
 
+import nl.defsoftware.mrgb.fileparsers.FileParser;
+import nl.defsoftware.mrgb.fileparsers.GraphGFAParser;
+
 /**
  * Generic file parser that is responsible for loading the various data files:
  * GFA, metadata, annotations etc.

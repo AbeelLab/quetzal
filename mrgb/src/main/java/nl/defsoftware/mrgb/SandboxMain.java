@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import nl.defsoftware.mrgb.services.GraphGFAParser;
+import nl.defsoftware.mrgb.fileparsers.GraphGFAParser;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.fxml.FXMLLoader;
