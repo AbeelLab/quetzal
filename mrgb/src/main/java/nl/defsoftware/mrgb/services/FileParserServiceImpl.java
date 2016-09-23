@@ -15,6 +15,8 @@ import java.util.HashMap;
 public class FileParserServiceImpl implements FileParserService {
 
     private FileParser graphParser = new GraphGFAParser();
+    //private FileParser metadataParser = new MetadataFileParser();
+    //private FileParser annotationParser = new AnnotationFileParser();
 
     @Override
     public void loadGraphData() {
