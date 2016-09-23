@@ -63,6 +63,14 @@ public class GraphGFAParser2 implements FileParser {
     @Override
     public void parseData() {
         log.info("Parsing data");
+        if (reader == null) {
+            try {
+                loadResource();
+            } catch (Exception ex) {
+                log.error("Couldn't load file resources to parse graph data.", ex);
+            }
+        }
+        
         Scanner scanner = new Scanner(reader);
         Pattern pattern = Pattern.compile("\t");
         for (int i = 0; i < 1000 ; i++) {
