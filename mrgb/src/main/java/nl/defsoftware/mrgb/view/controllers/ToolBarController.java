@@ -19,7 +19,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.HBox;
 import nl.defsoftware.mrgb.services.ParserServiceImpl;
-import nl.defsoftware.mrgb.view.models.ActionStateEnums;
 import nl.defsoftware.mrgb.view.models.ActionStates;
 
 public class ToolBarController extends HBox implements Initializable {
@@ -28,7 +27,6 @@ public class ToolBarController extends HBox implements Initializable {
 	private ParserServiceImpl parserService;
 	private RootController parentContoller;
 	private ActionStates<ActionStateEnums, Boolean> actionStates;
-	private List<Observer> o = new ArrayList<>();
 
 	@FXML
 	private ToolBar toolbar;
@@ -61,9 +59,12 @@ public class ToolBarController extends HBox implements Initializable {
 
 	@FXML
 	private void loadDataButtonAction(ActionEvent event) {
+	    actionStates.setState(ActionStateEnums.PARSE_DATA, Boolean.TRUE);
+	    actionStates.setState(ActionStateEnums.LOAD_DATA, Boolean.TRUE);
 		initialiseParser();
 	}
 
+	//@TODO remove me after refactoring
 	private void initialiseParser() {
 		parserService.loadGraphData();
 		parentContoller.setGraphMap(parserService.getParsedEdges());

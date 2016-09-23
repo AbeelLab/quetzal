@@ -1,7 +1,7 @@
 /**
  * 
  */
-package nl.defsoftware.mrgb.view.models;
+package nl.defsoftware.mrgb.view.controllers;
 
 /**
  * @author D.L. Ettema
@@ -10,11 +10,13 @@ package nl.defsoftware.mrgb.view.models;
  */
 public enum ActionStateEnums {
 
+    
     /* Action stating new data needs to be loaded into the display since maybe a view or filters have changed */
     LOAD_DATA,
     
     /* action that states that data needs to be parsed from file */
-    PARSE_DATA;
+    PARSE_DATA
+    
 
 
 }

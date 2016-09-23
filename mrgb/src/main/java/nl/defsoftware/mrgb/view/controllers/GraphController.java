@@ -17,7 +17,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.Pane;
 import nl.defsoftware.mrgb.view.GraphScrollPane;
-import nl.defsoftware.mrgb.view.models.ActionStateEnums;
 import nl.defsoftware.mrgb.view.models.GraphModel;
 import nl.defsoftware.mrgb.view.models.Sequence;
 
@@ -86,10 +85,13 @@ public class GraphController extends Group implements Initializable, MapChangeLi
 
     @Override
     public void onChanged(MapChangeListener.Change<? extends ActionStateEnums, ? extends Boolean> change) {
-        if (change.getKey() instanceof ActionStateEnums.PARSE_DATA) {
-            
+        if (change.getKey() instanceof ActionStateEnums) {
+            if (ActionStateEnums.PARSE_DATA == change.getKey()) {
+                log.info("new action parse data. Value: " + change.getValueAdded());
+            } else if (ActionStateEnums.LOAD_DATA == change.getKey()) {
+                log.info("new action load data. Value: " + change.getValueAdded());
+            }
         }
-        
     }
     
     public ScrollPane getScrollPane() {

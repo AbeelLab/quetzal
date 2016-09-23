@@ -38,17 +38,19 @@ public class RootController extends VBox implements Initializable {
 		}
 		setManaged(true);
 		
-		graphController = new GraphController();
-		graphController.getScrollPane().prefWidthProperty().bind(this.widthProperty());
-		graphController.getScrollPane().prefHeightProperty().bind(this.heightProperty());
-		this.getChildren().add(graphController.getScrollPane());
 	}
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		log.info("Root Controller init");
-		toolbar.setRootController(this);
 		
+		graphController = new GraphController();
+        graphController.getScrollPane().prefWidthProperty().bind(this.widthProperty());
+        graphController.getScrollPane().prefHeightProperty().bind(this.heightProperty());
+        this.getChildren().add(graphController.getScrollPane());
+        
+		toolbar.setRootController(this);
+		toolbar.addObserver(graphController);
 	}
 	
 	/** @TODO refactor to listener construction **/
