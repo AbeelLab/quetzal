@@ -24,7 +24,7 @@ import nl.defsoftware.mrgb.models.Sequence;
  * @author D.L. Ettema
  * @date 21 September 2016
  */
-public class GraphGFAParser2 implements Parser {
+public class GraphGFAParser2 implements FileParser {
     private static final Logger log = LoggerFactory.getLogger(GraphGFAParser2.class);
 
     /* Reader for the datasource */
@@ -55,6 +55,12 @@ public class GraphGFAParser2 implements Parser {
         reader.close();
     }
 
+    @Override
+    public HashMap<Short, short[]> getParsedEdges() {
+        return edgesMap;
+    }
+    
+    @Override
     public void parseData() {
         log.info("Parsing data");
         Scanner scanner = new Scanner(reader);
@@ -90,9 +96,5 @@ public class GraphGFAParser2 implements Parser {
         } else {
             edgesMap.put(key, new short[] { toNode });
         }
-    }
-
-    public HashMap<Short, short[]> getParsedEdges() {
-        return edgesMap;
     }
 }

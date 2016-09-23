@@ -2,9 +2,6 @@ package nl.defsoftware.mrgb.view.controllers;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observer;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
@@ -18,13 +15,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.HBox;
-import nl.defsoftware.mrgb.services.ParserServiceImpl;
 import nl.defsoftware.mrgb.view.models.ActionStates;
 
 public class ToolBarController extends HBox implements Initializable {
 	private static final Logger log = LoggerFactory.getLogger(ToolBarController.class);
 
-	private ParserServiceImpl parserService;
+	
 	private RootController parentContoller;
 	private ActionStates<ActionStateEnums, Boolean> actionStates;
 
@@ -36,7 +32,6 @@ public class ToolBarController extends HBox implements Initializable {
 
 	public ToolBarController() {
 		log.info("init action toolbar Controller");
-		parserService = new ParserServiceImpl();
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("toolbar.fxml"));
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);
@@ -59,16 +54,7 @@ public class ToolBarController extends HBox implements Initializable {
 
 	@FXML
 	private void loadDataButtonAction(ActionEvent event) {
-	    actionStates.setState(ActionStateEnums.PARSE_DATA, Boolean.TRUE);
-	    actionStates.setState(ActionStateEnums.LOAD_DATA, Boolean.TRUE);
-		initialiseParser();
-	}
-
-	//@TODO remove me after refactoring
-	private void initialiseParser() {
-		parserService.loadGraphData();
-		parentContoller.setGraphMap(parserService.getParsedEdges());
-		// setGraphMapForNodeLabels(parserService.getParsedEdges());
+	    actionStates.setState(ActionStateEnums.LOAD_DATA_AND_PARSE, Boolean.TRUE);
 	}
 
     public void addObserver(MapChangeListener<ActionStateEnums, Boolean> o) {

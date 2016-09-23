@@ -2,7 +2,6 @@ package nl.defsoftware.mrgb.view.controllers;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
@@ -51,10 +50,5 @@ public class RootController extends VBox implements Initializable {
         
 		toolbar.setRootController(this);
 		toolbar.addObserver(graphController);
-	}
-	
-	/** @TODO refactor to listener construction **/
-	public void setGraphMap(HashMap<Short, short[]> graphMap) {
-		graphController.setGraphMap(graphMap);
 	}
 }

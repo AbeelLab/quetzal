@@ -1,6 +1,3 @@
-/**
- * 
- */
 package nl.defsoftware.mrgb.view.controllers;
 
 /**
@@ -11,12 +8,9 @@ package nl.defsoftware.mrgb.view.controllers;
 public enum ActionStateEnums {
 
     
-    /* Action stating new data needs to be loaded into the display since maybe a view or filters have changed */
-    LOAD_DATA,
+    /* Action stating loading files adata needs to be loaded into the display since maybe a view or filters have changed */
+    LOAD_DATA_AND_PARSE,
     
-    /* action that states that data needs to be parsed from file */
-    PARSE_DATA
-    
-
-
+    /* Action to reload data on the viewscreen */
+    RELOAD_DATA;
 }

@@ -16,6 +16,7 @@ import javafx.scene.Group;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.Pane;
+import nl.defsoftware.mrgb.services.GraphService;
 import nl.defsoftware.mrgb.view.GraphScrollPane;
 import nl.defsoftware.mrgb.view.models.GraphModel;
 import nl.defsoftware.mrgb.view.models.Sequence;
@@ -32,6 +33,8 @@ public class GraphController extends Group implements Initializable, MapChangeLi
 
     private static final Logger log = LoggerFactory.getLogger(GraphController.class);
 
+    private GraphService graphService;
+    
     private GraphHandler graphHandler;
 
     private GraphModel model;
@@ -60,10 +63,12 @@ public class GraphController extends Group implements Initializable, MapChangeLi
 //            throw new RuntimeException(exception);
 //        }
         
+        graphService = new GraphService();
+        graphHandler = new GraphHandler();
+        
         model = new GraphModel();
         groupedNodes = new Group();
         cellLayer = new CellLayer();
-        graphHandler = new GraphHandler();
 
         groupedNodes.getChildren().add(cellLayer);
 
@@ -86,10 +91,13 @@ public class GraphController extends Group implements Initializable, MapChangeLi
     @Override
     public void onChanged(MapChangeListener.Change<? extends ActionStateEnums, ? extends Boolean> change) {
         if (change.getKey() instanceof ActionStateEnums) {
-            if (ActionStateEnums.PARSE_DATA == change.getKey()) {
-                log.info("new action parse data. Value: " + change.getValueAdded());
-            } else if (ActionStateEnums.LOAD_DATA == change.getKey()) {
-                log.info("new action load data. Value: " + change.getValueAdded());
+            if (ActionStateEnums.LOAD_DATA_AND_PARSE == change.getKey()) {
+                //@TODO make it in another thread.
+                beginUpdate();
+                graphHandler.setGraphViewModel(model, graphService.loadDataAndParseToGraph());
+                endUpdate();
+            } else if (ActionStateEnums.RELOAD_DATA == change.getKey()) {
+               
             }
         }
     }
@@ -104,17 +112,6 @@ public class GraphController extends Group implements Initializable, MapChangeLi
 
     public GraphModel getModel() {
         return model;
-    }
-
-    public void setGraphMap(HashMap<Short, short[]> graphMap) {
-        beginUpdate();
-        graphHandler.setGraphViewModel(model, graphMap);
-        endUpdate();
-    }
-
-    private void layoutGraph() {
-        log.info("Layout graph");
-        // List<Sequence> sequences = getModel().getAllSequences();
     }
 
     private void beginUpdate() {
@@ -144,8 +141,6 @@ public class GraphController extends Group implements Initializable, MapChangeLi
 
         // merge added & removed cells with all cells
         getModel().merge();
-
-        layoutGraph();
     }
 
     public double getScale() {

@@ -14,8 +14,8 @@ import nl.defsoftware.mrgb.view.models.GraphModel;
 import nl.defsoftware.mrgb.view.models.Sequence;
 
 /**
- * This GraphHandler object is responsible for filling the graph model with the
- * nodes and their coordinates.
+ * This GraphHandler object is responsible for filling the graph model from parsed data with the
+ * nodes and placing them in a local coordinate system.
  * 
  * @author D.L. Ettema
  *

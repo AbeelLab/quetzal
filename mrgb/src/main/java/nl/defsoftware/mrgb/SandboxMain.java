@@ -39,7 +39,7 @@ public class SandboxMain extends Application {
 		}
 	}
 
-	private void initialiseParser() throws UnsupportedEncodingException, FileNotFoundException {
+	private void initialiseParser() throws IOException, UnsupportedEncodingException, FileNotFoundException {
 		GraphGFAParser p = new GraphGFAParser();
 		p.loadResource();
 		p.parseData();

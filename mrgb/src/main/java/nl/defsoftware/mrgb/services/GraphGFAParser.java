@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
@@ -24,9 +23,10 @@ import nl.defsoftware.mrgb.models.Sequence;
  * A GFA parser that takes the GFA file and finds the links and sequences and
  * stores these separate in different hashmaps.
  * 
- * @author D.L. Ettema 22 May 2016
+ * @author D.L. Ettema 
+ * @date 22 May 2016
  */
-public class GraphGFAParser implements Parser {
+public class GraphGFAParser implements FileParser {
     private static final Logger log = LoggerFactory.getLogger(GraphGFAParser.class);
 
     /* Local Main only */
@@ -50,32 +50,33 @@ public class GraphGFAParser implements Parser {
     private HashMap<Short, short[]> edgesMap = new HashMap<>();
     private HashMap<Short, Sequence> sequencesMap = new HashMap<>();
 
-    // public static void main(String [] args) throws Exception {
-    // GraphDataParser p = new GraphDataParser();
-    // p.loadProperties();
-    // p.loadResource();
-    // p.parseData();
-    //
-    // }
-    //
-    // /* Local Main only */
-    // private void loadProperties() throws IOException {
-    // properties.load(new
-    // FileInputStream(Constants.PREFIX_PATH.concat("application.properties")));
-    // }
-
     @Override
-    public void loadResource() throws UnsupportedEncodingException, FileNotFoundException {
+    public void loadResource() throws IOException, UnsupportedEncodingException, FileNotFoundException {
         String dataPath = Constants.PREFIX_PATH.concat(System.getProperties().getProperty(Constants.GRAPH_DATA));
         reader = new BufferedReader(new InputStreamReader(new FileInputStream(dataPath), "UTF-8"));
+        reader.ready();//call throws IOException is something has failed.
     }
 
     public void closeResources() throws IOException {
         reader.close();
     }
-
+    
+    @Override
+    public HashMap<Short, short[]> getParsedEdges() {
+        return edgesMap;
+    }
+    
+    @Override
     public void parseData() {
         log.info("Parsing data");
+        if (reader == null) {
+            try {
+                loadResource();
+            } catch (Exception ex) {
+                log.error("Couldn't load file resources to parse graph data.", ex);
+            }
+        }
+        
         Scanner scanner = new Scanner(reader);
         Pattern pattern = Pattern.compile("\t");
         for (int i = 0; scanner.hasNextLine() /* && i < 20 */; i++) {
@@ -88,6 +89,7 @@ public class GraphGFAParser implements Parser {
         }
         log.info("Finished parsing graph data");
         scanner.close();
+    
     }
 
     private void processSequence(String[] aLine) {
@@ -110,7 +112,5 @@ public class GraphGFAParser implements Parser {
         }
     }
 
-    public HashMap<Short, short[]> getParsedEdges() {
-        return edgesMap;
-    }
+    
 }
