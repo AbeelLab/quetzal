@@ -30,7 +30,7 @@ public class GraphHandler {
     private static final int VER_NODE_BASELINE = 200;
 
     
-    public void setAlternateGraphViewModel(GraphModel model) {
+    public void setAlternateGraphViewModel(GraphModel model, HashMap<Short, short[]> graphMap) {
         
     }
     
@@ -96,10 +96,7 @@ public class GraphHandler {
     
     /**
      * @param sequenceParents
-     * @return
-     * 
-     *         int
-     *
+     * @return int
      */
     private int calculateAverageYCoordinate(List<Sequence> sequenceParents) {
         BigDecimal avgYCoord = new BigDecimal(0);

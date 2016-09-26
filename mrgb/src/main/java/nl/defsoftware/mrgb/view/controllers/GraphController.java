@@ -5,6 +5,7 @@ package nl.defsoftware.mrgb.view.controllers;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
@@ -90,18 +91,27 @@ public class GraphController extends Group implements Initializable, MapChangeLi
 
     @Override
     public void onChanged(MapChangeListener.Change<? extends ActionStateEnums, ? extends Boolean> change) {
+        printMemoryUsage();
         if (change.getKey() instanceof ActionStateEnums) {
             if (ActionStateEnums.LOAD_DATA_AND_PARSE == change.getKey()) {
                 //@TODO make it in another thread.
                 beginUpdate();
-                graphHandler.setGraphViewModel(model, graphService.loadDataAndParseToGraph());
+                graphHandler.setGraphViewModel(model, graphService.loadDataAndParse());
                 endUpdate();
             } else if (ActionStateEnums.RELOAD_DATA == change.getKey()) {
                
             }
         }
+        printMemoryUsage();
     }
     
+    private void printMemoryUsage() {
+        Runtime runtime = Runtime.getRuntime();
+        long bytes = (runtime.totalMemory() - runtime.freeMemory());
+        double megabytes = bytes / 1024.0 / 1024.0;
+        log.info("memory = " + String.format(Locale.US, "%.3f", megabytes) + " MB");        
+    }
+
     public ScrollPane getScrollPane() {
         return this.scrollPane;
     }

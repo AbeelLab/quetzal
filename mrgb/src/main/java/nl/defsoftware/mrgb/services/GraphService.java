@@ -20,7 +20,7 @@ public class GraphService {
         parserService = new FileParserServiceImpl();
     }
     
-    public HashMap<Short, short[]> loadDataAndParseToGraph() {
+    public HashMap<Short, short[]> loadDataAndParse() {
         parserService.loadGraphData();
         return parserService.getParsedEdges();
     }
