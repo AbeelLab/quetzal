@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import nl.defsoftware.mrgb.fileparsers.FileParser;
 import nl.defsoftware.mrgb.fileparsers.GraphGFAParser;
+import nl.defsoftware.mrgb.fileparsers.GraphGFAParser2;
 
 /**
  * Generic file parser that is responsible for loading the various data files:
@@ -17,7 +18,8 @@ import nl.defsoftware.mrgb.fileparsers.GraphGFAParser;
  */
 public class FileParserServiceImpl implements FileParserService {
 
-    private FileParser graphParser = new GraphGFAParser();
+//    private FileParser graphParser = new GraphGFAParser();
+    private FileParser graphParser = new GraphGFAParser2();
     //private FileParser metadataParser = new MetadataFileParser();
     //private FileParser annotationParser = new AnnotationFileParser();
 

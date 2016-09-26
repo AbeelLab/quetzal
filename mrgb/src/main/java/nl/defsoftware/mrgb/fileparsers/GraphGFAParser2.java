@@ -8,14 +8,24 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.shorts.ShortSet;
 import nl.defsoftware.mrgb.Constants;
+import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.models.Sequence;
 
 /**
@@ -25,25 +35,34 @@ import nl.defsoftware.mrgb.models.Sequence;
  * @date 21 September 2016
  */
 public class GraphGFAParser2 implements FileParser {
+
     private static final Logger log = LoggerFactory.getLogger(GraphGFAParser2.class);
 
     /* Reader for the datasource */
     private BufferedReader reader = null;
-    private String SEQUENCE = "S";
-    private String LINK = "L";
+    private static final String SEQUENCE = "S";
+    private static final String LINK = "L";
+    private static final String HEADER = "H";
+    private static final String ORI_HEADER = "ORI";
 
-    private static int GFA_LINE_INDICATOR = 0;
-    private static int GFA_FROM_NODE = 1;
-    private static int GFA_SEQUENCE = 2;
-    private static int GFA_TO_NODE = 3;
-    private static int GFA_ORI = 4;
-    private static int GFA_CRD = 5;
-    private static int GFA_CRDCTG = 6;
-    private static int GFA_CTG = 7;
-    private static int GFA_START = 8;
+    private static final int GFA_LINE_INDICATOR = 0;
+    private static final int GFA_GENOME_NAMES = 1;
+    private static final int GFA_FROM_NODE = 1;
+    private static final int GFA_SEQUENCE = 2;
+    private static final int GFA_TO_NODE = 3;
+    private static final int GFA_ORI = 4;
+    private static final int GFA_CRD = 5;
+    private static final int GFA_CRDCTG = 6;
+    private static final int GFA_CTG = 7;
+    private static final int GFA_START = 8;
+    
+    private static final int PREFIX_LENGTH = 2;
 
     private HashMap<Short, short[]> edgesMap = new HashMap<>();
-    private HashMap<Short, Sequence> sequencesMap = new HashMap<>();
+//    private HashMap<Integer, Sequence> sequencesMap = new HashMap<>();
+    private Int2ObjectOpenHashMap<Rib> sequencesMap = new Int2ObjectOpenHashMap<>();
+    
+    private Short2ObjectOpenHashMap<String> genomeNamesMap = new Short2ObjectOpenHashMap<>();
 
     @Override
     public void loadResource() throws UnsupportedEncodingException, FileNotFoundException {
@@ -73,25 +92,78 @@ public class GraphGFAParser2 implements FileParser {
         
         Scanner scanner = new Scanner(reader);
         Pattern pattern = Pattern.compile("\t");
-        for (int i = 0; i < 1000 ; i++) {
+        for (int i = 0; i < 1000 ; i++) { // for testing purposes
         //for (int i = 0; scanner.hasNextLine(); i++) {
             String[] aLine = pattern.split(scanner.nextLine(), 0);
             if (StringUtils.equals(SEQUENCE, aLine[GFA_LINE_INDICATOR])) {
                 processSequence(aLine);
             } else if (StringUtils.equals(LINK, aLine[GFA_LINE_INDICATOR])) {
                 processEdges(aLine);
+            } else if (StringUtils.equals(HEADER, aLine[GFA_LINE_INDICATOR])) {
+                processGenomeNames(aLine[GFA_GENOME_NAMES]);
             }
         }
         log.info("Finished parsing graph data");
         scanner.close();
     }
 
-    private void processSequence(String[] aLine) {
-        for (int i = 0; i < aLine.length; i++) {
-            Sequence aSequence = new Sequence(Integer.parseInt(aLine[GFA_FROM_NODE]), aLine[GFA_SEQUENCE].toCharArray(),
-                    null, null, null, null);
-            sequencesMap.put(Short.valueOf(aLine[GFA_FROM_NODE]), aSequence);
+    private void processGenomeNames(String aLine) {
+        Pattern pattern = Pattern.compile("(:|;)");
+        String[] genomeNames = pattern.split(aLine, 0);
+        if (genomeNames.length > (int) Short.MAX_VALUE) {
+            throw new UnsupportedOperationException("The number of genomes exceed the capacity (" + Short.MAX_VALUE +  ") of this application, please limit the number of genomes. ");
         }
+        if (ORI_HEADER.equals(genomeNames[0])) {
+            for (int i = PREFIX_LENGTH; i < genomeNames.length; i++) {
+                genomeNamesMap.put((short) (i - 1), genomeNames[i]);
+            }
+        }
+    }
+
+    private void processSequence(String[] aLine) {
+        Pattern pattern = Pattern.compile("(:|;)");
+        for (int i = 0; i < aLine.length; i++) {
+            int fromNode = Integer.parseInt(aLine[GFA_FROM_NODE]);
+            Rib aSequence = new Rib(fromNode,
+                    aLine[GFA_SEQUENCE].toCharArray(), 
+                    extractGenomeNames(pattern.split(aLine[GFA_ORI])), 
+                    extractReferenceGenome(pattern.split(aLine[GFA_CRD])), 
+                    extractGenomeCoordinates(pattern.split(aLine[GFA_START])));
+                    
+            sequencesMap.put(fromNode, aSequence);
+        }
+    }
+
+    /**
+     * Extracting all the genome name labels we can use to identify each genome sample.
+     * @param oriString
+     * @return Integer ID and the string name.
+     */
+    private short[] extractGenomeNames(String[] aLine) {
+        short[] genomeIds = new short[aLine.length - PREFIX_LENGTH];
+        for (int i = PREFIX_LENGTH; i < aLine.length; i++) {
+            genomeIds[i - PREFIX_LENGTH] = getLabelIdForGenomeLabel(aLine[i]);
+        }
+        return genomeIds;
+    }
+    
+    private short getLabelIdForGenomeLabel(String genomeLabel) {
+        ShortSet keys = genomeNamesMap.keySet();
+        for (short key : keys) {
+            if (genomeNamesMap.get(key).equals(genomeLabel)) return key;
+        }
+        log.info("A genome label was not in the GFA header line. Please fix problem in GFA file. Will continue with loading, but for accurate analysis please fix problem.");
+        return -1;
+    }
+
+    private short extractReferenceGenome(String[] aLine) {
+        int REFERENCE_NAME_POSITION = 2;
+        return getLabelIdForGenomeLabel(aLine[REFERENCE_NAME_POSITION]);
+    }
+    
+    private Integer extractGenomeCoordinates(String[] aLine) {
+        int START_COORDINATE_POSITION = 2;
+        return Integer.parseInt(aLine[START_COORDINATE_POSITION]);
     }
 
     private void processEdges(String[] aLine) {
