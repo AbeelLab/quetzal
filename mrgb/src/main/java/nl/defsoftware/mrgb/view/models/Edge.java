@@ -63,7 +63,7 @@ public class Edge extends Group {
     }
 
     public void redrawLineOfEdge() {
-    	line.startXProperty().bind( from.layoutXProperty().add(from.getBoundsInParent().getWidth() / 2.0));
+        line.startXProperty().bind( from.layoutXProperty().add(from.getBoundsInParent().getWidth() / 2.0));
       line.startYProperty().bind( from.layoutYProperty().add(from.getBoundsInParent().getHeight() / 2.0));
 
       line.endXProperty().bind( to.layoutXProperty().add( to.getBoundsInParent().getWidth() / 2.0));

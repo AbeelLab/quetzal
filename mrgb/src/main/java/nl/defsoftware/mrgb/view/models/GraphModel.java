@@ -26,11 +26,11 @@ public class GraphModel {
 	List<Edge> addedEdges;
 	List<Edge> removedEdges;
 
-	Map<Short, Sequence> sequenceMap; // <id,Sequence>
-	Map<Integer, List<Short>> xCoordinateMap; // <xCoordinate, ids[]>
+	Map<Integer, Sequence> sequenceMap; // <id,Sequence>
+	Map<Integer, List<Integer>> xCoordinateMap; // <xCoordinate, ids[]>
 
 	public GraphModel() {
-		graphParent = new Sequence(new Short("0"));
+		graphParent = new Sequence(new Integer(0));
 		// clear model, create lists
 		clear();
 	}
@@ -44,8 +44,8 @@ public class GraphModel {
 		addedEdges = new ArrayList<>();
 		removedEdges = new ArrayList<>();
 
-		sequenceMap = new HashMap<Short, Sequence>(); // <id,Sequence>
-		xCoordinateMap = new HashMap<Integer, List<Short>>();
+		sequenceMap = new HashMap<Integer, Sequence>(); // <id,Sequence>
+		xCoordinateMap = new HashMap<Integer, List<Integer>>();
 	}
 
 	public void clearAddedLists() {
@@ -77,7 +77,7 @@ public class GraphModel {
 		return allEdges;
 	}
 
-	public Sequence addSequence(Short id, int x, int y) {
+	public Sequence addSequence(Integer id, int x, int y) {
 		Sequence sequence = new Sequence(id);
 		sequence.relocate(x, y);
 		addSequence(sequence, x);
@@ -96,19 +96,19 @@ public class GraphModel {
 		return sequenceMap.get(id);
 	}
 
-	public List<Short> findIdsAtXCoordinate(int xCoordinate) {
-		return xCoordinateMap.getOrDefault(xCoordinateMap, new ArrayList<Short>());
+	public List<Integer> findIdsAtXCoordinate(int xCoordinate) {
+		return xCoordinateMap.getOrDefault(xCoordinateMap, new ArrayList<Integer>());
 	}
 
 	private void addSequence(Sequence sequence, int xCoord) {
 		addedSequences.add(sequence);
 		sequenceMap.put(sequence.getSequenceId(), sequence);
-		List<Short> ids = xCoordinateMap.getOrDefault(xCoord, new ArrayList<Short>());
+		List<Integer> ids = xCoordinateMap.getOrDefault(xCoord, new ArrayList<Integer>());
 		ids.add(sequence.getSequenceId());
 		xCoordinateMap.put(xCoord, ids);
 	}
 
-	public void addEdge(Short sourceId, Short targetId) {
+	public void addEdge(Integer sourceId, Integer targetId) {
 		Sequence sourceSequence = sequenceMap.get(sourceId);
 		Sequence targetSequence = sequenceMap.get(targetId);
 		Edge edge = new Edge(sourceSequence, targetSequence);

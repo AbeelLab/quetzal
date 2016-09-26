@@ -3,7 +3,11 @@
  */
 package nl.defsoftware.mrgb.services;
 
-import java.util.HashMap;
+import java.util.Map;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
+import nl.defsoftware.mrgb.models.Rib;
 
 /**
  * A service that takes care of retrieving and storing graph data.
@@ -14,15 +18,25 @@ import java.util.HashMap;
  */
 public class GraphService {
 
-    private FileParserService parserService;
+    private FileParserService parserService = new FileParserServiceImpl();
     
     public GraphService() {
-        parserService = new FileParserServiceImpl();
     }
     
-    public HashMap<Short, short[]> loadDataAndParse() {
+    public void loadDataAndParse() {
         parserService.loadGraphData();
+    }
+
+    public Map<Integer, int[]> getEdges() {
         return parserService.getParsedEdges();
+    }
+    
+    public Int2ObjectOpenHashMap<Rib> getSequences() {
+        return parserService.getParsedSequences();
+    }
+    
+    public Short2ObjectOpenHashMap<String> getGenomeNames() {
+        return parserService.getParsedGenomeNames();
     }
     
 }

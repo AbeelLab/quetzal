@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -16,11 +17,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import nl.defsoftware.mrgb.Constants;
+import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.models.Sequence;
 
 /**
- * A GFA parser that takes the GFA file and finds the links and sequences and
+ *  *Deprecated* A GFA parser that takes the GFA file and finds the links and sequences and
  * stores these separate in different hashmaps.
  * 
  * @author D.L. Ettema 
@@ -62,8 +66,23 @@ public class GraphGFAParser implements FileParser {
     }
     
     @Override
-    public HashMap<Short, short[]> getParsedEdges() {
-        return edgesMap;
+    public Map<Integer, int[]> getParsedEdges() {
+        return null; // not yet implemented
+    }
+    
+    @Override
+    public Int2ObjectOpenHashMap<Rib> getParsedSequences() {
+        return null; //not yet implemented
+    }
+    
+    @Override
+    public Short2ObjectOpenHashMap<String> getParsedGenomeNames() {
+        return null; //not yet implemented
+    }
+
+    @Override
+    public boolean isParsed() {
+        return edgesMap.size() > 0 && sequencesMap.size() > 0;
     }
     
     @Override
@@ -111,6 +130,4 @@ public class GraphGFAParser implements FileParser {
             edgesMap.put(key, new short[] { toNode });
         }
     }
-
-    
 }

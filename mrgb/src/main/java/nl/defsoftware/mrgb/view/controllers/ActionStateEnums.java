@@ -12,5 +12,8 @@ public enum ActionStateEnums {
     LOAD_DATA_AND_PARSE,
     
     /* Action to reload data on the viewscreen */
-    RELOAD_DATA;
+    RELOAD_DATA, 
+    
+    /* View the data in the main screen */
+    VIEW_GRAPH;
 }

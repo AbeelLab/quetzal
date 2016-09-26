@@ -4,6 +4,7 @@
 <fx:root type="javafx.scene.layout.HBox" xmlns:fx="http://javafx.com/fxml">
   <ToolBar>
     <Button fx:id="loadDataButton" onAction="#loadDataButtonAction" text="Load GFA Data" />
+    <Button fx:id="viewGraphButton" onAction="#viewGraphButtonAction" text="View Graph" />
     <Button text="y" />
     <Button text="z" />
   </ToolBar>

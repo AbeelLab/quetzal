@@ -18,17 +18,25 @@ import javafx.scene.shape.Circle;
  */
 public class Sequence extends Circle {
 
-	private Short id;
+	private Integer id;
 	private Collection<Edge> edges;
 	private List<Sequence> childSequences = new ArrayList<Sequence>();
 	private List<Sequence> parentSequences = new ArrayList<Sequence>();
 	
-	public Sequence(Short id) {
-		this.id = id;
-		this.edges = new ArrayList<Edge>();
-		this.setRadius(10.0);
-		this.setFill(Color.BLACK);
-		this.setOpacity(0.6);
+	public Sequence(Integer id) {
+	    this.id = id;
+        this.edges = new ArrayList<Edge>();
+        setRadius(5);
+        this.setFill(Color.BLACK);
+        this.setOpacity(0.6);
+	}
+	
+	public Sequence(Integer id, int xCoord, int yCoord) {
+//	    super(xCoord, yCoord, 5);
+	    this.id = id;
+        this.edges = new ArrayList<Edge>();
+        this.setFill(Color.BLACK);
+        this.setOpacity(0.6);
 	}
 
 	public void addEdge(Sequence to, int capacity) {
@@ -45,11 +53,11 @@ public class Sequence extends Circle {
 		return edges;
 	}
 
-	public Short getSequenceId() {
+	public Integer getSequenceId() {
 		return id;
 	}
 
-	public void setSequenceId(Short id) {
+	public void setSequenceId(Integer id) {
 		this.id = id;
 	}
 

@@ -58,7 +58,7 @@ public class GraphGFAParser2 implements FileParser {
     
     private static final int PREFIX_LENGTH = 2;
 
-    private HashMap<Short, short[]> edgesMap = new HashMap<>();
+    private Map<Integer, int[]> edgesMap = new HashMap<>();
 //    private HashMap<Integer, Sequence> sequencesMap = new HashMap<>();
     private Int2ObjectOpenHashMap<Rib> sequencesMap = new Int2ObjectOpenHashMap<>();
     
@@ -75,8 +75,23 @@ public class GraphGFAParser2 implements FileParser {
     }
 
     @Override
-    public HashMap<Short, short[]> getParsedEdges() {
+    public Map<Integer, int[]> getParsedEdges() {
         return edgesMap;
+    }
+    
+    @Override
+    public Int2ObjectOpenHashMap<Rib> getParsedSequences() {
+        return sequencesMap;
+    }
+
+    @Override
+    public Short2ObjectOpenHashMap<String> getParsedGenomeNames() {
+        return genomeNamesMap;
+    }
+    
+    @Override
+    public boolean isParsed() {
+        return edgesMap.size() > 0 && sequencesMap.size() > 0 && genomeNamesMap.size() > 0;
     }
     
     @Override
@@ -167,14 +182,14 @@ public class GraphGFAParser2 implements FileParser {
     }
 
     private void processEdges(String[] aLine) {
-        Short key = Short.valueOf(aLine[GFA_FROM_NODE]);
-        short toNode = Short.parseShort(aLine[GFA_TO_NODE]);
+        int key = Integer.parseInt(aLine[GFA_FROM_NODE]);
+        int toNode = Integer.parseInt(aLine[GFA_TO_NODE]);
         if (edgesMap.containsKey(key)) {
-            short[] edges = Arrays.copyOf(edgesMap.get(key), edgesMap.get(key).length + 1);
+            int[] edges = Arrays.copyOf(edgesMap.get(key), edgesMap.get(key).length + 1);
             edges[edges.length - 1] = toNode;
             edgesMap.put(key, edges);
         } else {
-            edgesMap.put(key, new short[] { toNode });
+            edgesMap.put(key, new int[] { toNode });
         }
     }
 }

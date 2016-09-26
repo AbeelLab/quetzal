@@ -6,6 +6,7 @@ package nl.defsoftware.mrgb.view.controllers;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public class GraphHandler {
     private static final int VER_NODE_BASELINE = 200;
 
     
-    public void setAlternateGraphViewModel(GraphModel model, HashMap<Short, short[]> graphMap) {
+    public void setAlternateGraphViewModel(GraphModel model, Map<Integer, int[]> graphMap) {
         
     }
     
@@ -40,9 +41,9 @@ public class GraphHandler {
      * @param model
      * @param graphMap
      */
-    public void setGraphViewModel(GraphModel model, HashMap<Short, short[]> graphMap) {
+    public void setGraphViewModel(GraphModel model, Map<Integer, int[]> graphMap) {
         int HORIZONTAL_NODE_CURSOR = 1;
-        for (Short fromKey : graphMap.keySet()) {
+        for (Integer fromKey : graphMap.keySet()) {
             int VERTICAL_NODE_CURSOR = 1;// reset after each new key
             int xCoord = HORIZONTAL_NODE_CURSOR * HOR_NODE_SPACING;
             int yCoord = VER_NODE_BASELINE;
@@ -60,7 +61,7 @@ public class GraphHandler {
 
             int prevFollowUpNodeId = fromKey.intValue();
             // @TODO do topological sort first
-            short[] connectedSequences = graphMap.get(fromKey);
+            int[] connectedSequences = graphMap.get(fromKey);
             for (int i = 0; i < connectedSequences.length; i++) {
                 // Sequence prevPlacedSequence =
                 // model.findSequenceById(connectedSequences[i]);
@@ -70,7 +71,7 @@ public class GraphHandler {
                 // prevPlacedSequence.setCenterY(avgYCoord);
                 //
                 // } else {
-                if (prevFollowUpNodeId + 1 == Short.toUnsignedInt(connectedSequences[i])) {
+                if (prevFollowUpNodeId + 1 == connectedSequences[i]) {
                     if (i == 0) { // backbone vertical position
                         xCoord = HORIZONTAL_NODE_CURSOR * HOR_NODE_SPACING;
                         HORIZONTAL_NODE_CURSOR++;
@@ -106,7 +107,7 @@ public class GraphHandler {
         return avgYCoord.divideToIntegralValue(BigDecimal.valueOf(sequenceParents.size())).intValue();
     }
 
-    private void addEdges(short[] toNodes, GraphModel model, Short from) {
+    private void addEdges(int[] toNodes, GraphModel model, Integer from) {
         for (int i = 0; i < toNodes.length; i++) {
             model.addEdge(from, toNodes[i]);
         }

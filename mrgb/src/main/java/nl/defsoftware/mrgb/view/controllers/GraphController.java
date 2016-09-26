@@ -95,11 +95,13 @@ public class GraphController extends Group implements Initializable, MapChangeLi
         if (change.getKey() instanceof ActionStateEnums) {
             if (ActionStateEnums.LOAD_DATA_AND_PARSE == change.getKey()) {
                 //@TODO make it in another thread.
+                graphService.loadDataAndParse();
+                log.info("LOAD DATA AND PARSE");
+            } else if (ActionStateEnums.VIEW_GRAPH == change.getKey()) {
                 beginUpdate();
-                graphHandler.setGraphViewModel(model, graphService.loadDataAndParse());
+                graphHandler.setGraphViewModel(model, graphService.getEdges());
                 endUpdate();
-            } else if (ActionStateEnums.RELOAD_DATA == change.getKey()) {
-               
+                log.info("VIEW GRAPH");
             }
         }
         printMemoryUsage();

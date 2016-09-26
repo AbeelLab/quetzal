@@ -3,7 +3,11 @@
  */
 package nl.defsoftware.mrgb.services;
 
-import java.util.HashMap;
+import java.util.Map;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
+import nl.defsoftware.mrgb.models.Rib;
 
 /**
  *
@@ -13,7 +17,11 @@ import java.util.HashMap;
  */
 public interface FileParserService {
 
-	void loadGraphData();
-	
-	HashMap<Short, short[]> getParsedEdges();
+    public void loadGraphData();
+
+    public Map<Integer, int[]> getParsedEdges();
+
+    public Int2ObjectOpenHashMap<Rib> getParsedSequences();
+
+    public Short2ObjectOpenHashMap<String> getParsedGenomeNames();
 }

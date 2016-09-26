@@ -3,10 +3,13 @@
  */
 package nl.defsoftware.mrgb.services;
 
-import java.util.HashMap;
+import java.util.Map;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import nl.defsoftware.mrgb.fileparsers.FileParser;
 import nl.defsoftware.mrgb.fileparsers.GraphGFAParser2;
+import nl.defsoftware.mrgb.models.Rib;
 
 /**
  * Generic file parser that is responsible for loading the various data files:
@@ -17,22 +20,43 @@ import nl.defsoftware.mrgb.fileparsers.GraphGFAParser2;
  */
 public class FileParserServiceImpl implements FileParserService {
 
-    private FileParser graphParser = new GraphGFAParser2();
-    //private FileParser metadataParser = new MetadataFileParser();
-    //private FileParser annotationParser = new AnnotationFileParser();
+    private FileParser graphGFAParser = new GraphGFAParser2();
+    // private FileParser metadataParser = new MetadataFileParser();
+    // private FileParser annotationParser = new AnnotationFileParser();
 
     @Override
     public void loadGraphData() {
         try {
-            graphParser.loadResource();
+            graphGFAParser.loadResource();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        graphParser.parseData();
+        graphGFAParser.parseData();
+        // @TODO store in persistent storage
     }
 
     @Override
-    public HashMap<Short, short[]> getParsedEdges() {
-        return graphParser.getParsedEdges();
+    public Map<Integer, int[]> getParsedEdges() {
+        if (!graphGFAParser.isParsed()) {
+            loadGraphData();
+        }
+        return graphGFAParser.getParsedEdges();
     }
+
+    @Override
+    public Int2ObjectOpenHashMap<Rib> getParsedSequences() {
+        if (!graphGFAParser.isParsed()) {
+            loadGraphData();
+        }
+        return graphGFAParser.getParsedSequences();
+    }
+
+    @Override
+    public Short2ObjectOpenHashMap<String> getParsedGenomeNames() {
+        if (!graphGFAParser.isParsed()) {
+            loadGraphData();
+        }
+        return graphGFAParser.getParsedGenomeNames();
+    }
+
 }
