@@ -11,12 +11,9 @@ public class Rib {
     private short[] genomeIds; //ORI attribute in the GFA file
     private short referenceGenomeId; //CRD attribute in the GFA file
     private Integer referenceGenomeCoordinates; //START attribute in the GFA file
-    
+    private int[] connectedEdges = new int[1];
 //    private List<String> crdctg; //unknown what to use for. Not yet implemented
 //    private List<String> ctg; //unknown what to use for. Not yet implemented
-    
-    // Derived set of parameters
-    private int amountOfGenomes = 0;
     
     public Rib(Integer nodeId, char[] sequence, short[] genomeIds, short referenceGenomeId,
             Integer referenceGenomeCoordinates) {
@@ -27,6 +24,14 @@ public class Rib {
         this.referenceGenomeCoordinates = referenceGenomeCoordinates;
     }
     
+    public void setConnectedEdges(int[] connectedEdges) {
+        this.connectedEdges = connectedEdges;
+    }
+    
+    public int[] getConnectedEdges() {
+        return connectedEdges;
+    }
+
     public int amountOfGenomes() {
         return genomeIds.length;
     }

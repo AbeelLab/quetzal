@@ -4,7 +4,6 @@
 package nl.defsoftware.mrgb.view.controllers;
 
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -99,7 +98,7 @@ public class GraphController extends Group implements Initializable, MapChangeLi
                 log.info("LOAD DATA AND PARSE");
             } else if (ActionStateEnums.VIEW_GRAPH == change.getKey()) {
                 beginUpdate();
-                graphHandler.setGraphViewModel(model, graphService.getEdges());
+                graphHandler.setAlternateGraphViewModel(model, graphService.getSequences());
                 endUpdate();
                 log.info("VIEW GRAPH");
             }

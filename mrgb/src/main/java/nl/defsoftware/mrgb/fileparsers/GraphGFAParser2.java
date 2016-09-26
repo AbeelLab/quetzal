@@ -113,7 +113,8 @@ public class GraphGFAParser2 implements FileParser {
             if (StringUtils.equals(SEQUENCE, aLine[GFA_LINE_INDICATOR])) {
                 processSequence(aLine);
             } else if (StringUtils.equals(LINK, aLine[GFA_LINE_INDICATOR])) {
-                processEdges(aLine);
+//                processEdges(aLine);
+                processEdgesToSequenceMaps(aLine);
             } else if (StringUtils.equals(HEADER, aLine[GFA_LINE_INDICATOR])) {
                 processGenomeNames(aLine[GFA_GENOME_NAMES]);
             }
@@ -190,6 +191,20 @@ public class GraphGFAParser2 implements FileParser {
             edgesMap.put(key, edges);
         } else {
             edgesMap.put(key, new int[] { toNode });
+        }
+    }
+    
+    private void processEdgesToSequenceMaps(String[] aLine) {
+        int key = Integer.parseInt(aLine[GFA_FROM_NODE]);
+        int toNode = Integer.parseInt(aLine[GFA_TO_NODE]);
+        if (sequencesMap.containsKey(key)) {
+            Rib rib = sequencesMap.get(key);
+            int[] edges = Arrays.copyOf(rib.getConnectedEdges(), rib.getConnectedEdges().length + 1);
+            edges[edges.length - 1] = toNode;
+            rib.setConnectedEdges(edges);
+            sequencesMap.put(key, rib);
+        } else {
+            //this should not happen.
         }
     }
 }
