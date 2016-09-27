@@ -12,6 +12,7 @@ public class Rib {
     private short referenceGenomeId; //CRD attribute in the GFA file
     private Integer referenceGenomeCoordinates; //START attribute in the GFA file
     private int[] connectedEdges = new int[1];
+    
 //    private List<String> crdctg; //unknown what to use for. Not yet implemented
 //    private List<String> ctg; //unknown what to use for. Not yet implemented
     

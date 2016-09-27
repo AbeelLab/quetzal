@@ -13,12 +13,14 @@ import org.slf4j.LoggerFactory;
 import javafx.collections.MapChangeListener;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.Pane;
 import nl.defsoftware.mrgb.services.GraphService;
 import nl.defsoftware.mrgb.view.GraphScrollPane;
 import nl.defsoftware.mrgb.view.models.GraphModel;
+import nl.defsoftware.mrgb.view.models.RibbonGraphModel;
 import nl.defsoftware.mrgb.view.models.Sequence;
 
 /**
@@ -37,7 +39,7 @@ public class GraphController extends Group implements Initializable, MapChangeLi
     
     private GraphHandler graphHandler;
 
-    private GraphModel model;
+    private RibbonGraphModel model;
 
     private Group groupedNodes;
 
@@ -66,7 +68,7 @@ public class GraphController extends Group implements Initializable, MapChangeLi
         graphService = new GraphService();
         graphHandler = new GraphHandler();
         
-        model = new GraphModel();
+        model = new RibbonGraphModel();
         groupedNodes = new Group();
         cellLayer = new CellLayer();
 
@@ -139,16 +141,16 @@ public class GraphController extends Group implements Initializable, MapChangeLi
         getCellLayer().getChildren().removeAll(model.getRemovedEdges());
 
         // enable dragging of cells
-        for (Sequence sequence : model.getAddedSequences()) {
-            mouseGestures.makeDraggable(sequence);
+        for (Node node : model.getAddedSequences()) {
+            mouseGestures.makeDraggable(node);
         }
 
         // every cell must have a parent, if it doesn't, then the graphParent is
         // the parent
-        getModel().attachOrphansToGraphParent(model.getAddedSequences());
-
-        // remove reference to graphParent
-        getModel().disconnectFromGraphParent(model.getRemovedSequences());
+//        getModel().attachOrphansToGraphParent(model.getAddedSequences());
+//
+//        // remove reference to graphParent
+//        getModel().disconnectFromGraphParent(model.getRemovedSequences());
 
         // merge added & removed cells with all cells
         getModel().merge();

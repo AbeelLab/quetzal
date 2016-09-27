@@ -4,7 +4,6 @@
 package nl.defsoftware.mrgb.view.controllers;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.view.models.GraphModel;
+import nl.defsoftware.mrgb.view.models.RibbonGraphModel;
 import nl.defsoftware.mrgb.view.models.Sequence;
 
 /**
@@ -33,7 +33,10 @@ public class GraphHandler {
     private static final int VER_NODE_BASELINE = 200;
 
     
-    public void setAlternateGraphViewModel(GraphModel model, Int2ObjectOpenHashMap<Rib> graphMap) {
+    public void setAlternateGraphViewModel(RibbonGraphModel model, Int2ObjectOpenHashMap<Rib> graphMap) {
+        model.addRibbon(1, 100, 100);
+        model.addRibbon(1, 200, 200);
+        
     }
     
     /**

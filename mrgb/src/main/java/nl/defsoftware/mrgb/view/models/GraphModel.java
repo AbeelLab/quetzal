@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.scene.shape.Shape;
+
 /**
  *
  *
@@ -18,9 +20,9 @@ public class GraphModel {
 
 	Sequence graphParent;
 
-	List<Sequence> allSequences;
-	List<Sequence> addedSequences;
-	List<Sequence> removedSequences;
+	List<Shape> allSequences;
+	List<Shape> addedSequences;
+	List<Shape> removedSequences;
 
 	List<Edge> allEdges;
 	List<Edge> addedEdges;
@@ -53,15 +55,15 @@ public class GraphModel {
 		addedEdges.clear();
 	}
 
-	public List<Sequence> getAddedSequences() {
+	public List<Shape> getAddedSequences() {
 		return addedSequences;
 	}
 
-	public List<Sequence> getRemovedSequences() {
+	public List<Shape> getRemovedSequences() {
 		return removedSequences;
 	}
 
-	public List<Sequence> getAllSequences() {
+	public List<Shape> getAllSequences() {
 		return allSequences;
 	}
 
