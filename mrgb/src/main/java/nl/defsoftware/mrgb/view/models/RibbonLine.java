@@ -1,9 +1,7 @@
 package nl.defsoftware.mrgb.view.models;
 
-import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.StrokeLineCap;
-import javafx.scene.shape.StrokeType;
 
 /**
  * 
@@ -18,11 +16,12 @@ public class RibbonLine extends Line {
     public RibbonLine(Integer id) {
         this.id = id;
         
-        setStrokeLineCap(StrokeLineCap.BUTT);
-        setStrokeWidth(5.0);
-        setStroke(Color.valueOf("black"));
-        setStrokeType(StrokeType.CENTERED);
-        setFill(Color.valueOf("black"));
+        setStrokeWidth(3.0);
+        setFill(Paint.valueOf("BLACK"));
+        setStartX(0);
+        setStartY(0);
+        setEndX(0);
+        setEndY(25);
     }
     
     

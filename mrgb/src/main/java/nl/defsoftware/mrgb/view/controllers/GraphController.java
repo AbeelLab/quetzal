@@ -37,8 +37,6 @@ public class GraphController extends Group implements Initializable, MapChangeLi
 
     private GraphService graphService;
     
-    private GraphHandler graphHandler;
-
     private RibbonGraphModel model;
 
     private Group groupedNodes;
@@ -66,7 +64,6 @@ public class GraphController extends Group implements Initializable, MapChangeLi
 //        }
         
         graphService = new GraphService();
-        graphHandler = new GraphHandler();
         
         model = new RibbonGraphModel();
         groupedNodes = new Group();
@@ -100,7 +97,8 @@ public class GraphController extends Group implements Initializable, MapChangeLi
                 log.info("LOAD DATA AND PARSE");
             } else if (ActionStateEnums.VIEW_GRAPH == change.getKey()) {
                 beginUpdate();
-                graphHandler.setAlternateGraphViewModel(model, graphService.getSequences());
+//                graphService.loadSequenceModel(model, semanticView);
+                graphService.loadSequenceModel(model);
                 endUpdate();
                 log.info("VIEW GRAPH");
             }

@@ -1,12 +1,5 @@
 package nl.defsoftware.mrgb.view.models;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javafx.scene.shape.Shape;
-
 /**
  * @author D.L. Ettema
  * @date: 27 September 2016
@@ -23,14 +16,24 @@ public class RibbonGraphModel extends GraphModel {
 //        graphParentNode = new Ribbon(new Integer(0));
     }
     
-    public RibbonCurve addRibbon(Integer id, int x, int y) {
-        RibbonCurve ribbon = new RibbonCurve(id, true);
+    @Override
+    public void addSequence(Integer id, int x, int y) {
+        RibbonCurve ribbon = new RibbonCurve(id, false);
         ribbon.relocate(x, y);
-        addRibbon(ribbon, x);
-        return ribbon;
+        super.addedSequences.add(ribbon);
+        RibbonCurve ribbon2 = new RibbonCurve(id, true);
+        ribbon2.relocate(x+100, y+100);
+        super.addedSequences.add(ribbon2);
+        RibbonLine ribbonLine = new RibbonLine(id);
+        ribbonLine.relocate(x-100, y-100);
+        super.addedSequences.add(ribbonLine);
     }
     
-    private void addRibbon(RibbonCurve ribbon, int xCoord) {
-        addedSequences.add(ribbon);
+    @Override
+    public void addEdge(Integer startx, Integer toId) {
+//        RibbonLine ribbonLine = new RibbonLine(fromId);
+//        ribbonLine.setStartX(value);
+//        ribbonLine.relocate(, y-100);
+//        super.addedEdges.add(ribbonLine);
     }
 }

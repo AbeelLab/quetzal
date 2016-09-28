@@ -79,11 +79,10 @@ public class GraphModel {
 		return allEdges;
 	}
 
-	public Sequence addSequence(Integer id, int x, int y) {
+	public void addSequence(Integer id, int x, int y) {
 		Sequence sequence = new Sequence(id);
 		sequence.relocate(x, y);
 		addSequence(sequence, x);
-		return sequence;
 	}
 	
 	/**

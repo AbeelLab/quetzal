@@ -8,6 +8,8 @@ import java.util.Map;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import nl.defsoftware.mrgb.models.Rib;
+import nl.defsoftware.mrgb.view.controllers.GraphHandler;
+import nl.defsoftware.mrgb.view.models.GraphModel;
 
 /**
  * A service that takes care of retrieving and storing graph data.
@@ -19,8 +21,10 @@ import nl.defsoftware.mrgb.models.Rib;
 public class GraphService {
 
     private FileParserService parserService = new FileParserServiceImpl();
+    private GraphHandler graphHandler;
     
     public GraphService() {
+        graphHandler = new GraphHandler();
     }
     
     public void loadDataAndParse() {
@@ -31,8 +35,8 @@ public class GraphService {
         return parserService.getParsedEdges();
     }
     
-    public Int2ObjectOpenHashMap<Rib> getSequences() {
-        return parserService.getParsedSequences();
+    public void loadSequenceModel(GraphModel model) {
+        graphHandler.setAlternateGraphViewModel(model, parserService.getParsedSequences(), parserService.getParsedGenomeNames());
     }
     
     public Short2ObjectOpenHashMap<String> getGenomeNames() {

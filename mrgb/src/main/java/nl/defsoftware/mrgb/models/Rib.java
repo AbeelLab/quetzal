@@ -1,22 +1,27 @@
 package nl.defsoftware.mrgb.models;
 
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+
 /**
  * @author D.L. Ettema
  *
  */
 public class Rib {
     
-    private Integer nodeId;
+    private int nodeId;
     private char[] sequence;
     private short[] genomeIds; //ORI attribute in the GFA file
     private short referenceGenomeId; //CRD attribute in the GFA file
     private Integer referenceGenomeCoordinates; //START attribute in the GFA file
     private int[] connectedEdges = new int[1];
+    private Int2IntOpenHashMap edgeWeights = new Int2IntOpenHashMap();
+    private int xCoordinate;
+    private int yCoordinate;
     
 //    private List<String> crdctg; //unknown what to use for. Not yet implemented
 //    private List<String> ctg; //unknown what to use for. Not yet implemented
     
-    public Rib(Integer nodeId, char[] sequence, short[] genomeIds, short referenceGenomeId,
+    public Rib(int nodeId, char[] sequence, short[] genomeIds, short referenceGenomeId,
             Integer referenceGenomeCoordinates) {
         this.nodeId = nodeId;
         this.sequence = sequence;
@@ -35,5 +40,70 @@ public class Rib {
 
     public int amountOfGenomes() {
         return genomeIds.length;
+    }
+
+    public void setCoordinates(int xCoord, int yCoord) {
+        xCoordinate = xCoord;
+        yCoordinate = yCoord;
+    }
+    
+    public short getRankedWeightOfEdge(int nodeId) {
+        return (short) Math.ceil((Math.random() * nodeId));
+    }
+
+    public int getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(int nodeId) {
+        this.nodeId = nodeId;
+    }
+
+    public char[] getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(char[] sequence) {
+        this.sequence = sequence;
+    }
+
+    public short[] getGenomeIds() {
+        return genomeIds;
+    }
+
+    public void setGenomeIds(short[] genomeIds) {
+        this.genomeIds = genomeIds;
+    }
+
+    public short getReferenceGenomeId() {
+        return referenceGenomeId;
+    }
+
+    public void setReferenceGenomeId(short referenceGenomeId) {
+        this.referenceGenomeId = referenceGenomeId;
+    }
+
+    public Integer getReferenceGenomeCoordinates() {
+        return referenceGenomeCoordinates;
+    }
+
+    public void setReferenceGenomeCoordinates(Integer referenceGenomeCoordinates) {
+        this.referenceGenomeCoordinates = referenceGenomeCoordinates;
+    }
+
+    public int getXCoordinate() {
+        return xCoordinate;
+    }
+
+    public void setXCoordinate(int xCoordinate) {
+        this.xCoordinate = xCoordinate;
+    }
+
+    public int getYCoordinate() {
+        return yCoordinate;
+    }
+
+    public void setYCoordinate(int yCoordinate) {
+        this.yCoordinate = yCoordinate;
     }
 }

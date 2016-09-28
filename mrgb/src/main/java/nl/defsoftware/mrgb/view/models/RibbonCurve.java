@@ -49,8 +49,8 @@ public class RibbonCurve extends CubicCurve {
             setRotate(0.0f);
         }
         setStrokeLineCap(StrokeLineCap.BUTT);
-        setStrokeWidth(5.0);
-        setStroke(Color.valueOf("black"));
+        setStrokeWidth(3.0);
+        setStroke(Color.valueOf("BLACK"));
         setStrokeType(StrokeType.CENTERED);
         setFill(Color.valueOf("ffffff00"));
     }
