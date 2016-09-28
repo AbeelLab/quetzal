@@ -156,4 +156,9 @@ public class GraphModel {
 		addedEdges.clear();
 		removedEdges.clear();
 	}
+
+    public void addEdge(int id, int startX, int startY, int endX, int endY, int rank) {
+        // TODO Auto-generated method stub
+        
+    }
 }

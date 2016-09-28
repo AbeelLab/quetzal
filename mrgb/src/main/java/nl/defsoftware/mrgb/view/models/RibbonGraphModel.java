@@ -30,10 +30,28 @@ public class RibbonGraphModel extends GraphModel {
     }
     
     @Override
-    public void addEdge(Integer startx, Integer toId) {
-//        RibbonLine ribbonLine = new RibbonLine(fromId);
-//        ribbonLine.setStartX(value);
-//        ribbonLine.relocate(, y-100);
-//        super.addedEdges.add(ribbonLine);
+    public void addEdge(int id, int startX, int startY, int endX, int endY, int rank) {
+        if (rank > 0) {
+            addRibbonCurve(1, startX, startY, true);
+            addRibbonLine(1, startX, startY, endX, endY);
+            addRibbonCurve(1, endX, endY, false);
+        } else {
+            addRibbonLine(1, startX, startY, endX, endY);
+        }
+    }
+    
+    private void addRibbonLine(int id, int startX, int startY, int endX, int endY) {
+        RibbonLine ribbonLine = new RibbonLine(id);
+        ribbonLine.setStartX(startX);
+        ribbonLine.setStartY(startY);
+        ribbonLine.setEndX(endX);
+        ribbonLine.setEndY(endY);
+        super.addedSequences.add(ribbonLine);
+    }
+    
+    private void addRibbonCurve(int id, int startX, int startY, boolean isOpeningCurve) {
+        RibbonCurve ribbon = new RibbonCurve(id, isOpeningCurve);
+        ribbon.relocate(startX, startY);
+        super.addedSequences.add(ribbon);
     }
 }

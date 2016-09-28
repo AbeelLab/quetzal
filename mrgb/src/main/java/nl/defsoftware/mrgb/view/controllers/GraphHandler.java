@@ -41,7 +41,7 @@ public class GraphHandler {
     
     private Int2ObjectOpenHashMap<int[]> edgeQueue = new Int2ObjectOpenHashMap<>();
     /* Keeps track of the X,Y  coordinates that have a node already in place. */
-    private int FIRST_NODE = 0;
+    private int FIRST_NODE = 1;
     
     
     public void setAlternateGraphViewModel(GraphModel model, Int2ObjectOpenHashMap<Rib> graphMap,
@@ -77,7 +77,7 @@ public class GraphHandler {
                     
                     //draw edge
                     //TODO: start here by providing means to the ribbongraphmodel to draw curves and lines
-//                    model.addEdge(sourceId, targetId);
+                    model.addEdge(aRib.getNodeId(), startX, startY, endX, endY, rank);
                     
                     //draw node
                     
