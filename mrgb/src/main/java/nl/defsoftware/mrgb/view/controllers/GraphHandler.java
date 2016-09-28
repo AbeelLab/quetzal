@@ -76,7 +76,7 @@ public class GraphHandler {
                     //TODO: postpone: probably add length of the edge, since we dont know how much sequence or nodes are in between
                     
                     //draw edge
-                    //TODO: start here by provinding means to the model to draw curves and lines
+                    //TODO: start here by providing means to the ribbongraphmodel to draw curves and lines
 //                    model.addEdge(sourceId, targetId);
                     
                     //draw node
