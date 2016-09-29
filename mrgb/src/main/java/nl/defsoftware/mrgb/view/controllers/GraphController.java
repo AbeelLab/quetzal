@@ -92,12 +92,12 @@ public class GraphController extends Group implements Initializable, MapChangeLi
         printMemoryUsage();
         if (change.getKey() instanceof ActionStateEnums) {
             if (ActionStateEnums.LOAD_DATA_AND_PARSE == change.getKey()) {
-                //@TODO make it in another thread.
+                //@TODO do this work in another thread.
                 graphService.loadDataAndParse();
                 log.info("LOAD DATA AND PARSE");
             } else if (ActionStateEnums.VIEW_GRAPH == change.getKey()) {
                 beginUpdate();
-//                graphService.loadSequenceModel(model, semanticView);
+//                graphService.loadSequenceModel(model, semanticView);//TODO
                 graphService.loadSequenceModel(model);
                 endUpdate();
                 log.info("VIEW GRAPH");
@@ -133,15 +133,16 @@ public class GraphController extends Group implements Initializable, MapChangeLi
         // add components to graph pane
         getCellLayer().getChildren().addAll(model.getAddedEdges());
         getCellLayer().getChildren().addAll(model.getAddedSequences());
+        getCellLayer().getChildren().addAll(model.getAllLabels());
 
         // remove components from graph pane
         getCellLayer().getChildren().removeAll(model.getRemovedSequences());
         getCellLayer().getChildren().removeAll(model.getRemovedEdges());
 
         // enable dragging of cells
-        for (Node node : model.getAddedSequences()) {
-            mouseGestures.makeDraggable(node);
-        }
+//        for (Node node : model.getAddedSequences()) {
+//            mouseGestures.makeDraggable(node);
+//        }
 
         // every cell must have a parent, if it doesn't, then the graphParent is
         // the parent

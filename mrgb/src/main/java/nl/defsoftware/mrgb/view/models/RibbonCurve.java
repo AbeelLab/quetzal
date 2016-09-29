@@ -12,7 +12,7 @@ import javafx.scene.shape.StrokeType;
  */
 public class RibbonCurve extends CubicCurve {
 
-    private static final float CURVE_SIZE = 25.0f;
+    private static final float CURVE_SIZE = 20.0f;
     private Integer id;
 
     public RibbonCurve(Integer id, boolean openingCurve) {
@@ -33,7 +33,7 @@ public class RibbonCurve extends CubicCurve {
 
             setEndX(CURVE_SIZE);
             setEndY(0.0f);
-            setRotate(0.0f);
+            setRotate(90.0f);
         } else {
             setStartX(0.0f);
             setStartY(0.0f);
@@ -46,13 +46,14 @@ public class RibbonCurve extends CubicCurve {
 
             setEndX(CURVE_SIZE);
             setEndY(CURVE_SIZE);
-            setRotate(0.0f);
+            setRotate(90.0f);
         }
         setStrokeLineCap(StrokeLineCap.BUTT);
         setStrokeWidth(3.0);
         setStroke(Color.valueOf("BLACK"));
         setStrokeType(StrokeType.CENTERED);
         setFill(Color.valueOf("ffffff00"));
+        setOpacity(0.5);
     }
 
     public Integer getRibbonId() {

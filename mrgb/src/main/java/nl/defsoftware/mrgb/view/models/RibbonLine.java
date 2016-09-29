@@ -21,7 +21,9 @@ public class RibbonLine extends Line {
         setStartX(0);
         setStartY(0);
         setEndX(0);
-        setEndY(25);
+        setEndY(23);
+        setOpacity(0.5);
+        setRotate(0.0);
     }
     
     

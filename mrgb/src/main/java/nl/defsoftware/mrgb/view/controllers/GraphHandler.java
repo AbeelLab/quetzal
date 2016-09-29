@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
+import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.view.models.GraphModel;
 import nl.defsoftware.mrgb.view.models.Sequence;
@@ -30,68 +31,110 @@ public class GraphHandler {
     private static final Logger log = LoggerFactory.getLogger(GraphHandler.class);
 
     private static final int HOR_NODE_SPACING = 20;
-    private static final int VER_NODE_SPACING = 20;
+    private static final int VER_NODE_SPACING = 25;
     private static final int VER_NODE_BASELINE = 200;
-    
+
     private static final int BACKBONE_X_BASELINE = 200;
     private static final int BACKBONE_Y_BASELINE = 200;
-    
-    
+
     private Int2ObjectOpenHashMap<Rib> graphMap = new Int2ObjectOpenHashMap<>();
-    
+
     private Int2ObjectOpenHashMap<int[]> edgeQueue = new Int2ObjectOpenHashMap<>();
-    /* Keeps track of the X,Y  coordinates that have a node already in place. */
+    /* Keeps track of the X,Y coordinates that have a node already in place. */
     private int FIRST_NODE = 1;
-    
-    
+
+    /**
+     * This will fill the graph based on the graphmap.
+     * 
+     * 
+     * @param model
+     * @param graphMap
+     * @param genomeNamesMap
+     */
     public void setAlternateGraphViewModel(GraphModel model, Int2ObjectOpenHashMap<Rib> graphMap,
             Short2ObjectOpenHashMap<String> genomeNamesMap) {
-        
+
         Rib firstRib = graphMap.get(FIRST_NODE);
-        log.info("Rib({}) has {} edges", firstRib.getNodeId(), firstRib.getConnectedEdges().length);
-        addEdgesToQueue(FIRST_NODE, firstRib.getConnectedEdges());
-        firstRib.setCoordinates(BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE);
-        model.addSequence(FIRST_NODE, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE);
+//        log.info("Rib({}) has {} edges", firstRib.getNodeId(), firstRib.getConnectedEdges().length);
+        addEdgesToQueue(firstRib.getNodeId(), firstRib.getConnectedEdges());
+        drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0);
+        
         int XCursor = BACKBONE_X_BASELINE;
         int YCursor = BACKBONE_Y_BASELINE;
-        
-        //this algorithm goes thru the nodes in the graphmap in topological order.
-        //stores the edges in map to draw in a backward order so we know how to draw in respect of the many parallel paths.
-       
-        for (int i = 1; i < graphMap.size(); i++) {
+
+        // this algorithm goes thru the nodes in the graphmap in topological order.
+        // stores the edges in map to draw in a backward order so we know how to
+        // draw in respect of the many parallel paths.
+
+        for (int i = (FIRST_NODE + 1); i < graphMap.size(); i++) {
             Rib aRib = graphMap.get(i);
-            log.info("Rib({}) has {} edges", aRib.getNodeId(), aRib.getConnectedEdges().length);
+            // log.info("Rib({}) has {} edges", aRib.getNodeId(),
+            // aRib.getConnectedEdges().length);
             addEdgesToQueue(aRib.getNodeId(), aRib.getConnectedEdges());
-            if (edgeQueue.containsKey(aRib.getNodeId())) {
-                int[] parentNodes = edgeQueue.get(aRib.getNodeId());
-                for (int j = 0; j < parentNodes.length; j++) {
-                    Rib parentRib = graphMap.get(parentNodes[j]);
-                    short rank = parentRib.getRankedWeightOfEdge(aRib.getNodeId());//the ranked weight
-                    //find parent x and y coordinates
-                    int startX = parentRib.getXCoordinate();
-                    int startY = parentRib.getYCoordinate();
-                    int endX = rank * HOR_NODE_SPACING;
-                    int endY = VER_NODE_SPACING;
-                    
-                    //TODO: postpone: probably add length of the edge, since we dont know how much sequence or nodes are in between
-                    
-                    //draw edge
-                    //TODO: start here by providing means to the ribbongraphmodel to draw curves and lines
-                    model.addEdge(aRib.getNodeId(), startX, startY, endX, endY, rank);
-                    
-                    //draw node
-                    
-                }
-                //find weight of each edge.
-                //find the parent node x and y coords
-                //draw edges
-                //draw node on the axis of the heaviest edge
-            } else {
-                //contains a node with no parent which means it is a strain that starts at this position.
-                //TODO: not yet implemented
-            }
+            drawEdgesToParents(model, graphMap, aRib);
         }
 
+    }
+
+    private void drawSequence(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
+        int xCoordinate = parentXCoordinate + (rank * HOR_NODE_SPACING);
+        int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
+        aRib.setCoordinates(xCoordinate, yCoordinate);
+        model.addSequence(aRib.getNodeId(), xCoordinate, yCoordinate);
+        model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate+10, yCoordinate);
+    }
+
+    /**
+     * This method will determine any parent nodes previously stored in the
+     * 'addEdgesToQueue' in a previous iteration and draw these edges with
+     * respect to the location of the parent node and current node
+     * 
+     * @param model
+     *            the data model to be filled
+     * @param graphMap
+     *            map containing all the nodes in the graph
+     * @param aRib
+     *            current node
+     */
+    private void drawEdgesToParents(GraphModel model, Int2ObjectOpenHashMap<Rib> graphMap, Rib aRib) {
+        if (edgeQueue.containsKey(aRib.getNodeId())) {
+            int[] parentNodes = edgeQueue.get(aRib.getNodeId());
+            for (int j = 0; j < parentNodes.length; j++) {
+                Rib parentRib = graphMap.get(parentNodes[j]);
+                log.info("Parent ID({}) X={} and Y={}", parentRib.getNodeId(), parentRib.getXCoordinate(), parentRib.getYCoordinate());
+
+                short rank = parentRib.getRankedWeightOfEdge(aRib.getNodeId());// the ranked weight
+                
+                drawEdge(model, aRib, parentRib, rank);
+                drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
+            }
+            // find weight of each edge.
+            // find the parent node x and y coords
+            // draw edges
+            // draw node on the axis of the heaviest edge
+        } else {
+            log.info("Rib({}) has no parent edges, new parent", aRib.getNodeId());
+            // contains a node with no parent which means it is a strain that
+            // starts at this position.
+            // TODO: not yet implemented
+        }
+    }
+
+    private void drawEdge(GraphModel model, Rib aRib, Rib parentRib, short rank) {
+        // find parent x and y coordinates
+        int startX = parentRib.getXCoordinate();
+        int startY = parentRib.getYCoordinate();
+        
+        int endX = parentRib.getXCoordinate() + (rank * HOR_NODE_SPACING);
+        int endY = parentRib.getYCoordinate() + VER_NODE_SPACING;
+
+        // TODO: postpone: probably add length of the edge, since we
+        // dont know how much sequence or nodes are in between
+
+        // draw edge
+        // TODO: start here by providing means to the ribbongraphmodel
+        // to draw curves and lines
+        model.addEdge(aRib.getNodeId(), startX, startY, endX, endY, rank);
     }
 
     private void addEdgesToQueue(int fromId, int[] to) {
@@ -102,7 +145,7 @@ public class GraphHandler {
                 newFromEdges[newFromEdges.length - 1] = fromId;
                 edgeQueue.put(to[i], newFromEdges);
             } else {
-                edgeQueue.put(to[i], new int[]{fromId});
+                edgeQueue.put(to[i], new int[] { fromId });
             }
         }
     }

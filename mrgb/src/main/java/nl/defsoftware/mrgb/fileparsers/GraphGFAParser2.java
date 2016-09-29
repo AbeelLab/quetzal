@@ -91,7 +91,7 @@ public class GraphGFAParser2 implements FileParser {
     
     @Override
     public boolean isParsed() {
-        return edgesMap.size() > 0 && sequencesMap.size() > 0 && genomeNamesMap.size() > 0;
+        return sequencesMap.size() > 0 && genomeNamesMap.size() > 0;
     }
     
     @Override
@@ -107,8 +107,8 @@ public class GraphGFAParser2 implements FileParser {
         
         Scanner scanner = new Scanner(reader);
         Pattern pattern = Pattern.compile("\t");
-//        for (int i = 0; i < 1000 ; i++) { // for testing purposes
-        for (int i = 0; scanner.hasNextLine(); i++) {
+        for (int i = 0; i < 100 ; i++) { // for testing purposes
+//        for (int i = 0; scanner.hasNextLine(); i++) {
             String[] aLine = pattern.split(scanner.nextLine(), 0);
             if (StringUtils.equals(SEQUENCE, aLine[GFA_LINE_INDICATOR])) {
                 processSequence(aLine);

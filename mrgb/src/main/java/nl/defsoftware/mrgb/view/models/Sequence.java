@@ -30,7 +30,6 @@ public class Sequence extends Circle {
 	}
 	
 	public Sequence(Integer id, int xCoord, int yCoord) {
-//	    super(xCoord, yCoord, 5);
 	    this.id = id;
         this.edges = new ArrayList<Edge>();
         this.setFill(Color.BLACK);
