@@ -55,14 +55,16 @@ public class GraphHandler {
             Short2ObjectOpenHashMap<String> genomeNamesMap) {
 
         Rib firstRib = graphMap.get(FIRST_NODE);
-//        log.info("Rib({}) has {} edges", firstRib.getNodeId(), firstRib.getConnectedEdges().length);
+        // log.info("Rib({}) has {} edges", firstRib.getNodeId(),
+        // firstRib.getConnectedEdges().length);
         addEdgesToQueue(firstRib.getNodeId(), firstRib.getConnectedEdges());
         drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0);
-        
+
         int XCursor = BACKBONE_X_BASELINE;
         int YCursor = BACKBONE_Y_BASELINE;
 
-        // this algorithm goes thru the nodes in the graphmap in topological order.
+        // this algorithm goes thru the nodes in the graphmap in topological
+        // order.
         // stores the edges in map to draw in a backward order so we know how to
         // draw in respect of the many parallel paths.
 
@@ -71,17 +73,9 @@ public class GraphHandler {
             // log.info("Rib({}) has {} edges", aRib.getNodeId(),
             // aRib.getConnectedEdges().length);
             addEdgesToQueue(aRib.getNodeId(), aRib.getConnectedEdges());
-            drawEdgesToParents(model, graphMap, aRib);
+            drawEdgesAndNodesToParents(model, graphMap, aRib);
         }
 
-    }
-
-    private void drawSequence(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
-        int xCoordinate = parentXCoordinate + (rank * HOR_NODE_SPACING);
-        int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
-        aRib.setCoordinates(xCoordinate, yCoordinate);
-        model.addSequence(aRib.getNodeId(), xCoordinate, yCoordinate);
-        model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate+10, yCoordinate);
     }
 
     /**
@@ -96,15 +90,19 @@ public class GraphHandler {
      * @param aRib
      *            current node
      */
-    private void drawEdgesToParents(GraphModel model, Int2ObjectOpenHashMap<Rib> graphMap, Rib aRib) {
+    private void drawEdgesAndNodesToParents(GraphModel model, Int2ObjectOpenHashMap<Rib> graphMap, Rib aRib) {
         if (edgeQueue.containsKey(aRib.getNodeId())) {
             int[] parentNodes = edgeQueue.get(aRib.getNodeId());
-            for (int j = 0; j < parentNodes.length; j++) {
-                Rib parentRib = graphMap.get(parentNodes[j]);
-                log.info("Parent ID({}) X={} and Y={}", parentRib.getNodeId(), parentRib.getXCoordinate(), parentRib.getYCoordinate());
+            short [] matchingScore = determineEdgeRanking(aRib, parentNodes, graphMap);
+            for (int i = 0; i < parentNodes.length; i++) {
+                Rib parentRib = graphMap.get(parentNodes[i]);
+                log.info("Parent ID({}) X={} and Y={}", parentRib.getNodeId(), parentRib.getXCoordinate(),
+                        parentRib.getYCoordinate());
 
-                short rank = parentRib.getRankedWeightOfEdge(aRib.getNodeId());// the ranked weight
-                
+                short rank = parentRib.getRankedWeightOfEdge(aRib.getNodeId());// the
+                                                                               // ranked
+                                                                               // weight
+
                 drawEdge(model, aRib, parentRib, rank);
                 drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
             }
@@ -120,11 +118,54 @@ public class GraphHandler {
         }
     }
 
+    /**
+     * Ranking based on matching genome id's. 
+     * A rank number rank(p,c): determined by the number of genomes shared
+     * between a child node 'c' and a parent node 'p' ranked in relation to the
+     * other number of genomes shared between 'c' other parent nodes 'p' ' of
+     * that child node. A number 0 means it is equal to the backbone. A number
+     * higher then 0 means it is shifted from the backbone and should be placed
+     * in a high lane parallel to the backbone.
+     * 
+     * @param aRib
+     * @param parentNodes
+     * @param graphMap
+     * @return
+     */
+    private short[] determineEdgeRanking(Rib aRib, int[] parentNodes, Int2ObjectOpenHashMap<Rib> graphMap) {
+        short [] rankIndex = new short[parentNodes.length];
+        short matchingScore = 0;
+        short [] childGenomeIds = aRib.getGenomeIds();
+        
+        for (int i = 0; i < parentNodes.length; i++) {
+            Rib parentRib = graphMap.get(parentNodes[i]);
+            short[] parentGenomeIds = parentRib.getGenomeIds();
+            for (int j = 0; j < parentGenomeIds.length; j++) {
+                for (int k = 0; k < childGenomeIds.length; k++) {
+                    if (parentGenomeIds[j] == childGenomeIds[k]) matchingScore++;
+                }
+            }
+            rankIndex[i] = matchingScore;
+            matchingScore = 0;
+        }
+        
+        //TODO: continue with ranking the matchingscore
+        return rankIndex;
+    }
+
+    private void drawSequence(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
+        int xCoordinate = parentXCoordinate + (rank * HOR_NODE_SPACING);
+        int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
+        aRib.setCoordinates(xCoordinate, yCoordinate);
+        model.addSequence(aRib.getNodeId(), xCoordinate, yCoordinate);
+        model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10, yCoordinate);
+    }
+
     private void drawEdge(GraphModel model, Rib aRib, Rib parentRib, short rank) {
         // find parent x and y coordinates
         int startX = parentRib.getXCoordinate();
         int startY = parentRib.getYCoordinate();
-        
+
         int endX = parentRib.getXCoordinate() + (rank * HOR_NODE_SPACING);
         int endY = parentRib.getYCoordinate() + VER_NODE_SPACING;
 

@@ -27,11 +27,10 @@ public class RibbonGraphModel extends GraphModel {
     
     @Override
     public void addEdge(int id, int startX, int startY, int endX, int endY, int rank) {
-        if (rank > 0) {
-            addRibbonCurve(1, startX, startY, true);
+        if (rank == 0) { //backbone part
             addRibbonLine(1, startX, startY, 1);
         } else {
-            addRibbonLine(1, startX, startY, 1);
+            addRibbonCurve(1, startX, startY, true);
         }
     }
     
