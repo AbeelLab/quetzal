@@ -107,7 +107,7 @@ public class GraphHandler {
                 drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
                 drawEdge(model, aRib, parentRib, rank);
             } else {
-                //draw sequence on its main axis by taking the parent rib with which this node has the lowest rank.
+                //Draw the first occurrence of aRib on its main axis by aligning it up with the parent that has the highest rank with this aRib.
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     if (entry.getChildNodeId() == aRib.getNodeId()) {
@@ -115,9 +115,12 @@ public class GraphHandler {
                     }
                 }
                 
+                //draw all the edges to this aRib
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
-                    drawEdge(model, aRib, entry.getParentRib(), rank);
+                    if (entry.getChildNodeId() == aRib.getNodeId()) {
+                        drawEdge(model, aRib, entry.getParentRib(), rank);
+                    }
                 }
             }
             
