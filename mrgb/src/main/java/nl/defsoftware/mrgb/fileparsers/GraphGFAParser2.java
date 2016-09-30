@@ -204,7 +204,7 @@ public class GraphGFAParser2 implements FileParser {
             rib.setConnectedEdges(edges);
             sequencesMap.put(key, rib);
         } else {
-            //this should not happen.
+            log.info("ERROR: This should not happen: processEdgesToSequenceMaps()");//this should not happen.
         }
     }
 }

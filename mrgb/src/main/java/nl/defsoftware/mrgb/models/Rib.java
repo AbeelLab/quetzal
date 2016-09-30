@@ -13,7 +13,7 @@ public class Rib {
     private short[] genomeIds; //ORI attribute in the GFA file
     private short referenceGenomeId; //CRD attribute in the GFA file
     private Integer referenceGenomeCoordinates; //START attribute in the GFA file
-    private int[] connectedEdges = new int[1];
+    private int[] connectedEdges = new int[0];
     private Int2IntOpenHashMap edgeWeights = new Int2IntOpenHashMap();
     private int xCoordinate;
     private int yCoordinate;
