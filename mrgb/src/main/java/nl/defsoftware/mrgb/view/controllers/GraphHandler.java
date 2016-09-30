@@ -4,17 +4,19 @@
 package nl.defsoftware.mrgb.view.controllers;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
-import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.view.models.GraphModel;
 import nl.defsoftware.mrgb.view.models.Sequence;
@@ -60,8 +62,8 @@ public class GraphHandler {
         addEdgesToQueue(firstRib.getNodeId(), firstRib.getConnectedEdges());
         drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0);
 
-        int XCursor = BACKBONE_X_BASELINE;
-        int YCursor = BACKBONE_Y_BASELINE;
+//        int XCursor = BACKBONE_X_BASELINE;
+//        int YCursor = BACKBONE_Y_BASELINE;
 
         // this algorithm goes thru the nodes in the graphmap in topological
         // order.
@@ -93,23 +95,20 @@ public class GraphHandler {
     private void drawEdgesAndNodesToParents(GraphModel model, Int2ObjectOpenHashMap<Rib> graphMap, Rib aRib) {
         if (edgeQueue.containsKey(aRib.getNodeId())) {
             int[] parentNodes = edgeQueue.get(aRib.getNodeId());
-            short [] matchingScore = determineEdgeRanking(aRib, parentNodes, graphMap);
-            for (int i = 0; i < parentNodes.length; i++) {
-                Rib parentRib = graphMap.get(parentNodes[i]);
-                log.info("Parent ID({}) X={} and Y={}", parentRib.getNodeId(), parentRib.getXCoordinate(),
-                        parentRib.getYCoordinate());
-
-                short rank = parentRib.getRankedWeightOfEdge(aRib.getNodeId());// the
-                                                                               // ranked
-                                                                               // weight
-
-                drawEdge(model, aRib, parentRib, rank);
+            List<MatchingScoreEntry> matchingRanking = determineSortedEdgeRanking(aRib, parentNodes, graphMap);
+            if (matchingRanking.size() == 1) {//this aRib could have siblings pointing to the same parent
+                int rank = 0;
+                Rib parentRib = matchingRanking.get(rank).getParentRib();
                 drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
+                drawEdge(model, aRib, parentRib, rank);
+            } else {
+                Rib parentRib = matchingRanking.get(1).getParentRib();
+                drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), 0);
+                for (int rank = 0; rank < matchingRanking.size(); rank++) {
+                    drawEdge(model, aRib, parentRib, rank);
+                }
             }
-            // find weight of each edge.
-            // find the parent node x and y coords
-            // draw edges
-            // draw node on the axis of the heaviest edge
+            
         } else {
             log.info("Rib({}) has no parent edges, new parent", aRib.getNodeId());
             // contains a node with no parent which means it is a strain that
@@ -127,41 +126,42 @@ public class GraphHandler {
      * higher then 0 means it is shifted from the backbone and should be placed
      * in a high lane parallel to the backbone.
      * 
+     * REFACTOR to the use of streams
+     * 
      * @param aRib
      * @param parentNodes
      * @param graphMap
-     * @return
+     * @return List<MatchingScoreEntry>
      */
-    private short[] determineEdgeRanking(Rib aRib, int[] parentNodes, Int2ObjectOpenHashMap<Rib> graphMap) {
-        short [] rankIndex = new short[parentNodes.length];
+    private List<MatchingScoreEntry> determineSortedEdgeRanking(Rib aRib, int[] parentNodes, Int2ObjectOpenHashMap<Rib> graphMap) {
         short matchingScore = 0;
         short [] childGenomeIds = aRib.getGenomeIds();
+        List<MatchingScoreEntry> scoresList = new ArrayList<>();
         
         for (int i = 0; i < parentNodes.length; i++) {
             Rib parentRib = graphMap.get(parentNodes[i]);
             short[] parentGenomeIds = parentRib.getGenomeIds();
             for (int j = 0; j < parentGenomeIds.length; j++) {
                 for (int k = 0; k < childGenomeIds.length; k++) {
-                    if (parentGenomeIds[j] == childGenomeIds[k]) matchingScore++;
+                    if (parentGenomeIds[j] == childGenomeIds[k]) { matchingScore++; }
                 }
             }
-            rankIndex[i] = matchingScore;
+            scoresList.add(new MatchingScoreEntry(matchingScore, parentRib, aRib.getNodeId())) ;
             matchingScore = 0;
         }
-        
-        //TODO: continue with ranking the matchingscore
-        return rankIndex;
+        Collections.sort(scoresList); //.stream().sorted().collect(Collectors.toList());
+        return scoresList;
     }
 
     private void drawSequence(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
-        int xCoordinate = parentXCoordinate + (rank * HOR_NODE_SPACING);
+        int xCoordinate = parentXCoordinate + (HOR_NODE_SPACING * rank);
         int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
         aRib.setCoordinates(xCoordinate, yCoordinate);
         model.addSequence(aRib.getNodeId(), xCoordinate, yCoordinate);
         model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10, yCoordinate);
     }
 
-    private void drawEdge(GraphModel model, Rib aRib, Rib parentRib, short rank) {
+    private void drawEdge(GraphModel model, Rib aRib, Rib parentRib, int rank) {
         // find parent x and y coordinates
         int startX = parentRib.getXCoordinate();
         int startY = parentRib.getYCoordinate();
@@ -172,21 +172,18 @@ public class GraphHandler {
         // TODO: postpone: probably add length of the edge, since we
         // dont know how much sequence or nodes are in between
 
-        // draw edge
-        // TODO: start here by providing means to the ribbongraphmodel
-        // to draw curves and lines
         model.addEdge(aRib.getNodeId(), startX, startY, endX, endY, rank);
     }
 
-    private void addEdgesToQueue(int fromId, int[] to) {
-        for (int i = 0; i < to.length; i++) {
-            if (edgeQueue.containsKey(to[i])) {
-                int[] fromEdges = edgeQueue.get(to[i]);
+    private void addEdgesToQueue(int fromId, int[] toId) {
+        for (int i = 0; i < toId.length; i++) {
+            if (edgeQueue.containsKey(toId[i])) {
+                int[] fromEdges = edgeQueue.get(toId[i]);
                 int[] newFromEdges = Arrays.copyOf(fromEdges, fromEdges.length + 1);
                 newFromEdges[newFromEdges.length - 1] = fromId;
-                edgeQueue.put(to[i], newFromEdges);
+                edgeQueue.put(toId[i], newFromEdges);
             } else {
-                edgeQueue.put(to[i], new int[] { fromId });
+                edgeQueue.put(toId[i], new int[] { fromId });
             }
         }
     }
