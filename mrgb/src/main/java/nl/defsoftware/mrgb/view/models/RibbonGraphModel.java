@@ -28,21 +28,29 @@ public class RibbonGraphModel extends GraphModel {
     @Override
     public void addEdge(int id, int startX, int startY, int endX, int endY, int rank) {
         if (rank == 0) { //backbone part
-            addRibbonLine(1, startX, startY, 1);
+            addRibbonLine(1, startX, startY, determineLength(startY, endY));
         } else {
-            addRibbonCurve(1, startX, startY, rank, true);
+            addRibbonCurve(1, startX, startY, rank, isOpeningCurve(startX, endX));
         }
     }
+
+    private int determineLength(int startY, int endY) {
+        return endY - startY;
+    }
+
+    private boolean isOpeningCurve(int startX, int endX) {
+        return endX - startX > 0;
+    }
     
-    private void addRibbonLine(int id, float x, float y, float length) {
-        RibbonLine ribbonLine = new RibbonLine(id);
-        ribbonLine.relocate(x + 3, y + 5);//TODO remove manual radius of sequence node adjustment
+    private void addRibbonLine(int id, int startX, int startY, int length) {
+        RibbonLine ribbonLine = new RibbonLine(id, length);
+        ribbonLine.relocate(startX + 3, startY + 5);//TODO remove manual radius of sequence node adjustment
         super.addedSequences.add(ribbonLine);
     }
     
     private void addRibbonCurve(int id, int startX, int startY, int rank, boolean isOpeningCurve) {
-        RibbonCurve ribbon = new RibbonCurve(id, rank, isOpeningCurve);
-        ribbon.relocate(startX + 4, startY+5);
+        RibbonCurve ribbon = new RibbonCurve(id, rank, startX, startY, isOpeningCurve);
+//        ribbon.relocate(startX + 4, startY+5);
         super.addedSequences.add(ribbon);
     }
 }

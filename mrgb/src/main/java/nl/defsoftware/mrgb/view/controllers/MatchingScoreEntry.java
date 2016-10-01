@@ -9,11 +9,11 @@ import nl.defsoftware.mrgb.models.Rib;
  */
 public class MatchingScoreEntry implements Comparable<MatchingScoreEntry>{
     
-    private Short score;
+    private short score;
     private Rib parentRib;
     private int childNodeId;
     
-    public MatchingScoreEntry(Short score, Rib parentRib, int childNodeId) {
+    public MatchingScoreEntry(short score, Rib parentRib, int childNodeId) {
         this.score = score;
         this.parentRib = parentRib;
         this.childNodeId = childNodeId;
@@ -21,14 +21,14 @@ public class MatchingScoreEntry implements Comparable<MatchingScoreEntry>{
 
     @Override
     public int compareTo(MatchingScoreEntry o) {
-        return score.compareTo(o.getScore());
+        return Math.negateExact(Short.compare(score, o.getScore()));
     }
 
-    public Short getScore() {
+    public short getScore() {
         return score;
     }
 
-    public void setScore(Short score) {
+    public void setScore(short score) {
         this.score = score;
     }
 

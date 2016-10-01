@@ -5,9 +5,7 @@ package nl.defsoftware.mrgb.services;
 
 import java.util.Map;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
-import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.view.controllers.GraphHandler;
 import nl.defsoftware.mrgb.view.models.GraphModel;
 

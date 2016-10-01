@@ -8,25 +8,19 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
 import nl.defsoftware.mrgb.Constants;
 import nl.defsoftware.mrgb.models.Rib;
-import nl.defsoftware.mrgb.models.Sequence;
 
 /**
  * A parser that as a result delivers one data structure that contains the links, nodes, sequences and the strains.
@@ -107,7 +101,7 @@ public class GraphGFAParser2 implements FileParser {
         
         Scanner scanner = new Scanner(reader);
         Pattern pattern = Pattern.compile("\t");
-        for (int i = 0; i < 100 ; i++) { // for testing purposes
+        for (int i = 0; i < 2000 ; i++) { // for testing purposes
 //        for (int i = 0; scanner.hasNextLine(); i++) {
             String[] aLine = pattern.split(scanner.nextLine(), 0);
             if (StringUtils.equals(SEQUENCE, aLine[GFA_LINE_INDICATOR])) {

@@ -61,6 +61,7 @@ public class GraphModel {
 	    if (colour > 0) {
 	        label.setTextFill(Paint.valueOf("red"));
 	    }
+	    label.setStyle("font-size: 8px;");
 	    label.relocate(x, y);
 	    allLabels.add(label);
 	}

@@ -13,31 +13,37 @@ import javafx.scene.shape.StrokeType;
 public class RibbonCurve extends CubicCurve {
 
     private static final float CURVE_SIZE = 20.0f;
+    private static final float BASE = 0.0f;
     private Integer id;
 
-    public RibbonCurve(Integer id, int rank, boolean openingCurve) {
+    public RibbonCurve(Integer id, int rank, int startX, int startY, boolean openingCurve) {
         this.id = id;
-        setBasicShapeProperties(rank, openingCurve);
+        setBasicShapeProperties(rank, startX, startY, openingCurve);
     }
 
-    private void setBasicShapeProperties(int rank, boolean openingCurve) {
+    private void setBasicShapeProperties(int rank, int startX, int startY, boolean openingCurve) {
         rank--;
         if (openingCurve) {
-            setStartX(0.0f);
-            setStartY(CURVE_SIZE);
+            setStartX(CURVE_SIZE);
+            setStartY(BASE);
 
-            setControlX1(CURVE_SIZE);
-            setControlY1(CURVE_SIZE);
+            setEndX(BASE);
+            setEndY(CURVE_SIZE);
+            
+            setControlX1(BASE);
+            setControlY1(BASE);
 
-            setControlX2(0.0f);
-            setControlY2(Math.ceil(rank * -20.0));
+            setControlX2(CURVE_SIZE);
+            setControlY2(CURVE_SIZE);
 
-            setEndX(CURVE_SIZE);
-            setEndY(Math.ceil(rank * -20.0));
             setRotate(90.0f);
+            relocate(startX+4, startY+5);
         } else {
             setStartX(0.0f);
             setStartY(0.0f);
+
+            setEndX(CURVE_SIZE);
+            setEndY(CURVE_SIZE);
 
             setControlX1(CURVE_SIZE);
             setControlY1(0.0f);
@@ -45,9 +51,9 @@ public class RibbonCurve extends CubicCurve {
             setControlX2(0.0f);
             setControlY2(CURVE_SIZE);
 
-            setEndX(CURVE_SIZE);
-            setEndY(CURVE_SIZE);
             setRotate(90.0f);
+            relocate(startX+4, startY+5);
+            setTranslateX(-CURVE_SIZE);
         }
         setStrokeLineCap(StrokeLineCap.BUTT);
         setStrokeWidth(3.0);

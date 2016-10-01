@@ -96,30 +96,43 @@ public class GraphHandler {
         if (edgeQueue.containsKey(aRib.getNodeId())) {
             int[] parentNodes = edgeQueue.get(aRib.getNodeId());
             List<MatchingScoreEntry> matchedGenomeRanking = determineSortedEdgeRanking(aRib, parentNodes, graphMap);
-            if (aRib.getNodeId() == 4) {
-                MatchingScoreEntry entry = matchedGenomeRanking.get(0);
-                entry.getScore();
-            }
-            
+    //5-6 = 4
+    //5-7 = 5
+    //6-7 = 4
             if (matchedGenomeRanking.size() == 1) {
                 int rank = 0;
                 Rib parentRib = matchedGenomeRanking.get(rank).getParentRib();
                 drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
-                drawEdge(model, aRib, parentRib, rank);
+                drawEdge(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
             } else {
-                //Draw the first occurrence of aRib on its main axis by aligning it up with the parent that has the highest rank with this aRib.
+                //if the matching produces an equal score, they will end up on a different rank. We must determine the true rank based on:
+                //1. is a score equal to a score in a higher rank
+                //2. find the one with the highest node id closest to the aRib.nodeId and draw from those coordinates
+                
+//                int highestYCoord = determineHigestYCoordinateFromParents(matchedGenomeRanking);
+                int highestYCoord = 0;
+                int xCoord = 0;
+                int aRibRank = 0;
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
-                    if (entry.getChildNodeId() == aRib.getNodeId()) {
-                        drawSequence(model, aRib, entry.getParentRib().getXCoordinate(), entry.getParentRib().getYCoordinate(), rank);
+                    //Find the first occurrence of aRib on its main axis by aligning it up with the parent that has the highest rank with this aRib.
+                    if (entry.getChildNodeId() == aRib.getNodeId() && xCoord == 0) {
+                        xCoord = entry.getParentRib().getXCoordinate();
+                        aRibRank = rank;
+                    }
+                    
+                    //Find highest y coordinate from this child's parents so its drawn at an adequate Y distance.
+                    if (highestYCoord < entry.getParentRib().getYCoordinate()) {
+                        highestYCoord = entry.getParentRib().getYCoordinate();
                     }
                 }
+                drawSequence(model, aRib, xCoord, highestYCoord, aRibRank);
                 
                 //draw all the edges to this aRib
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     if (entry.getChildNodeId() == aRib.getNodeId()) {
-                        drawEdge(model, aRib, entry.getParentRib(), rank);
+                        drawEdge(model, aRib, entry.getParentRib().getXCoordinate(), entry.getParentRib().getYCoordinate(), rank);
                     }
                 }
             }
@@ -159,10 +172,10 @@ public class GraphHandler {
             int[] siblingIds = parentRib.getConnectedEdges();
             for (int j = 0; j < siblingIds.length; j++) {
                 Rib siblingRib = graphMap.get(siblingIds[j]);
-                calculateMatchingScore(scoresList, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
-                
+                if (siblingRib != null) {
+                    calculateMatchingScore(scoresList, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
+                }
             }
-//            calculateMatchingScore(scoresList, aRib.getNodeId(), aRib.getGenomeIds(), parentRib);
         }
         Collections.sort(scoresList);
         return scoresList;
@@ -185,21 +198,25 @@ public class GraphHandler {
         int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
         aRib.setCoordinates(xCoordinate, yCoordinate);
         model.addSequence(aRib.getNodeId(), xCoordinate, yCoordinate);
-//        model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10, yCoordinate, 0);
+        model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10, yCoordinate, 0);
     }
 
-    private void drawEdge(GraphModel model, Rib aRib, Rib parentRib, int rank) {
+    private void drawEdge(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
         // find parent x and y coordinates
-        int startX = parentRib.getXCoordinate();
-        int startY = parentRib.getYCoordinate();
+        int startX = parentXCoordinate;
+        int startY = parentYCoordinate;
 
-        int endX = parentRib.getXCoordinate() + HOR_NODE_SPACING;
-        int endY = parentRib.getYCoordinate() + VER_NODE_SPACING;
+        int endX = aRib.getXCoordinate();
+        int endY = aRib.getYCoordinate();
 
+        //we know the start and end location
+        //we know the size of the ribboncurve shape
+        //thus the ribboncurve should be able dynamically shaped accordingly.
+        
         model.addEdge(aRib.getNodeId(), startX, startY, endX, endY, rank);
-        if (rank > 0) {
-            model.addLabel(Integer.toString(aRib.getNodeId()).concat("-").concat(Integer.toString(parentRib.getNodeId())), startX + 10, startY, 2);
-        }
+//        if (rank > 0) {
+//            model.addLabel(Integer.toString(aRib.getNodeId()).concat("-").concat(Integer.toString(parentRib.getNodeId())), endX + 10, endY, 2);
+//        }
     }
 
     private void addEdgesToQueue(int fromId, int[] toId) {
