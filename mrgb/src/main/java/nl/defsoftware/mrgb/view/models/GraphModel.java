@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javafx.scene.control.Label;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 
 /**
@@ -55,8 +56,11 @@ public class GraphModel {
 		xCoordinateMap = new HashMap<Integer, List<Integer>>();
 	}
 
-	public void addLabel(String text, int x, int y) {
+	public void addLabel(String text, int x, int y, int colour) {
 	    Label label = new Label(text);
+	    if (colour > 0) {
+	        label.setTextFill(Paint.valueOf("red"));
+	    }
 	    label.relocate(x, y);
 	    allLabels.add(label);
 	}

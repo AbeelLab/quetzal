@@ -15,12 +15,13 @@ public class RibbonCurve extends CubicCurve {
     private static final float CURVE_SIZE = 20.0f;
     private Integer id;
 
-    public RibbonCurve(Integer id, boolean openingCurve) {
+    public RibbonCurve(Integer id, int rank, boolean openingCurve) {
         this.id = id;
-        setBasicShapeProperties(openingCurve);
+        setBasicShapeProperties(rank, openingCurve);
     }
 
-    private void setBasicShapeProperties(boolean openingCurve) {
+    private void setBasicShapeProperties(int rank, boolean openingCurve) {
+        rank--;
         if (openingCurve) {
             setStartX(0.0f);
             setStartY(CURVE_SIZE);
@@ -29,10 +30,10 @@ public class RibbonCurve extends CubicCurve {
             setControlY1(CURVE_SIZE);
 
             setControlX2(0.0f);
-            setControlY2(0.0f);
+            setControlY2(Math.ceil(rank * -20.0));
 
             setEndX(CURVE_SIZE);
-            setEndY(0.0f);
+            setEndY(Math.ceil(rank * -20.0));
             setRotate(90.0f);
         } else {
             setStartX(0.0f);

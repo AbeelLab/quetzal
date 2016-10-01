@@ -30,7 +30,7 @@ public class RibbonGraphModel extends GraphModel {
         if (rank == 0) { //backbone part
             addRibbonLine(1, startX, startY, 1);
         } else {
-            addRibbonCurve(1, startX, startY, true);
+            addRibbonCurve(1, startX, startY, rank, true);
         }
     }
     
@@ -40,8 +40,8 @@ public class RibbonGraphModel extends GraphModel {
         super.addedSequences.add(ribbonLine);
     }
     
-    private void addRibbonCurve(int id, int startX, int startY, boolean isOpeningCurve) {
-        RibbonCurve ribbon = new RibbonCurve(id, isOpeningCurve);
+    private void addRibbonCurve(int id, int startX, int startY, int rank, boolean isOpeningCurve) {
+        RibbonCurve ribbon = new RibbonCurve(id, rank, isOpeningCurve);
         ribbon.relocate(startX + 4, startY+5);
         super.addedSequences.add(ribbon);
     }

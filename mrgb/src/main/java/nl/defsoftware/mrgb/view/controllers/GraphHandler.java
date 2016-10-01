@@ -185,7 +185,7 @@ public class GraphHandler {
         int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
         aRib.setCoordinates(xCoordinate, yCoordinate);
         model.addSequence(aRib.getNodeId(), xCoordinate, yCoordinate);
-        model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10, yCoordinate);
+//        model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10, yCoordinate, 0);
     }
 
     private void drawEdge(GraphModel model, Rib aRib, Rib parentRib, int rank) {
@@ -193,13 +193,13 @@ public class GraphHandler {
         int startX = parentRib.getXCoordinate();
         int startY = parentRib.getYCoordinate();
 
-        int endX = parentRib.getXCoordinate() + (rank * HOR_NODE_SPACING);
+        int endX = parentRib.getXCoordinate() + HOR_NODE_SPACING;
         int endY = parentRib.getYCoordinate() + VER_NODE_SPACING;
 
-        // TODO: postpone: probably add length of the edge, since we
-        // dont know how much sequence or nodes are in between
-
         model.addEdge(aRib.getNodeId(), startX, startY, endX, endY, rank);
+        if (rank > 0) {
+            model.addLabel(Integer.toString(aRib.getNodeId()).concat("-").concat(Integer.toString(parentRib.getNodeId())), startX + 10, startY, 2);
+        }
     }
 
     private void addEdgesToQueue(int fromId, int[] toId) {
