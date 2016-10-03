@@ -11,19 +11,17 @@ import javafx.scene.shape.Line;
  */
 public class RibbonLine extends Line {
 
-    private Integer id;
     
-    public RibbonLine(Integer id, int length) {
-        this.id = id;
+    public RibbonLine(int length) {
         
         setEndY(length);
 
         setStrokeWidth(3.0);
         setFill(Paint.valueOf("BLACK"));
+        setOpacity(0.5);
         setStartX(0);
         setStartY(0);
         setEndX(0);
-        setOpacity(0.5);
         setRotate(0.0);
     }
     

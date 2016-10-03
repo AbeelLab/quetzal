@@ -135,6 +135,7 @@ public class GraphHandler {
                         drawEdge(model, aRib, entry.getParentRib().getXCoordinate(), entry.getParentRib().getYCoordinate(), rank);
                     }
                 }
+                matchedGenomeRanking = null;
             }
             
         } else {
@@ -198,7 +199,7 @@ public class GraphHandler {
         int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
         aRib.setCoordinates(xCoordinate, yCoordinate);
         model.addSequence(aRib.getNodeId(), xCoordinate, yCoordinate);
-        model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10, yCoordinate, 0);
+//        model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10, yCoordinate, 0);
     }
 
     private void drawEdge(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
