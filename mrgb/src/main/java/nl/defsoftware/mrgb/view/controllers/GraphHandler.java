@@ -38,6 +38,8 @@ public class GraphHandler {
 
     private static final int BACKBONE_X_BASELINE = 200;
     private static final int BACKBONE_Y_BASELINE = 200;
+    
+    private static final int Y_CORRECTION = 5;
 
     private Int2ObjectOpenHashMap<Rib> graphMap = new Int2ObjectOpenHashMap<>();
 
@@ -121,6 +123,8 @@ public class GraphHandler {
                         aRibRank = rank;
                     }
                     
+                    if (entry.getChildNodeId() == aRib.getNodeId()) {
+                    }
                     //Find highest y coordinate from this child's parents so its drawn at an adequate Y distance.
                     if (highestYCoord < entry.getParentRib().getYCoordinate()) {
                         highestYCoord = entry.getParentRib().getYCoordinate();
@@ -129,10 +133,12 @@ public class GraphHandler {
                 drawSequence(model, aRib, xCoord, highestYCoord, aRibRank);
                 
                 //draw all the edges to this aRib
+                int matched = 0;
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     if (entry.getChildNodeId() == aRib.getNodeId()) {
                         drawEdge(model, aRib, entry.getParentRib().getXCoordinate(), entry.getParentRib().getYCoordinate(), rank);
+                        matched++;
                     }
                 }
                 matchedGenomeRanking = null;
@@ -144,6 +150,13 @@ public class GraphHandler {
             // starts at this position.
             // TODO: not yet implemented
         }
+    }
+
+    private boolean matchingParentNodes(int[] parentNodes, MatchingScoreEntry entry) {
+        for (int nodeId : parentNodes) {
+            if (nodeId == entry.getParentRib().getNodeId()) { return true; }
+        }
+        return false;
     }
 
     /**
@@ -197,6 +210,8 @@ public class GraphHandler {
     private void drawSequence(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
         int xCoordinate = parentXCoordinate + (HOR_NODE_SPACING * rank);
         int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
+        
+        
         aRib.setCoordinates(xCoordinate, yCoordinate);
         model.addSequence(aRib.getNodeId(), xCoordinate, yCoordinate);
 //        model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10, yCoordinate, 0);
@@ -205,15 +220,11 @@ public class GraphHandler {
     private void drawEdge(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
         // find parent x and y coordinates
         int startX = parentXCoordinate;
-        int startY = parentYCoordinate;
+        int startY = parentYCoordinate + Y_CORRECTION;
 
         int endX = aRib.getXCoordinate();
-        int endY = aRib.getYCoordinate();
+        int endY = aRib.getYCoordinate() + Y_CORRECTION;
 
-        //we know the start and end location
-        //we know the size of the ribboncurve shape
-        //thus the ribboncurve should be able dynamically shaped accordingly.
-        
         model.addEdge(aRib.getNodeId(), startX, startY, endX, endY, rank);
 //        if (rank > 0) {
 //            model.addLabel(Integer.toString(aRib.getNodeId()).concat("-").concat(Integer.toString(parentRib.getNodeId())), endX + 10, endY, 2);

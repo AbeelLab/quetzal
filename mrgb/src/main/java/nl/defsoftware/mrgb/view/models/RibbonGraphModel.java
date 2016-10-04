@@ -12,7 +12,7 @@ import javafx.scene.shape.Shape;
  */
 public class RibbonGraphModel extends GraphModel {
 
-    List<Shape> allEdges;
+    private List<Shape> allEdges;
     
     public RibbonGraphModel() {
         super();
@@ -29,9 +29,12 @@ public class RibbonGraphModel extends GraphModel {
     @Override
     public void addEdge(int id, int startX, int startY, int endX, int endY, int rank) {
         if (rank == 0) { //backbone part
-            addRibbonLine(1, startX, startY+5, determineLength(startY, endY));
+            RibbonLine ribbonLine = new RibbonLine(determineLength(startY, endY));
+            ribbonLine.relocate(startX, startY);
+            allEdges.add(ribbonLine);
         } else {
-            addRibbonCurve(1, startX, startY, rank, isOpeningCurve(startX, endX));
+            RibbonCurve ribbon = new RibbonCurve(rank, startX, startY, isOpeningCurve(startX, endX));
+            allEdges.add(ribbon);
         }
     }
 
@@ -56,16 +59,5 @@ public class RibbonGraphModel extends GraphModel {
 
     private boolean isOpeningCurve(int startX, int endX) {
         return endX - startX > 0;
-    }
-    
-    private void addRibbonLine(int id, int startX, int startY, int length) {
-        RibbonLine ribbonLine = new RibbonLine(length);
-        ribbonLine.relocate(startX, startY);//TODO remove manual radius of sequence node adjustment
-        allEdges.add(ribbonLine);
-    }
-    
-    private void addRibbonCurve(int id, int startX, int startY, int rank, boolean isOpeningCurve) {
-        RibbonCurve ribbon = new RibbonCurve(rank, startX, startY, isOpeningCurve);
-        allEdges.add(ribbon);
     }
 }

@@ -11,7 +11,7 @@ public class RibbonSequence extends Rectangle {
     
     
     public RibbonSequence() {
-        setWidth(5.0);
+        setWidth(3.0);
         setHeight(5.0);
         setFill(Paint.valueOf("DARKRED"));
         setOpacity(0.5);

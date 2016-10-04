@@ -15,16 +15,17 @@ public class RibbonCurve extends CubicCurve {
     private static final float CURVE_SIZE = 20.0f;
     private static final float NEG_CURVE_SIZE = -20.0f;
     private static final float BASE = 0.0f;
+    private static final float X_CORRECTION = 1.5f;
 
     public RibbonCurve(int rank, int startX, int startY, boolean openingCurve) {
+        relocate(startX + X_CORRECTION, startY);
         setBasicShapeProperties(rank, startX, startY, openingCurve);
     }
 
     private void setBasicShapeProperties(int rank, int startX, int startY, boolean openingCurve) {
         rank--;
-        float LENGTH_CURVE_SIZE = CURVE_SIZE + CURVE_SIZE * rank;
         
-        relocate(startX + 2, startY + 5);
+        float LENGTH_CURVE_SIZE = CURVE_SIZE + CURVE_SIZE * rank;
         
         if (openingCurve) {
             setStartX(CURVE_SIZE);
@@ -57,7 +58,6 @@ public class RibbonCurve extends CubicCurve {
             setControlY2(LENGTH_CURVE_SIZE);
             setTranslateY(-10.0f * rank);
             if (rank > 0) {
-//                rank--;
                 setTranslateX(-20.0f - (10.0f * rank));
             } else {
                 setTranslateX(NEG_CURVE_SIZE + (NEG_CURVE_SIZE*rank));
@@ -65,7 +65,7 @@ public class RibbonCurve extends CubicCurve {
             setRotate(90.0f);
         }
         setStrokeLineCap(StrokeLineCap.BUTT);
-        setStrokeWidth(3.0);
+        setStrokeWidth(3);
         setStroke(Color.valueOf("BLACK"));
         setStrokeType(StrokeType.CENTERED);
         setFill(Color.valueOf("ffffff00"));
