@@ -9,7 +9,7 @@ import javafx.scene.shape.Line;
  * @date 27 September 2016
  *
  */
-public class RibbonLine extends Line {
+public class RibbonLine extends Line implements ModelLine {
 
     
     public RibbonLine(int length) {
@@ -25,5 +25,8 @@ public class RibbonLine extends Line {
         setRotate(0.0);
     }
     
+    public double getLength() {
+        return getEndY();
+    }
     
 }

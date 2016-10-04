@@ -166,9 +166,9 @@ public class GraphModel {
 		return removedEdges;
 	}
 
-	public List<Edge> getAllEdges() {
-		return allEdges;
-	}
+//	public List<Edge> getAllEdges() {
+//		return allEdges;
+//	}
 
 	public List<Label> getAllLabels() {
 	    return allLabels;
