@@ -50,7 +50,6 @@ public class GraphHandler {
     /**
      * This will fill the graph based on the graphmap.
      * 
-     * 
      * @param model
      * @param graphMap
      * @param genomeNamesMap
@@ -59,33 +58,25 @@ public class GraphHandler {
             Short2ObjectOpenHashMap<String> genomeNamesMap) {
 
         Rib firstRib = graphMap.get(FIRST_NODE);
-        // log.info("Rib({}) has {} edges", firstRib.getNodeId(),
-        // firstRib.getConnectedEdges().length);
         addEdgesToQueue(firstRib.getNodeId(), firstRib.getConnectedEdges());
         drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0);
 
-//        int XCursor = BACKBONE_X_BASELINE;
-//        int YCursor = BACKBONE_Y_BASELINE;
-
-        // this algorithm goes thru the nodes in the graphmap in topological
-        // order.
-        // stores the edges in map to draw in a backward order so we know how to
-        // draw in respect of the many parallel paths.
-
         for (int i = (FIRST_NODE + 1); i < graphMap.size(); i++) {
             Rib aRib = graphMap.get(i);
-            // log.info("Rib({}) has {} edges", aRib.getNodeId(),
-            // aRib.getConnectedEdges().length);
             addEdgesToQueue(aRib.getNodeId(), aRib.getConnectedEdges());
             drawEdgesAndNodesToParents(model, graphMap, aRib);
         }
-
     }
 
     /**
      * This method will determine any parent nodes previously stored in the
      * 'addEdgesToQueue' in a previous iteration and draw these edges with
      * respect to the location of the parent node and current node
+     * 
+     * insertion:
+     * 5-6 = 4
+     * 5-7 = 5
+     * 6-7 = 4
      * 
      * @param model
      *            the data model to be filled
@@ -98,9 +89,7 @@ public class GraphHandler {
         if (edgeQueue.containsKey(aRib.getNodeId())) {
             int[] parentNodes = edgeQueue.get(aRib.getNodeId());
             List<MatchingScoreEntry> matchedGenomeRanking = determineSortedEdgeRanking(aRib, parentNodes, graphMap);
-    //5-6 = 4
-    //5-7 = 5
-    //6-7 = 4
+
             if (matchedGenomeRanking.size() == 1) {
                 int rank = 0;
                 Rib parentRib = matchedGenomeRanking.get(rank).getParentRib();
@@ -111,7 +100,6 @@ public class GraphHandler {
                 //1. is a score equal to a score in a higher rank
                 //2. find the one with the highest node id closest to the aRib.nodeId and draw from those coordinates
                 
-//                int highestYCoord = determineHigestYCoordinateFromParents(matchedGenomeRanking);
                 int highestYCoord = 0;
                 int xCoord = 0;
                 int aRibRank = 0;
@@ -123,8 +111,6 @@ public class GraphHandler {
                         aRibRank = rank;
                     }
                     
-                    if (entry.getChildNodeId() == aRib.getNodeId()) {
-                    }
                     //Find highest y coordinate from this child's parents so its drawn at an adequate Y distance.
                     if (highestYCoord < entry.getParentRib().getYCoordinate()) {
                         highestYCoord = entry.getParentRib().getYCoordinate();
@@ -137,7 +123,12 @@ public class GraphHandler {
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     if (entry.getChildNodeId() == aRib.getNodeId()) {
-                        drawEdge(model, aRib, entry.getParentRib().getXCoordinate(), entry.getParentRib().getYCoordinate(), rank);
+//                    if (matchingParentNodes(parentNodes, entry)) {
+                        drawEdge(model, 
+                                aRib, 
+                                entry.getParentRib().getXCoordinate(), 
+                                entry.getParentRib().getYCoordinate(), 
+                                rank);
                         matched++;
                     }
                 }
@@ -178,9 +169,6 @@ public class GraphHandler {
     private List<MatchingScoreEntry> determineSortedEdgeRanking(Rib aRib, int[] parentNodes, Int2ObjectOpenHashMap<Rib> graphMap) {
         List<MatchingScoreEntry> scoresList = new ArrayList<>();
         
-        //looking for multiple siblings sharing one parent
-        
-        //looking backwards for multiple parents
         for (int i = 0; i < parentNodes.length; i++) {
             Rib parentRib = graphMap.get(parentNodes[i]);
             int[] siblingIds = parentRib.getConnectedEdges();
@@ -218,7 +206,6 @@ public class GraphHandler {
     }
 
     private void drawEdge(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
-        // find parent x and y coordinates
         int startX = parentXCoordinate;
         int startY = parentYCoordinate + Y_CORRECTION;
 
