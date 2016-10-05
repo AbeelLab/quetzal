@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import nl.defsoftware.mrgb.Constants;
@@ -71,7 +72,7 @@ public class GraphGFAParser implements FileParser {
     }
     
     @Override
-    public Int2ObjectOpenHashMap<Rib> getParsedSequences() {
+    public Int2ObjectLinkedOpenHashMap<Rib> getParsedSequences() {
         return null; //not yet implemented
     }
     

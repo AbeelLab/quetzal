@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
@@ -53,8 +54,8 @@ public class GraphGFAParser2 implements FileParser {
     private static final int PREFIX_LENGTH = 2;
 
     private Map<Integer, int[]> edgesMap = new HashMap<>();
-//    private HashMap<Integer, Sequence> sequencesMap = new HashMap<>();
-    private Int2ObjectOpenHashMap<Rib> sequencesMap = new Int2ObjectOpenHashMap<>();
+//    private Int2ObjectOpenHashMap<Rib> sequencesMap = new Int2ObjectOpenHashMap<>();
+    private Int2ObjectLinkedOpenHashMap<Rib> sequencesMap = new Int2ObjectLinkedOpenHashMap<>();
     
     private Short2ObjectOpenHashMap<String> genomeNamesMap = new Short2ObjectOpenHashMap<>();
 
@@ -74,7 +75,7 @@ public class GraphGFAParser2 implements FileParser {
     }
     
     @Override
-    public Int2ObjectOpenHashMap<Rib> getParsedSequences() {
+    public Int2ObjectLinkedOpenHashMap<Rib> getParsedSequences() {
         return sequencesMap;
     }
 
@@ -101,17 +102,19 @@ public class GraphGFAParser2 implements FileParser {
         
         Scanner scanner = new Scanner(reader);
         Pattern pattern = Pattern.compile("\t");
-//        for (int i = 0; i < 200 ; i++) { // for testing purposes
-        for (int i = 0; scanner.hasNextLine(); i++) {
-            String[] aLine = pattern.split(scanner.nextLine(), 0);
-            if (StringUtils.equals(SEQUENCE, aLine[GFA_LINE_INDICATOR])) {
-                processSequence(aLine);
-            } else if (StringUtils.equals(LINK, aLine[GFA_LINE_INDICATOR])) {
-//                processEdges(aLine);
-                processEdgesToSequenceMaps(aLine);
-            } else if (StringUtils.equals(HEADER, aLine[GFA_LINE_INDICATOR])) {
-                processGenomeNames(aLine[GFA_GENOME_NAMES]);
-            }
+        for (int i = 0; i < 1000 ; i++) { // for testing purposes
+//        for (int i = 0; scanner.hasNextLine(); i++) {
+                String[] aLine = pattern.split(scanner.nextLine(), 0);
+//                if (i < 2 || i > 2800) {
+                if (StringUtils.equals(SEQUENCE, aLine[GFA_LINE_INDICATOR])) {
+                    processSequence(aLine);
+                } else if (StringUtils.equals(LINK, aLine[GFA_LINE_INDICATOR])) {
+    //                processEdges(aLine);
+                    processEdgesToSequenceMaps(aLine);
+                } else if (StringUtils.equals(HEADER, aLine[GFA_LINE_INDICATOR])) {
+                    processGenomeNames(aLine[GFA_GENOME_NAMES]);
+                }
+//            }
         }
         log.info("Finished parsing graph data");
         scanner.close();

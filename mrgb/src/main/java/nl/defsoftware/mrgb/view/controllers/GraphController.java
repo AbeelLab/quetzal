@@ -157,7 +157,7 @@ public class GraphController extends Group implements Initializable, MapChangeLi
         
         getCellLayer().getChildren().addAll(model.getAllEdges());
         getCellLayer().getChildren().addAll(model.getAddedSequences());
-//        getCellLayer().getChildren().addAll(model.getAllLabels());
+        getCellLayer().getChildren().addAll(model.getAllLabels());
 
         // remove components from graph pane
 //        getCellLayer().getChildren().removeAll(model.getRemovedSequences());
