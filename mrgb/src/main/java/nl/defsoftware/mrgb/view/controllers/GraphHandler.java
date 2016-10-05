@@ -88,7 +88,7 @@ public class GraphHandler {
     private void drawEdgesAndNodesToParents(GraphModel model, Int2ObjectOpenHashMap<Rib> graphMap, Rib aRib) {
         if (edgeQueue.containsKey(aRib.getNodeId())) {
             int[] parentNodes = edgeQueue.get(aRib.getNodeId());
-            List<MatchingScoreEntry> matchedGenomeRanking = determineSortedEdgeRanking(aRib, parentNodes, graphMap);
+            List<MatchingScoreEntry> matchedGenomeRanking = determineSortedNodeRanking(aRib, parentNodes, graphMap);
 
             if (matchedGenomeRanking.size() == 1) {
                 int rank = 0;
@@ -119,7 +119,7 @@ public class GraphHandler {
                 drawSequence(model, aRib, xCoord, highestYCoord, aRibRank);
                 
                 //draw all the edges to this aRib
-                int matched = 0;
+//                matchedGenomeRanking = determineSortedEdgeRanking(aRib, parentNodes, graphMap);
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     if (entry.getChildNodeId() == aRib.getNodeId()) {
@@ -129,7 +129,6 @@ public class GraphHandler {
                                 entry.getParentRib().getXCoordinate(), 
                                 entry.getParentRib().getYCoordinate(), 
                                 rank);
-                        matched++;
                     }
                 }
                 matchedGenomeRanking = null;
@@ -166,6 +165,23 @@ public class GraphHandler {
      * @param graphMap
      * @return List<MatchingScoreEntry>
      */
+    private List<MatchingScoreEntry> determineSortedNodeRanking(Rib aRib, int[] parentNodes, Int2ObjectOpenHashMap<Rib> graphMap) {
+        List<MatchingScoreEntry> scoresList = new ArrayList<>();
+        
+        for (int i = 0; i < parentNodes.length; i++) {
+            Rib parentRib = graphMap.get(parentNodes[i]);
+            int[] siblingIds = parentRib.getConnectedEdges();
+            for (int j = 0; j < siblingIds.length; j++) {
+                Rib siblingRib = graphMap.get(siblingIds[j]);
+                if (siblingRib != null) {
+                    calculateMatchingScore(scoresList, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
+                }
+            }
+        }
+        Collections.sort(scoresList);
+        return scoresList;
+    }
+    
     private List<MatchingScoreEntry> determineSortedEdgeRanking(Rib aRib, int[] parentNodes, Int2ObjectOpenHashMap<Rib> graphMap) {
         List<MatchingScoreEntry> scoresList = new ArrayList<>();
         
@@ -191,6 +207,7 @@ public class GraphHandler {
                 if (parentGenomeIds[j] == childGenomeIds[k]) { matchingScore++; }
             }
         }
+//        if (parentRib.getNodeId() == )
         scoresList.add(new MatchingScoreEntry(matchingScore, parentRib, childNodeId)) ;
         matchingScore = 0;
     }

@@ -17,17 +17,18 @@ public class RibbonCurve extends CubicCurve {
     private static final float BASE = 0.0f;
     private static final float X_CORRECTION = 1.5f;
 
-    public RibbonCurve(int rank, int startX, int startY, boolean openingCurve) {
+    public RibbonCurve(int rank, int startX, int startY, int endX, int endY, boolean openingCurve) {
         relocate(startX + X_CORRECTION, startY);
-        setBasicShapeProperties(rank, startX, startY, openingCurve);
+        setBasicShapeProperties(rank, startX, startY, endX, endY,openingCurve);
     }
 
-    private void setBasicShapeProperties(int rank, int startX, int startY, boolean openingCurve) {
+    private void setBasicShapeProperties(int rank, int startX, int startY, int endX, int endY, boolean openingCurve) {
         rank--;
         
         float LENGTH_CURVE_SIZE = CURVE_SIZE + CURVE_SIZE * rank;
         
         if (openingCurve) {
+            LENGTH_CURVE_SIZE = endX - startX;
             setStartX(CURVE_SIZE);
             setStartY(BASE);
 
@@ -45,6 +46,7 @@ public class RibbonCurve extends CubicCurve {
             setRotate(90.0f);
             
         } else {
+            LENGTH_CURVE_SIZE = startX - endX;
             setStartX(BASE);
             setStartY(BASE);
 

@@ -33,7 +33,7 @@ public class RibbonGraphModel extends GraphModel {
             ribbonLine.relocate(startX, startY);
             allEdges.add(ribbonLine);
         } else {
-            RibbonCurve ribbon = new RibbonCurve(rank, startX, startY, isOpeningCurve(startX, endX));
+            RibbonCurve ribbon = new RibbonCurve(rank, startX, startY, endX, endY, isOpeningCurve(startX, endX));
             allEdges.add(ribbon);
         }
     }

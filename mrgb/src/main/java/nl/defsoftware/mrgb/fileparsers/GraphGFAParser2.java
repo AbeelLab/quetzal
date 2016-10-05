@@ -101,8 +101,8 @@ public class GraphGFAParser2 implements FileParser {
         
         Scanner scanner = new Scanner(reader);
         Pattern pattern = Pattern.compile("\t");
-        for (int i = 0; i < 200 ; i++) { // for testing purposes
-//        for (int i = 0; scanner.hasNextLine(); i++) {
+//        for (int i = 0; i < 200 ; i++) { // for testing purposes
+        for (int i = 0; scanner.hasNextLine(); i++) {
             String[] aLine = pattern.split(scanner.nextLine(), 0);
             if (StringUtils.equals(SEQUENCE, aLine[GFA_LINE_INDICATOR])) {
                 processSequence(aLine);
