@@ -102,19 +102,16 @@ public class GraphGFAParser2 implements FileParser {
         
         Scanner scanner = new Scanner(reader);
         Pattern pattern = Pattern.compile("\t");
-        for (int i = 0; i < 1000 ; i++) { // for testing purposes
-//        for (int i = 0; scanner.hasNextLine(); i++) {
-                String[] aLine = pattern.split(scanner.nextLine(), 0);
-//                if (i < 2 || i > 2800) {
-                if (StringUtils.equals(SEQUENCE, aLine[GFA_LINE_INDICATOR])) {
-                    processSequence(aLine);
-                } else if (StringUtils.equals(LINK, aLine[GFA_LINE_INDICATOR])) {
-    //                processEdges(aLine);
-                    processEdgesToSequenceMaps(aLine);
-                } else if (StringUtils.equals(HEADER, aLine[GFA_LINE_INDICATOR])) {
-                    processGenomeNames(aLine[GFA_GENOME_NAMES]);
-                }
-//            }
+//        for (int i = 0; i < 1000 ; i++) { // for testing purposes
+        for (int i = 0; scanner.hasNextLine(); i++) {
+            String[] aLine = pattern.split(scanner.nextLine(), 0);
+            if (StringUtils.equals(SEQUENCE, aLine[GFA_LINE_INDICATOR])) {
+                processSequence(aLine);
+            } else if (StringUtils.equals(LINK, aLine[GFA_LINE_INDICATOR])) {
+                processEdgesToSequenceMaps(aLine);
+            } else if (StringUtils.equals(HEADER, aLine[GFA_LINE_INDICATOR])) {
+                processGenomeNames(aLine[GFA_GENOME_NAMES]);
+            }
         }
         log.info("Finished parsing graph data");
         scanner.close();

@@ -4,13 +4,8 @@
 package nl.defsoftware.mrgb.view.controllers;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,12 +37,18 @@ public class GraphHandler {
     
     private static final int Y_CORRECTION = 5;
 
-    private Int2ObjectOpenHashMap<Rib> graphMap = new Int2ObjectOpenHashMap<>();
-
+    private Int2ObjectLinkedOpenHashMap<Rib> graphMap = new Int2ObjectLinkedOpenHashMap<>();
+    private Short2ObjectOpenHashMap<String> genomeNamesMap = new Short2ObjectOpenHashMap<>();
+    
     private Int2ObjectOpenHashMap<int[]> edgeQueue = new Int2ObjectOpenHashMap<>();
     /* Keeps track of the X,Y coordinates that have a node already in place. */
     private int FIRST_NODE = 0;
 
+    public GraphHandler(Int2ObjectLinkedOpenHashMap<Rib> graphMap, Short2ObjectOpenHashMap<String> genomeNamesMap) {
+        this.graphMap = graphMap;
+        this.genomeNamesMap = genomeNamesMap;
+    }
+    
     /**
      * This will fill the graph based on the graphmap.
      * 
@@ -55,19 +56,20 @@ public class GraphHandler {
      * @param graphMap
      * @param genomeNamesMap
      */
-    public void setAlternateGraphViewModel(GraphModel model, Int2ObjectLinkedOpenHashMap<Rib> graphMap,
-            Short2ObjectOpenHashMap<String> genomeNamesMap) {
+    public void setAlternateGraphViewModel(GraphModel model) {
 
-        FIRST_NODE = graphMap.firstIntKey();
+//        FIRST_NODE = graphMap.firstIntKey();
+        FIRST_NODE = 344;
         Rib firstRib = graphMap.get(FIRST_NODE);
-                
-        addEdgesToQueue(firstRib.getNodeId(), firstRib.getConnectedEdges());
+        
+        
+        GraphHandlerUtil.addEdgesToQueue(edgeQueue, firstRib.getNodeId(), firstRib.getConnectedEdges());
         drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0);
 
-        for (int i = (FIRST_NODE + 1); i < graphMap.size(); i++) {
+        for (int i = (FIRST_NODE + 1); i < 500; i++) {
             Rib aRib = graphMap.get(i);
-            addEdgesToQueue(aRib.getNodeId(), aRib.getConnectedEdges());
-            drawEdgesAndNodesToParents(model, graphMap, aRib);
+            GraphHandlerUtil.addEdgesToQueue(edgeQueue, aRib.getNodeId(), aRib.getConnectedEdges());
+            drawEdgesAndNodesToParents(model, aRib);
         }
     }
 
@@ -88,10 +90,10 @@ public class GraphHandler {
      * @param aRib
      *            current node
      */
-    private void drawEdgesAndNodesToParents(GraphModel model, Int2ObjectLinkedOpenHashMap<Rib> graphMap, Rib aRib) {
+    private void drawEdgesAndNodesToParents(GraphModel model, Rib aRib) {
         if (edgeQueue.containsKey(aRib.getNodeId())) {
             int[] parentNodes = edgeQueue.get(aRib.getNodeId());
-            List<MatchingScoreEntry> matchedGenomeRanking = determineSortedNodeRanking(aRib, parentNodes, graphMap);
+            List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aRib, parentNodes, graphMap);
 
             if (matchedGenomeRanking.size() == 1) {
                 int rank = 0;
@@ -122,7 +124,7 @@ public class GraphHandler {
                 drawSequence(model, aRib, xCoord, highestYCoord, nodeRank);
                 
                 //draw all the edges to this aRib
-                matchedGenomeRanking = determineSortedEdgeRanking(aRib, parentNodes, graphMap);
+                matchedGenomeRanking = GraphHandlerUtil.determineSortedEdgeRanking(aRib, parentNodes, graphMap);
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     if (entry.getChildNodeId() == aRib.getNodeId()) {
@@ -145,82 +147,6 @@ public class GraphHandler {
         }
     }
 
-    private boolean matchingParentNodes(int[] parentNodes, MatchingScoreEntry entry) {
-        for (int nodeId : parentNodes) {
-            if (nodeId == entry.getParentRib().getNodeId()) { return true; }
-        }
-        return false;
-    }
-
-    /**
-     * Ranking based on matching genome id's. 
-     * A rank number rank(p,c): determined by the number of genomes shared
-     * between a child node 'c' and a parent node 'p' ranked in relation to the
-     * other number of genomes shared between 'c' other parent nodes 'p' ' of
-     * that child node. A number 0 means it is equal to the backbone. A number
-     * higher then 0 means it is shifted from the backbone and should be placed
-     * in a high lane parallel to the backbone.
-     * 
-     * REFACTOR to the use of streams
-     * 
-     * @param aRib
-     * @param parentNodes
-     * @param graphMap
-     * @return List<MatchingScoreEntry>
-     */
-    private List<MatchingScoreEntry> determineSortedNodeRanking(Rib aRib, int[] parentNodes, Int2ObjectLinkedOpenHashMap<Rib> graphMap) {
-        List<MatchingScoreEntry> scoring = new ArrayList<>();
-        
-        for (int i = 0; i < parentNodes.length; i++) {
-            Rib parentRib = graphMap.get(parentNodes[i]);
-            int[] siblingIds = parentRib.getConnectedEdges();
-            for (int j = 0; j < siblingIds.length; j++) {
-                Rib siblingRib = graphMap.get(siblingIds[j]);
-                if (siblingRib != null) {
-                    calculateMatchingScore(scoring, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
-                }
-            }
-        }
-        Collections.sort(scoring);
-        return scoring;
-    }
-    
-    private List<MatchingScoreEntry> determineSortedEdgeRanking(Rib aRib, int[] parentNodes, Int2ObjectLinkedOpenHashMap<Rib> graphMap) {
-        List<MatchingScoreEntry> scoring = new ArrayList<>();
-        
-        for (int i = 0; i < parentNodes.length; i++) {
-            Rib parentRib = graphMap.get(parentNodes[i]);
-            int[] siblingIds = parentRib.getConnectedEdges();
-            
-            for (int j = 0; j < siblingIds.length; j++) {
-                Rib siblingRib = graphMap.get(siblingIds[j]);
-                if (siblingRib != null && siblingIsNotAParentNode(siblingIds[j], parentNodes)) {
-                    calculateMatchingScore(scoring, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
-                }
-            }
-        }
-        Collections.sort(scoring);
-        return scoring;
-    }
-
-    private boolean siblingIsNotAParentNode(int siblingId, int[] parentNodes) {
-        for (int i = 0; i < parentNodes.length; i++) {
-            if (parentNodes[i] == siblingId) { return false; }
-        }
-        return true;
-    }
-
-    private void calculateMatchingScore(List<MatchingScoreEntry> scoresList, int childNodeId, short[] childGenomeIds, Rib parentRib) {
-        short matchingScore = 0;
-        short[] parentGenomeIds = parentRib.getGenomeIds();
-        for (int j = 0; j < parentGenomeIds.length; j++) {
-            for (int k = 0; k < childGenomeIds.length; k++) {
-                if (parentGenomeIds[j] == childGenomeIds[k]) { matchingScore++; }
-            }
-        }
-        scoresList.add(new MatchingScoreEntry(matchingScore, parentRib, childNodeId)) ;
-    }
-
     private void drawSequence(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
         int xCoordinate = parentXCoordinate + (HOR_NODE_SPACING * rank);
         int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
@@ -238,29 +164,7 @@ public class GraphHandler {
         int endY = aRib.getYCoordinate() + Y_CORRECTION;
 
         model.addEdge(aRib.getNodeId(), startX, startY, endX, endY, rank);
-        if (rank > 0) {
-            model.addLabel(Integer.toString(aRib.getNodeId()), endX + 10, endY, 2);
-        }
-    }
-
-    private void addEdgesToQueue(int fromId, int[] toId) {
-        for (int i = 0; i < toId.length; i++) {
-            if (edgeQueue.containsKey(toId[i])) {
-                int[] fromEdges = edgeQueue.get(toId[i]);
-                int[] newFromEdges = Arrays.copyOf(fromEdges, fromEdges.length + 1);
-                newFromEdges[newFromEdges.length - 1] = fromId;
-                edgeQueue.put(toId[i], newFromEdges);
-            } else {
-                edgeQueue.put(toId[i], new int[] { fromId });
-            }
-        }
-    }
-
-    private void detectBubble(Rib aRib) {
-        int[] connectedEdgeIds = aRib.getConnectedEdges();
-        for (int i = 0; i < connectedEdgeIds.length; i++) {
-            detectBubble(graphMap.get(connectedEdgeIds[i]));
-        }
+        model.addLabel(Integer.toString(aRib.getNodeId()), endX, endY, 2);
     }
 
     /**
