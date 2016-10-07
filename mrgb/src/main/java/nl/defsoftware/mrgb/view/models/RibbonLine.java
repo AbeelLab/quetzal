@@ -12,17 +12,30 @@ import javafx.scene.shape.Line;
 public class RibbonLine extends Line implements ModelLine {
 
     
-    public RibbonLine(int length) {
+    public RibbonLine(double xDelta, double yDelta) {
         
-        setEndY(length);
+        setEndX(xDelta);
+        setEndY(yDelta);
 
         setStrokeWidth(3.0);
         setFill(Paint.valueOf("BLACK"));
         setOpacity(0.5);
         setStartX(0);
         setStartY(0);
-        setEndX(0);
         setRotate(0.0);
+    }
+    
+    public RibbonLine(RibbonSequence from, RibbonSequence to) {
+        
+        setStrokeWidth(3.0);
+        setFill(Paint.valueOf("BLACK"));
+        setOpacity(0.5);
+        
+        startXProperty().bind(from.layoutXProperty().add(from.getBoundsInParent().getWidth() / 2.0));
+        startYProperty().bind(from.layoutYProperty().add(from.getBoundsInParent().getHeight() / 2.0));
+
+        endXProperty().bind(to.layoutXProperty().add( to.getBoundsInParent().getWidth() / 2.0));
+        endYProperty().bind(to.layoutYProperty().add( to.getBoundsInParent().getHeight() / 2.0));
     }
     
     public double getLength() {

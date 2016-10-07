@@ -48,6 +48,7 @@ public class GraphHandler {
         this.genomeNamesMap = genomeNamesMap;
     }
     
+    
     /**
      * This will fill the graph based on the graphmap.
      * 
@@ -57,15 +58,16 @@ public class GraphHandler {
      */
     public void setAlternateGraphViewModel(GraphModel model) {
 
-//        int sourceNode = graphMap.firstIntKey();
-        int sourceNode = 344;
+        int sourceNode = graphMap.firstIntKey();
+//        int sourceNode = 344;
         Rib firstRib = graphMap.get(sourceNode);
         
         
         GraphHandlerUtil.addEdgesToQueue(edgeQueue, firstRib.getNodeId(), firstRib.getConnectedEdges());
         drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0);
 
-        for (int i = (sourceNode + 1); i < 500; i++) {
+//        for (int i = (sourceNode + 1); i < 500; i++) { //testing purposes
+        for (int i = (sourceNode + 1); i < graphMap.size(); i++) {
             Rib aRib = graphMap.get(i);
             GraphHandlerUtil.addEdgesToQueue(edgeQueue, aRib.getNodeId(), aRib.getConnectedEdges());
             drawEdgesAndNodesToParents(model, aRib);
@@ -98,7 +100,8 @@ public class GraphHandler {
                 int rank = 0;
                 Rib parentRib = matchedGenomeRanking.get(rank).getParentRib();
                 drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
-                drawEdge(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
+//                drawEdge(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
+                drawEdge(model, aRib.getNodeId(), parentRib.getNodeId(), rank);
             } else {
                 //if the matching produces an equal score, they will end up on a different rank. We must determine the true rank based on:
                 //1. is a score equal to a score in a higher rank
@@ -127,12 +130,12 @@ public class GraphHandler {
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     if (entry.getChildNodeId() == aRib.getNodeId()) {
-//                    if (matchingParentNodes(parentNodes, entry)) {
-                        drawEdge(model, 
-                                aRib, 
-                                entry.getParentRib().getXCoordinate(), 
-                                entry.getParentRib().getYCoordinate(), 
-                                rank);
+                        drawEdge(model, aRib.getNodeId(), entry.getParentRib().getNodeId(), rank);
+//                        drawEdge(model, 
+//                                aRib, 
+//                                entry.getParentRib().getXCoordinate(), 
+//                                entry.getParentRib().getYCoordinate(), 
+//                                rank);
                     }
                 }
                 matchedGenomeRanking = null;
@@ -164,6 +167,10 @@ public class GraphHandler {
 
         model.addEdge(aRib.getNodeId(), startX, startY, endX, endY, rank);
         model.addLabel(Integer.toString(aRib.getNodeId()), endX, endY, 2);
+    }
+    
+    private void drawEdge(GraphModel model, int childRibId, int parentRibId, int rank) {
+        model.addEdge(childRibId, parentRibId, rank);
     }
 
     /**

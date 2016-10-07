@@ -73,7 +73,7 @@ public class GraphModel {
 
         addedEdges.add(edge);
     }
-
+	
 	public void addSequence(Integer id, int x, int y) {
         Sequence sequence = new Sequence(id);
         sequence.relocate(x, y);
@@ -140,6 +140,7 @@ public class GraphModel {
      * To be overwritten by subclasses
      */
     public void addEdge(int id, int startX, int startY, int endX, int endY, int rank) {}
+    public void addEdge(int childId, int parentId, int rank) {}
     
 	public void clearAddedLists() {
 		addedSequences.clear();
