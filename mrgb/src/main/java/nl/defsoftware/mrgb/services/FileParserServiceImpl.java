@@ -39,7 +39,7 @@ public class FileParserServiceImpl implements FileParserService {
     @Override
     public Map<Integer, int[]> getParsedEdges() {
         if (!graphGFAParser.isParsed()) {
-            loadGraphData();
+            this.loadGraphData();
         }
         return graphGFAParser.getParsedEdges();
     }
@@ -47,7 +47,7 @@ public class FileParserServiceImpl implements FileParserService {
     @Override
     public Int2ObjectLinkedOpenHashMap<Rib> getParsedSequences() {
         if (!graphGFAParser.isParsed()) {
-            loadGraphData();
+            this.loadGraphData();
         }
         return graphGFAParser.getParsedSequences();
     }
@@ -55,7 +55,7 @@ public class FileParserServiceImpl implements FileParserService {
     @Override
     public Short2ObjectOpenHashMap<String> getParsedGenomeNames() {
         if (!graphGFAParser.isParsed()) {
-            loadGraphData();
+            this.loadGraphData();
         }
         return graphGFAParser.getParsedGenomeNames();
     }

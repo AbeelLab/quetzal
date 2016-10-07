@@ -18,11 +18,11 @@ import nl.defsoftware.mrgb.view.models.GraphModel;
  */
 public class GraphService {
 
-    private FileParserService parserService = new FileParserServiceImpl();
+    private FileParserService parserService;
     private GraphHandler graphHandler;
     
     public GraphService() {
-        graphHandler = new GraphHandler();
+        parserService = new FileParserServiceImpl();
     }
     
     public void loadDataAndParse() {
@@ -34,7 +34,8 @@ public class GraphService {
     }
     
     public void loadSequenceModel(GraphModel model) {
-        graphHandler.setAlternateGraphViewModel(model, parserService.getParsedSequences(), parserService.getParsedGenomeNames());
+        graphHandler = new GraphHandler(parserService.getParsedSequences(), parserService.getParsedGenomeNames());
+        graphHandler.setAlternateGraphViewModel(model);
     }
     
     public Short2ObjectOpenHashMap<String> getGenomeNames() {

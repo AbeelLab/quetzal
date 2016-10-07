@@ -42,7 +42,6 @@ public class GraphHandler {
     
     private Int2ObjectOpenHashMap<int[]> edgeQueue = new Int2ObjectOpenHashMap<>();
     /* Keeps track of the X,Y coordinates that have a node already in place. */
-    private int FIRST_NODE = 0;
 
     public GraphHandler(Int2ObjectLinkedOpenHashMap<Rib> graphMap, Short2ObjectOpenHashMap<String> genomeNamesMap) {
         this.graphMap = graphMap;
@@ -58,15 +57,15 @@ public class GraphHandler {
      */
     public void setAlternateGraphViewModel(GraphModel model) {
 
-//        FIRST_NODE = graphMap.firstIntKey();
-        FIRST_NODE = 344;
-        Rib firstRib = graphMap.get(FIRST_NODE);
+//        int sourceNode = graphMap.firstIntKey();
+        int sourceNode = 344;
+        Rib firstRib = graphMap.get(sourceNode);
         
         
         GraphHandlerUtil.addEdgesToQueue(edgeQueue, firstRib.getNodeId(), firstRib.getConnectedEdges());
         drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0);
 
-        for (int i = (FIRST_NODE + 1); i < 500; i++) {
+        for (int i = (sourceNode + 1); i < 500; i++) {
             Rib aRib = graphMap.get(i);
             GraphHandlerUtil.addEdgesToQueue(edgeQueue, aRib.getNodeId(), aRib.getConnectedEdges());
             drawEdgesAndNodesToParents(model, aRib);
