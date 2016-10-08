@@ -57,7 +57,7 @@ public class GraphHandler {
      * @param graphMap
      * @param genomeNamesMap
      */
-    public void setAlternateGraphViewModel(GraphModel model) {
+    public void loadAlternateGraphViewModel(GraphModel model) {
 
         int sourceNode = graphMap.firstIntKey();
 //        int sourceNode = 344;

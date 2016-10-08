@@ -34,7 +34,7 @@ public class GraphService {
     
     public void loadSequenceModel(GraphModel model) {
         graphHandler = new GraphHandler(parserService.getParsedSequences(), parserService.getParsedGenomeNames());
-        graphHandler.setAlternateGraphViewModel(model);
+        graphHandler.loadAlternateGraphViewModel(model);
     }
     
     public Short2ObjectOpenHashMap<String> getGenomeNames() {
