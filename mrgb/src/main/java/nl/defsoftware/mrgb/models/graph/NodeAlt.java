@@ -11,7 +11,7 @@ import java.util.Arrays;
  * @author D.L. Ettema
  * @date: 22 May 2016
  */
-public class Node {
+public class NodeAlt {
 
 	/**
 	 * toEdges is an array of identifiers from this node. Accessory methods

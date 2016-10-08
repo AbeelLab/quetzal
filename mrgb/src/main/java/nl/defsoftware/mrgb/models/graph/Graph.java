@@ -1,49 +1,35 @@
 package nl.defsoftware.mrgb.models.graph;
 import java.util.Collection;
-
-import org.jgrapht.graph.DefaultDirectedWeightedGraph;
-import org.jgrapht.graph.DefaultWeightedEdge;
-
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import nl.defsoftware.mrgb.view.models.Sequence;
+import java.util.Set;
 
 /**
  * A graph with a collection of nodes. The nodes should be linked with each other to create the graph. This class is
- * only a container class for the nodes.
+ * 
+ * @author D.L. Ettema
  * 
  */
-public class Graph extends DefaultDirectedWeightedGraph<Sequence, DefaultWeightedEdge> {
+public class Graph {
 
-    protected Collection<aNode> nodes;
-    protected Sequence source;
-    protected Sequence sink;
+    private Collection<Node> nodes;
+    private Node source;
+    private Node sink;
+    private Set<Integer> genomeIds;
 
-    public Graph(Collection<aNode> nodes, Sequence source, Sequence sink) {
-    	super(DefaultWeightedEdge.class);
+    public Graph(Collection<Node> nodes, Node source, Node sink) {
         this.nodes = nodes;
         this.source = source;
         this.sink = sink;
     }
 
-    public Sequence getSink() {
+    public Node getSink() {
         return sink;
     }
 
-    public Sequence getSource() {
+    public Node getSource() {
         return source;
     }
 
-    public Collection<aNode> getNodeList() {
+    public Collection<Node> getNodeList() {
     	return nodes;
     }
-    
-    public class aNode extends Circle {
-    	
-    }
-    
-    public class anEdge extends Line {
-    	
-    }
-
 }

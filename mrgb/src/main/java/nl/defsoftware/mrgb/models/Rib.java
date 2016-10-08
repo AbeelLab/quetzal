@@ -1,26 +1,30 @@
 package nl.defsoftware.mrgb.models;
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import nl.defsoftware.mrgb.models.graph.AbstractNode;
+import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
  * @author D.L. Ettema
  *
  */
-public class Rib {
-    
+public class Rib extends AbstractNode implements Node {
+
     private int nodeId;
     private char[] sequence;
-    private short[] genomeIds; //ORI attribute in the GFA file
-    private short referenceGenomeId; //CRD attribute in the GFA file
-    private Integer referenceGenomeCoordinates; //START attribute in the GFA file
+    private short[] genomeIds; // ORI attribute in the GFA file
+    private short referenceGenomeId; // CRD attribute in the GFA file
+    private Integer referenceGenomeCoordinates; // START attribute in the GFA
+                                                // file
     private int[] connectedEdges = new int[0];
     private Int2IntOpenHashMap edgeWeights = new Int2IntOpenHashMap();
     private int xCoordinate;
     private int yCoordinate;
-    
-//    private List<String> crdctg; //unknown what to use for. Not yet implemented
-//    private List<String> ctg; //unknown what to use for. Not yet implemented
-    
+
+    // private List<String> crdctg; //unknown what to use for. Not yet
+    // implemented
+    // private List<String> ctg; //unknown what to use for. Not yet implemented
+
     public Rib(int nodeId, char[] sequence, short[] genomeIds, short referenceGenomeId,
             Integer referenceGenomeCoordinates) {
         this.nodeId = nodeId;
@@ -29,11 +33,11 @@ public class Rib {
         this.referenceGenomeId = referenceGenomeId;
         this.referenceGenomeCoordinates = referenceGenomeCoordinates;
     }
-    
+
     public void setConnectedEdges(int[] connectedEdges) {
         this.connectedEdges = connectedEdges;
     }
-    
+
     public int[] getConnectedEdges() {
         return connectedEdges;
     }
@@ -46,7 +50,7 @@ public class Rib {
         xCoordinate = xCoord;
         yCoordinate = yCoord;
     }
-    
+
     public short getRankedWeightOfEdge(int nodeId) {
         return (short) Math.ceil((Math.random() * nodeId));
     }

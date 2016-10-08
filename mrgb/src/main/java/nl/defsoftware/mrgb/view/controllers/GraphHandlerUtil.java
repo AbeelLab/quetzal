@@ -3,7 +3,12 @@ package nl.defsoftware.mrgb.view.controllers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -35,16 +40,13 @@ public class GraphHandlerUtil {
             Rib rib = graphMap.get(key);
             if (rib.getConnectedEdges().length > 1) {
                 short[] startIds = rib.getGenomeIds();
-                
+                Set<Short> startGenomeIds = new HashSet(Arrays.asList(ArrayUtils.toObject(startIds)));
                 
             }
         }
     }
     
-    private static void dynamic() {
-        //if (startIds == endIds) conclude Bubble and store start and end node ids
-        //else dynamic ( startids, node.getchildren array
-    }
+
 
     /**
      * An array is filled with node id's that may be used to visit these nodes
