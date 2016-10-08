@@ -1,7 +1,7 @@
 /**
  * 
  */
-package nl.defsoftware.mrgb.view.controllers;
+package nl.defsoftware.mrgb.services;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,6 +14,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import nl.defsoftware.mrgb.models.Rib;
+import nl.defsoftware.mrgb.view.controllers.MatchingScoreEntry;
 import nl.defsoftware.mrgb.view.models.GraphModel;
 import nl.defsoftware.mrgb.view.models.Sequence;
 

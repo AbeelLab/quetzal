@@ -1,4 +1,4 @@
-package nl.defsoftware.mrgb.view.controllers;
+package nl.defsoftware.mrgb.services;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import nl.defsoftware.mrgb.models.Rib;
+import nl.defsoftware.mrgb.view.controllers.MatchingScoreEntry;
 
 /**
  * A static util class for the graphhandler and its main methods.

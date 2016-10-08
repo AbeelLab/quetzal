@@ -1,4 +1,4 @@
-package nl.defsoftware.mrgb.view.controllers;
+package nl.defsoftware.mrgb.view.actions;
 
 /**
  * @author D.L. Ettema

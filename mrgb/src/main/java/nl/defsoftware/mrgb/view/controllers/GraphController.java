@@ -22,6 +22,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.services.GraphService;
 import nl.defsoftware.mrgb.view.GraphScrollPane;
+import nl.defsoftware.mrgb.view.actions.ActionStateEnums;
 import nl.defsoftware.mrgb.view.models.GraphModel;
 import nl.defsoftware.mrgb.view.models.ModelLine;
 import nl.defsoftware.mrgb.view.models.RibbonGraphModel;

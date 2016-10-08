@@ -15,7 +15,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.HBox;
-import nl.defsoftware.mrgb.view.models.ActionStates;
+import nl.defsoftware.mrgb.view.actions.ActionStateEnums;
+import nl.defsoftware.mrgb.view.actions.ActionStates;
 
 public class ToolBarController extends HBox implements Initializable {
 	private static final Logger log = LoggerFactory.getLogger(ToolBarController.class);

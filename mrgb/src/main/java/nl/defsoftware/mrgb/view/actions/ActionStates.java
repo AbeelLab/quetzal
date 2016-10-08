@@ -1,7 +1,7 @@
 /**
  * 
  */
-package nl.defsoftware.mrgb.view.models;
+package nl.defsoftware.mrgb.view.actions;
 
 import java.util.HashMap;
 import java.util.Map;
