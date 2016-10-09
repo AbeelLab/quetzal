@@ -133,14 +133,22 @@ public class GraphGFAParser2 implements FileParser {
     private void processSequence(String[] aLine) {
         Pattern pattern = Pattern.compile("(:|;)");
         for (int i = 0; i < aLine.length; i++) {
-            int fromNode = Integer.parseInt(aLine[GFA_FROM_NODE]);
-            Rib aSequence = new Rib(fromNode,
-                    aLine[GFA_SEQUENCE].toCharArray(), 
-                    extractGenomeNames(pattern.split(aLine[GFA_ORI])), 
-                    extractReferenceGenome(pattern.split(aLine[GFA_CRD])), 
-                    extractGenomeCoordinates(pattern.split(aLine[GFA_START])));
+            int fromNodeId = Integer.parseInt(aLine[GFA_FROM_NODE]);
+            Rib aSequence = getOrCreateRib(fromNodeId);
+            aSequence.setSequence(aLine[GFA_SEQUENCE].toCharArray());
+            aSequence.setGenomeIds(extractGenomeIds(pattern.split(aLine[GFA_ORI])));
+            aSequence.setReferenceGenomeId(extractReferenceGenome(pattern.split(aLine[GFA_CRD])));
+            aSequence.setReferenceGenomeCoordinates(extractGenomeCoordinates(pattern.split(aLine[GFA_START])));
                     
-            sequencesMap.put(fromNode, aSequence);
+            sequencesMap.put(fromNodeId, aSequence);
+        }
+    }
+
+    private Rib getOrCreateRib(int nodeId) {
+        if (sequencesMap.containsKey(nodeId)) {
+            return sequencesMap.get(nodeId);
+        } else {
+            return new Rib(nodeId);
         }
     }
 
@@ -149,15 +157,15 @@ public class GraphGFAParser2 implements FileParser {
      * @param oriString
      * @return Integer ID and the string name.
      */
-    private short[] extractGenomeNames(String[] aLine) {
+    private short[] extractGenomeIds(String[] aLine) {
         short[] genomeIds = new short[aLine.length - PREFIX_LENGTH];
         for (int i = PREFIX_LENGTH; i < aLine.length; i++) {
-            genomeIds[i - PREFIX_LENGTH] = getLabelIdForGenomeLabel(aLine[i]);
+            genomeIds[i - PREFIX_LENGTH] = getIdForGenomeLabel(aLine[i]);
         }
         return genomeIds;
     }
     
-    private short getLabelIdForGenomeLabel(String genomeLabel) {
+    private short getIdForGenomeLabel(String genomeLabel) {
         ShortSet keys = genomeNamesMap.keySet();
         for (short key : keys) {
             if (genomeNamesMap.get(key).equals(genomeLabel)) return key;
@@ -168,7 +176,7 @@ public class GraphGFAParser2 implements FileParser {
 
     private short extractReferenceGenome(String[] aLine) {
         int REFERENCE_NAME_POSITION = 2;
-        return getLabelIdForGenomeLabel(aLine[REFERENCE_NAME_POSITION]);
+        return getIdForGenomeLabel(aLine[REFERENCE_NAME_POSITION]);
     }
     
     private Integer extractGenomeCoordinates(String[] aLine) {
@@ -177,28 +185,33 @@ public class GraphGFAParser2 implements FileParser {
     }
 
     private void processEdges(String[] aLine) {
-        int key = Integer.parseInt(aLine[GFA_FROM_NODE]);
-        int toNode = Integer.parseInt(aLine[GFA_TO_NODE]);
-        if (edgesMap.containsKey(key)) {
-            int[] edges = Arrays.copyOf(edgesMap.get(key), edgesMap.get(key).length + 1);
-            edges[edges.length - 1] = toNode;
-            edgesMap.put(key, edges);
+        int fromNodeId = Integer.parseInt(aLine[GFA_FROM_NODE]);
+        int toNodeId = Integer.parseInt(aLine[GFA_TO_NODE]);
+        if (edgesMap.containsKey(fromNodeId)) {
+            int[] edges = Arrays.copyOf(edgesMap.get(fromNodeId), edgesMap.get(fromNodeId).length + 1);
+            edges[edges.length - 1] = toNodeId;
+            edgesMap.put(fromNodeId, edges);
         } else {
-            edgesMap.put(key, new int[] { toNode });
+            edgesMap.put(fromNodeId, new int[] { toNodeId });
         }
     }
     
     private void processEdgesToSequenceMaps(String[] aLine) {
-        int key = Integer.parseInt(aLine[GFA_FROM_NODE]);
-        int toNode = Integer.parseInt(aLine[GFA_TO_NODE]);
-        if (sequencesMap.containsKey(key)) {
-            Rib rib = sequencesMap.get(key);
-            int[] edges = Arrays.copyOf(rib.getConnectedEdges(), rib.getConnectedEdges().length + 1);
-            edges[edges.length - 1] = toNode;
-            rib.setConnectedEdges(edges);
-            sequencesMap.put(key, rib);
+        int fromNodeId = Integer.parseInt(aLine[GFA_FROM_NODE]);
+        int toNodeId = Integer.parseInt(aLine[GFA_TO_NODE]);
+        if (sequencesMap.containsKey(fromNodeId)) {
+            Rib parentRib = sequencesMap.get(fromNodeId);
+            int[] edges = Arrays.copyOf(parentRib.getConnectedEdges(), parentRib.getConnectedEdges().length + 1);
+            edges[edges.length - 1] = toNodeId;
+            parentRib.setConnectedEdges(edges);
+            
+            Rib childRib = getOrCreateRib(toNodeId);
+            parentRib.addOutEdge(childRib);
+            childRib.addInEdge(parentRib);
+            sequencesMap.put(toNodeId, childRib);
+            sequencesMap.put(fromNodeId, parentRib);
         } else {
-            log.info("ERROR: This should not happen: processEdgesToSequenceMaps()");//this should not happen.
+            log.error("This should not happen: processEdgesToSequenceMaps()");//this should not happen.
         }
     }
 }

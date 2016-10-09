@@ -34,6 +34,10 @@ public class Rib extends AbstractNode implements Node {
         this.referenceGenomeCoordinates = referenceGenomeCoordinates;
     }
 
+    public Rib(int NodeId) {
+        this.nodeId = NodeId;
+    }
+
     public void setConnectedEdges(int[] connectedEdges) {
         this.connectedEdges = connectedEdges;
     }
