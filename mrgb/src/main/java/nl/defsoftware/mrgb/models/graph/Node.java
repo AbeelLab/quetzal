@@ -8,6 +8,14 @@ import java.util.Collection;
  */
 public interface Node {
 
+    public int getNodeId();
+    
+    public boolean isComposite();
+    
+    public boolean isNotComposite();
+    
+    public NodeType getNodeType();
+    
     public void addOutEdge(Node node);
 
     public void addInEdge(Node node);

@@ -2,10 +2,14 @@ package nl.defsoftware.mrgb.view.models;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javafx.scene.shape.Shape;
+import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
  * @author D.L. Ettema
@@ -22,6 +26,37 @@ public class RibbonGraphModel extends GraphModel {
     public RibbonGraphModel() {
         super();
         this.clear();
+    }
+    
+    public void addSequence(Node aNode, Node parentNode, int rank) {
+        Set<Node> nodesToDraw = new HashSet<>();
+        switch (aNode.getNodeType()) {
+        case SINGLE_NODE:
+            
+            break;
+        case SNP_BUBBLE:
+//            nodesToDraw.addAll(aNode.getNodes(zoomlevel));
+            break;
+        case INDEL_BUBBLE:
+
+            break;
+        case ALLELE_BUBBLE:
+
+            break;
+        default:
+            break;
+        }
+        
+//        for (Node node : nodesToDraw) {
+//            int xCoordinate = parentNode.getXCoordinate() + (HOR_NODE_SPACING * rank);
+//            int yCoordinate = parentNode.getYCoordinate() + VER_NODE_SPACING;
+//            node.setCoordinates(xCoordinate, yCoordinate);
+//            
+//            RibbonSequence seq = new RibbonSequence();
+//            seq.relocate(xCoordinate, yCoordinate);
+//            sequenceMap.put(node.getNodeId(), seq);
+//            super.addedSequences.add(seq);
+//        }
     }
     
     @Override
@@ -47,10 +82,7 @@ public class RibbonGraphModel extends GraphModel {
     public void addEdge(int fromId, int toId, int rank) {
         RibbonSequence from = sequenceMap.get(fromId);
         RibbonSequence to = sequenceMap.get(toId);
-        
-        RibbonLine ribbonLine = new RibbonLine(from, to);
-//        ribbonLine.relocate(startX, startY);
-        allEdges.add(ribbonLine);
+        allEdges.add(new RibbonLine(from, to));
     }
 
     @Override

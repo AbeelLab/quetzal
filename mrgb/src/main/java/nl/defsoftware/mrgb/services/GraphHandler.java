@@ -35,21 +35,27 @@ public class GraphHandler {
 
     private static final int BACKBONE_X_BASELINE = 200;
     private static final int BACKBONE_Y_BASELINE = 200;
-    
+
     private static final int Y_CORRECTION = 5;
 
     private Int2ObjectLinkedOpenHashMap<Rib> graphMap = new Int2ObjectLinkedOpenHashMap<>();
     private Short2ObjectOpenHashMap<String> genomeNamesMap = new Short2ObjectOpenHashMap<>();
-    
+
     private Int2ObjectOpenHashMap<int[]> edgeQueue = new Int2ObjectOpenHashMap<>();
     /* Keeps track of the X,Y coordinates that have a node already in place. */
 
+    /**
+     * Given the two datastructures this Handler will input these into the model
+     * and the model will determine the layout
+     * 
+     * @param graphMap
+     * @param genomeNamesMap
+     */
     public GraphHandler(Int2ObjectLinkedOpenHashMap<Rib> graphMap, Short2ObjectOpenHashMap<String> genomeNamesMap) {
         this.graphMap = graphMap;
         this.genomeNamesMap = genomeNamesMap;
     }
-    
-    
+
     /**
      * This will fill the graph based on the graphmap.
      * 
@@ -60,18 +66,19 @@ public class GraphHandler {
     public void loadAlternateGraphViewModel(GraphModel model) {
 
         int sourceNode = graphMap.firstIntKey();
-//        int sourceNode = 344;
+        // int sourceNode = 344;
         Rib firstRib = graphMap.get(sourceNode);
-        
-        
+
         GraphHandlerUtil.addEdgesToQueue(edgeQueue, firstRib.getNodeId(), firstRib.getConnectedEdges());
         drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0);
 
-//        for (int i = (sourceNode + 1); i < 500; i++) { //testing purposes
+        // for (int i = (sourceNode + 1); i < 500; i++) { //testing purposes
         for (int i = (sourceNode + 1); i < graphMap.size(); i++) {
-            Rib aRib = graphMap.get(i);
-            GraphHandlerUtil.addEdgesToQueue(edgeQueue, aRib.getNodeId(), aRib.getConnectedEdges());
-            drawEdgesAndNodesToParents(model, aRib);
+            if (graphMap.containsKey(i)) {
+                Rib aRib = graphMap.get(i);
+                GraphHandlerUtil.addEdgesToQueue(edgeQueue, aRib.getNodeId(), aRib.getConnectedEdges());
+                drawEdgesAndNodesToParents(model, aRib);
+            }
         }
     }
 
@@ -80,10 +87,7 @@ public class GraphHandler {
      * 'addEdgesToQueue' in a previous iteration and draw these edges with
      * respect to the location of the parent node and current node
      * 
-     * insertion:
-     * 5-6 = 4
-     * 5-7 = 5
-     * 6-7 = 4
+     * insertion: 5-6 = 4 5-7 = 5 6-7 = 4
      * 
      * @param model
      *            the data model to be filled
@@ -95,53 +99,53 @@ public class GraphHandler {
     private void drawEdgesAndNodesToParents(GraphModel model, Rib aRib) {
         if (edgeQueue.containsKey(aRib.getNodeId())) {
             int[] parentNodes = edgeQueue.get(aRib.getNodeId());
-            List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aRib, parentNodes, graphMap);
+            List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aRib,
+                    parentNodes, graphMap);
 
             if (matchedGenomeRanking.size() == 1) {
                 int rank = 0;
                 Rib parentRib = matchedGenomeRanking.get(rank).getParentRib();
                 drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
-//                drawEdge(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
-                drawEdge(model, aRib.getNodeId(), parentRib.getNodeId(), rank);
+                model.addEdge(aRib.getNodeId(), parentRib.getNodeId(), rank);
             } else {
-                //if the matching produces an equal score, they will end up on a different rank. We must determine the true rank based on:
-                //1. is a score equal to a score in a higher rank
-                //2. find the one with the highest node id closest to the aRib.nodeId and draw from those coordinates
-                
+                // if the matching produces an equal score, they will end up on
+                // a different rank. We must determine the true rank based on:
+                // 1. is a score equal to a score in a higher rank
+                // 2. find the one with the highest node id closest to the
+                // aRib.nodeId and draw from those coordinates
+
                 int highestYCoord = 0;
                 int xCoord = 0;
                 int nodeRank = 0;
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
-                    //Find the first occurrence of aRib on its main axis by aligning it up with the parent that has the highest rank with this aRib.
+                    // Find the first occurrence of aRib on its main axis by
+                    // aligning it up with the parent that has the highest rank
+                    // with this aRib.
                     if (entry.getChildNodeId() == aRib.getNodeId() && xCoord == 0) {
                         xCoord = entry.getParentRib().getXCoordinate();
                         nodeRank = rank;
                     }
-                    
-                    //Find highest y coordinate from this child's parents so its drawn at an adequate Y distance.
+
+                    // Find highest y coordinate from this child's parents so
+                    // its drawn at an adequate Y distance.
                     if (highestYCoord < entry.getParentRib().getYCoordinate()) {
                         highestYCoord = entry.getParentRib().getYCoordinate();
                     }
                 }
                 drawSequence(model, aRib, xCoord, highestYCoord, nodeRank);
-                
-                //draw all the edges to this aRib
+
+                // draw all the edges to this aRib
                 matchedGenomeRanking = GraphHandlerUtil.determineSortedEdgeRanking(aRib, parentNodes, graphMap);
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     if (entry.getChildNodeId() == aRib.getNodeId()) {
-                        drawEdge(model, aRib.getNodeId(), entry.getParentRib().getNodeId(), rank);
-//                        drawEdge(model, 
-//                                aRib, 
-//                                entry.getParentRib().getXCoordinate(), 
-//                                entry.getParentRib().getYCoordinate(), 
-//                                rank);
+                        model.addEdge(aRib.getNodeId(), entry.getParentRib().getNodeId(), rank);
                     }
                 }
                 matchedGenomeRanking = null;
             }
-            
+
         } else {
             log.info("Rib({}) has no parent edges, new parent", aRib.getNodeId());
             // contains a node with no parent which means it is a strain that
@@ -153,10 +157,11 @@ public class GraphHandler {
     private void drawSequence(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
         int xCoordinate = parentXCoordinate + (HOR_NODE_SPACING * rank);
         int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
-        
+
         aRib.setCoordinates(xCoordinate, yCoordinate);
         model.addSequence(aRib.getNodeId(), xCoordinate, yCoordinate);
-//        model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10, yCoordinate, 0);
+        // model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10,
+        // yCoordinate, 0);
     }
 
     private void drawEdge(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
@@ -168,10 +173,6 @@ public class GraphHandler {
 
         model.addEdge(aRib.getNodeId(), startX, startY, endX, endY, rank);
         model.addLabel(Integer.toString(aRib.getNodeId()), endX, endY, 2);
-    }
-    
-    private void drawEdge(GraphModel model, int childRibId, int parentRibId, int rank) {
-        model.addEdge(childRibId, parentRibId, rank);
     }
 
     /**

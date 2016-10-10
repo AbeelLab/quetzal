@@ -3,6 +3,7 @@ package nl.defsoftware.mrgb.models;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import nl.defsoftware.mrgb.models.graph.AbstractNode;
 import nl.defsoftware.mrgb.models.graph.Node;
+import nl.defsoftware.mrgb.models.graph.NodeType;
 
 /**
  * @author D.L. Ettema
@@ -10,7 +11,6 @@ import nl.defsoftware.mrgb.models.graph.Node;
  */
 public class Rib extends AbstractNode implements Node {
 
-    private int nodeId;
     private char[] sequence;
     private short[] genomeIds; // ORI attribute in the GFA file
     private short referenceGenomeId; // CRD attribute in the GFA file
@@ -27,15 +27,15 @@ public class Rib extends AbstractNode implements Node {
 
     public Rib(int nodeId, char[] sequence, short[] genomeIds, short referenceGenomeId,
             Integer referenceGenomeCoordinates) {
-        this.nodeId = nodeId;
+        super.setNodeId(nodeId);
         this.sequence = sequence;
         this.genomeIds = genomeIds;
         this.referenceGenomeId = referenceGenomeId;
         this.referenceGenomeCoordinates = referenceGenomeCoordinates;
     }
 
-    public Rib(int NodeId) {
-        this.nodeId = NodeId;
+    public Rib(int nodeId) {
+        super.setNodeId(nodeId);
     }
 
     public void setConnectedEdges(int[] connectedEdges) {
@@ -57,14 +57,6 @@ public class Rib extends AbstractNode implements Node {
 
     public short getRankedWeightOfEdge(int nodeId) {
         return (short) Math.ceil((Math.random() * nodeId));
-    }
-
-    public int getNodeId() {
-        return nodeId;
-    }
-
-    public void setNodeId(int nodeId) {
-        this.nodeId = nodeId;
     }
 
     public char[] getSequence() {
@@ -113,5 +105,20 @@ public class Rib extends AbstractNode implements Node {
 
     public void setYCoordinate(int yCoordinate) {
         this.yCoordinate = yCoordinate;
+    }
+
+    @Override
+    public boolean isComposite() {
+        return false;
+    }
+    
+    @Override
+    public boolean isNotComposite() {
+        return !isComposite();
+    }
+
+    @Override
+    public NodeType getNodeType() {
+        return NodeType.SINGLE_NODE;
     }
 }

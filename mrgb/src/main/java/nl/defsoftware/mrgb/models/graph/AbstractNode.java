@@ -10,12 +10,21 @@ import java.util.Set;
  */
 public abstract class AbstractNode implements Node {
 
+    private int nodeId;
     private Set<Node> inEdges;
     private Set<Node> outEdges;
     
     protected AbstractNode() {
         this.inEdges = new HashSet<>();
         this.outEdges = new HashSet<>();
+    }
+    
+    public int getNodeId() {
+        return nodeId;
+    }
+
+    protected void setNodeId(int nodeId) {
+        this.nodeId = nodeId;
     }
     
     public void addOutEdge(Node node) {

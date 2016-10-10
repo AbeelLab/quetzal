@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.ArrayUtils;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import nl.defsoftware.mrgb.models.Rib;
+import nl.defsoftware.mrgb.models.graph.Bubble;
+import nl.defsoftware.mrgb.models.graph.Node;
+import nl.defsoftware.mrgb.models.graph.NodeType;
 import nl.defsoftware.mrgb.view.controllers.MatchingScoreEntry;
 
 /**
@@ -33,21 +33,140 @@ public class GraphHandlerUtil {
      * 
      * @param graphMap
      */
-    public static void detectSimpleBubbles(Int2ObjectLinkedOpenHashMap<Rib> graphMap) {
+    public static void determineAndConstructNewBubble(Int2ObjectLinkedOpenHashMap<Rib> graphData) {
+        int firstId = graphData.firstIntKey();
+        HashSet<Node> visitedNodes = new HashSet<>();
 
-        int sourceNode = graphMap.firstIntKey();
-
-        for (int key = sourceNode; key < graphMap.size(); key++) {
-            Rib rib = graphMap.get(key);
-            if (rib.getConnectedEdges().length > 1) {
-                short[] startIds = rib.getGenomeIds();
-                Set<Short> startGenomeIds = new HashSet(Arrays.asList(ArrayUtils.toObject(startIds)));
-                
+        for (int key = firstId; key < graphData.size(); key++) {
+            Node sourceNode = graphData.get(key);
+            if (visitedNodes.contains(sourceNode)) {
+                continue;
+            } else if (sourceNode.getOutEdges().size() > 1) {
+                determineAndConstructNewBubble(graphData, visitedNodes, sourceNode);
             }
         }
     }
-    
 
+    /**
+     * @param graphMap
+     * @param visitedNodes
+     * @param sourceNode
+     */
+    private static void determineAndConstructNewBubble(Int2ObjectLinkedOpenHashMap<Rib> graphData,
+            HashSet<Node> visitedNodes, Node sourceNode) {
+        HashSet<Node> nestedNodes = new HashSet<>();
+
+        visitedNodes.add(sourceNode);
+        Iterator<Node> iter = sourceNode.getOutEdges().iterator();
+        Node firstChildNode = iter.next();
+        nestedNodes.add(firstChildNode);
+        Node sinkNode = findSinkNodeForSimpleBubble(firstChildNode);
+
+        if (sinkNode != null && isSameSinkNode(nestedNodes, iter, sinkNode, true)) {
+            // we found all siblings to be connected to the same
+            // sink node
+            visitedNodes.addAll(nestedNodes);
+            int nodeId = firstChildNode.getNodeId();
+            boolean isSnpBubble = true;
+            for (Node aNestedNode : nestedNodes) {
+                sourceNode.removeOutEdge(aNestedNode);
+                sinkNode.removeInEdge(aNestedNode);
+                graphMap.remove(aNestedNode.getNodeId());
+                isSnpBubble = isSnpBubbleType(isSnpBubble, aNestedNode);
+            }
+
+            NodeType bubbleType = isSnpBubble ? NodeType.SNP_BUBBLE : NodeType.ALLELE_BUBBLE;
+            Bubble bubble = createNewBubble(nodeId, sourceNode, nestedNodes, sinkNode, bubbleType);
+            // glue the parent of the source & sink node to this bubble
+            sourceNode.addOutEdge(bubble);
+            sinkNode.addInEdge(bubble);
+            graphMap.put(nodeId, bubble);
+        }
+    }
+
+    /**
+     * Method will add siblingNodes to the given <code>nestedNodes</code> if
+     * they are also part of this bubble.
+     * 
+     * @param nestedNodes
+     * @param iter
+     * @param sinkNode
+     * @param sameSinkNode
+     * @return <code>true</code> if the nodes in the iterator have the same
+     *         sinkNode as the given <code>sinkNode</code>
+     */
+    private static boolean isSameSinkNode(HashSet<Node> nestedNodes, Iterator<Node> iter, Node sinkNode,
+            boolean sameSinkNode) {
+        while (iter.hasNext() && sameSinkNode) {
+            Node siblingNode = iter.next();
+            /*
+             * This constraint determines if the sink node is still the same as
+             * the first sink node found from the frist child node.
+             */
+            Node tmpNode = findSinkNodeForSimpleBubble(siblingNode);
+            if (tmpNode == null || sinkNode.getNodeId() != tmpNode.getNodeId()) {
+                sameSinkNode = false;
+            } else {
+                nestedNodes.add(siblingNode);
+            }
+        }
+        return sameSinkNode;
+    }
+
+    private static boolean isSnpBubbleType(boolean isSnpBubble, Node aNestedNode) {
+        if (aNestedNode.isNotComposite() && isSnpBubble && aNestedNode instanceof Rib) {
+            return ((Rib) aNestedNode).getSequence().length == 1;
+        } else {
+            return isSnpBubble;
+        }
+    }
+
+    /**
+     * @param sourceNode
+     * @param nestedNodes
+     * @param firstChildNode
+     * @param sinkNode
+     * @param bubbleType
+     * @return
+     */
+    private static Bubble createNewBubble(int nodeId, Node sourceNode, HashSet<Node> nestedNodes, Node sinkNode,
+            NodeType bubbleType) {
+        Bubble bubble = new Bubble(nodeId, bubbleType);
+        bubble.setNestedNodes(nestedNodes);
+        bubble.addInEdge(sourceNode);
+        bubble.addOutEdge(sinkNode);
+        return bubble;
+    }
+
+    /**
+     * This method assumes the given <code>node</code> is the mutation and its
+     * only child is the sink for a possible bubble.
+     * 
+     * @param node
+     * @return The node that is the sink for a bubble.
+     */
+    private static Node findSinkNodeForSimpleBubble(Node node) {
+        if (node.getInEdges().size() == 1 && node.getOutEdges().size() == 1) {
+            return node.getOutEdges().iterator().next();
+        } else {
+            return null; // this node is part of a more complex bubble
+                         // structure.
+        }
+    }
+
+    /**
+     * @deprecated
+     * 
+     * @param node
+     * @return
+     */
+    private static boolean isSequenceSingleNucleotide(Node node) {
+        if (node.isNotComposite()) {
+            Rib rib = (Rib) node;
+            return (rib.getSequence().length == 1);
+        }
+        return false;
+    }
 
     /**
      * An array is filled with node id's that may be used to visit these nodes
