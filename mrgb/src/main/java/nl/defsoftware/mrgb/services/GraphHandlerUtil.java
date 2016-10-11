@@ -52,8 +52,11 @@ public class GraphHandlerUtil {
      * @param visitedNodes
      * @param sourceNode
      */
-    private static void determineAndConstructNewBubble(Int2ObjectLinkedOpenHashMap<Rib> graphData,
-            HashSet<Node> visitedNodes, Node sourceNode) {
+    private static void determineAndConstructNewBubble(
+            Int2ObjectLinkedOpenHashMap<Rib> graphData,
+            HashSet<Node> visitedNodes, 
+            Node sourceNode) {
+        
         HashSet<Node> nestedNodes = new HashSet<>();
 
         visitedNodes.add(sourceNode);
@@ -71,7 +74,7 @@ public class GraphHandlerUtil {
             for (Node aNestedNode : nestedNodes) {
                 sourceNode.removeOutEdge(aNestedNode);
                 sinkNode.removeInEdge(aNestedNode);
-                graphMap.remove(aNestedNode.getNodeId());
+                graphData.remove(aNestedNode.getNodeId());
                 isSnpBubble = isSnpBubbleType(isSnpBubble, aNestedNode);
             }
 
@@ -80,7 +83,7 @@ public class GraphHandlerUtil {
             // glue the parent of the source & sink node to this bubble
             sourceNode.addOutEdge(bubble);
             sinkNode.addInEdge(bubble);
-            graphMap.put(nodeId, bubble);
+//            graphData.put(nodeId, bubble);
         }
     }
 
