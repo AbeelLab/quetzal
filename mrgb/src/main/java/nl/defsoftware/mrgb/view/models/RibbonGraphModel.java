@@ -28,35 +28,27 @@ public class RibbonGraphModel extends GraphModel {
         this.clear();
     }
     
+    /**
+     * TODO
+     * 
+     * @param aNode
+     * @param parentNode
+     * @param rank
+     */
     public void addSequence(Node aNode, Node parentNode, int rank) {
         Set<Node> nodesToDraw = new HashSet<>();
         switch (aNode.getNodeType()) {
         case SINGLE_NODE:
-            
             break;
         case SNP_BUBBLE:
-//            nodesToDraw.addAll(aNode.getNodes(zoomlevel));
             break;
         case INDEL_BUBBLE:
-
             break;
         case ALLELE_BUBBLE:
-
             break;
         default:
             break;
         }
-        
-//        for (Node node : nodesToDraw) {
-//            int xCoordinate = parentNode.getXCoordinate() + (HOR_NODE_SPACING * rank);
-//            int yCoordinate = parentNode.getYCoordinate() + VER_NODE_SPACING;
-//            node.setCoordinates(xCoordinate, yCoordinate);
-//            
-//            RibbonSequence seq = new RibbonSequence();
-//            seq.relocate(xCoordinate, yCoordinate);
-//            sequenceMap.put(node.getNodeId(), seq);
-//            super.addedSequences.add(seq);
-//        }
     }
     
     @Override

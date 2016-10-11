@@ -38,7 +38,7 @@ public class GraphHandler {
 
     private static final int Y_CORRECTION = 5;
 
-    private Int2ObjectLinkedOpenHashMap<Rib> graphMap = new Int2ObjectLinkedOpenHashMap<>();
+    private Int2ObjectLinkedOpenHashMap<Rib> graphData = new Int2ObjectLinkedOpenHashMap<>();
     private Short2ObjectOpenHashMap<String> genomeNamesMap = new Short2ObjectOpenHashMap<>();
 
     private Int2ObjectOpenHashMap<int[]> edgeQueue = new Int2ObjectOpenHashMap<>();
@@ -51,8 +51,8 @@ public class GraphHandler {
      * @param graphMap
      * @param genomeNamesMap
      */
-    public GraphHandler(Int2ObjectLinkedOpenHashMap<Rib> graphMap, Short2ObjectOpenHashMap<String> genomeNamesMap) {
-        this.graphMap = graphMap;
+    public GraphHandler(Int2ObjectLinkedOpenHashMap<Rib> graphData, Short2ObjectOpenHashMap<String> genomeNamesMap) {
+        this.graphData = graphData;
         this.genomeNamesMap = genomeNamesMap;
     }
 
@@ -65,17 +65,17 @@ public class GraphHandler {
      */
     public void loadAlternateGraphViewModel(GraphModel model) {
 
-        int sourceNode = graphMap.firstIntKey();
+        int sourceNode = graphData.firstIntKey();
         // int sourceNode = 344;
-        Rib firstRib = graphMap.get(sourceNode);
+        Rib firstRib = graphData.get(sourceNode);
 
         GraphHandlerUtil.addEdgesToQueue(edgeQueue, firstRib.getNodeId(), firstRib.getConnectedEdges());
         drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0);
 
         // for (int i = (sourceNode + 1); i < 500; i++) { //testing purposes
-        for (int i = (sourceNode + 1); i < graphMap.size(); i++) {
-            if (graphMap.containsKey(i)) {
-                Rib aRib = graphMap.get(i);
+        for (int i = (sourceNode + 1); i < graphData.size(); i++) {
+            if (graphData.containsKey(i)) {
+                Rib aRib = graphData.get(i);
                 GraphHandlerUtil.addEdgesToQueue(edgeQueue, aRib.getNodeId(), aRib.getConnectedEdges());
                 drawEdgesAndNodesToParents(model, aRib);
             }
@@ -100,7 +100,7 @@ public class GraphHandler {
         if (edgeQueue.containsKey(aRib.getNodeId())) {
             int[] parentNodes = edgeQueue.get(aRib.getNodeId());
             List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aRib,
-                    parentNodes, graphMap);
+                    parentNodes, graphData);
 
             if (matchedGenomeRanking.size() == 1) {
                 int rank = 0;
@@ -136,7 +136,7 @@ public class GraphHandler {
                 drawSequence(model, aRib, xCoord, highestYCoord, nodeRank);
 
                 // draw all the edges to this aRib
-                matchedGenomeRanking = GraphHandlerUtil.determineSortedEdgeRanking(aRib, parentNodes, graphMap);
+                matchedGenomeRanking = GraphHandlerUtil.determineSortedEdgeRanking(aRib, parentNodes, graphData);
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     if (entry.getChildNodeId() == aRib.getNodeId()) {

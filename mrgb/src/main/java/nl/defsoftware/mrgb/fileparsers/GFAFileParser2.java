@@ -29,9 +29,9 @@ import nl.defsoftware.mrgb.models.Rib;
  * @author D.L. Ettema
  * @date 21 September 2016
  */
-public class GraphGFAParser2 implements FileParser {
+public class GFAFileParser2 implements FileParser {
 
-    private static final Logger log = LoggerFactory.getLogger(GraphGFAParser2.class);
+    private static final Logger log = LoggerFactory.getLogger(GFAFileParser2.class);
 
     /* Reader for the datasource */
     private BufferedReader reader = null;

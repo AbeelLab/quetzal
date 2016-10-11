@@ -9,7 +9,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import nl.defsoftware.mrgb.fileparsers.FileParser;
-import nl.defsoftware.mrgb.fileparsers.GraphGFAParser2;
+import nl.defsoftware.mrgb.fileparsers.GFAFileParser2;
 import nl.defsoftware.mrgb.models.Rib;
 
 /**
@@ -21,7 +21,7 @@ import nl.defsoftware.mrgb.models.Rib;
  */
 public class FileParserServiceImpl implements FileParserService {
 
-    private FileParser graphGFAParser = new GraphGFAParser2();
+    private FileParser graphGFAParser = new GFAFileParser2();
     // private FileParser metadataParser = new MetadataFileParser();
     // private FileParser annotationParser = new AnnotationFileParser();
 
