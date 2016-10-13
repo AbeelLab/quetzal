@@ -20,7 +20,7 @@ public class Rib extends AbstractNode implements Node {
     private Int2IntOpenHashMap edgeWeights = new Int2IntOpenHashMap();
     private int xCoordinate;
     private int yCoordinate;
-
+    
     // private List<String> crdctg; //unknown what to use for. Not yet
     // implemented
     // private List<String> ctg; //unknown what to use for. Not yet implemented

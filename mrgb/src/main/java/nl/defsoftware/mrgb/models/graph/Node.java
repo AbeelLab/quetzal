@@ -31,4 +31,10 @@ public interface Node {
     public Collection<Node> getOutEdges();
     
     public Collection<Node> getInEdges();
+    
+    public void setAsBubbleExitNode();
+    
+    public void setAsBubbleEntranceNode() ;
+    
+    public boolean isEntranceNode();
 }

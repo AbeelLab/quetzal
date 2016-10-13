@@ -13,6 +13,7 @@ public abstract class AbstractNode implements Node {
     private int nodeId;
     private Set<Node> inEdges;
     private Set<Node> outEdges;
+    private boolean isEntranceNode = false;
     
     protected AbstractNode() {
         this.inEdges = new HashSet<>();
@@ -57,5 +58,14 @@ public abstract class AbstractNode implements Node {
     
     public Collection<Node> getInEdges() {
         return inEdges;
+    }
+    public void setAsBubbleExitNode() {
+        isEntranceNode = false;
+    }
+    public void setAsBubbleEntranceNode() {
+        isEntranceNode = true;
+    }
+    public boolean isEntranceNode() {
+        return isEntranceNode;
     }
 }

@@ -11,8 +11,10 @@ public class Bubble extends AbstractNode implements Node {
 
     private Set<Node> nestedNodes = new HashSet<>();
     private NodeType nodeType = null; 
+    private Node start = null;
+    private Node stop = null;
     
-    public Bubble(int nodeId, NodeType nodeType) {
+    public Bubble(int nodeId, NodeType nodeType, Node start, Node stop) {
         super.setNodeId(nodeId);
         this.nodeType = nodeType;
     }
@@ -38,5 +40,21 @@ public class Bubble extends AbstractNode implements Node {
     @Override
     public NodeType getNodeType() {
       return nodeType;
+    }
+
+    public Node getStart() {
+        return start;
+    }
+
+    public void setStart(Node start) {
+        this.start = start;
+    }
+
+    public Node getStop() {
+        return stop;
+    }
+
+    public void setStop(Node stop) {
+        this.stop = stop;
     }
 }
