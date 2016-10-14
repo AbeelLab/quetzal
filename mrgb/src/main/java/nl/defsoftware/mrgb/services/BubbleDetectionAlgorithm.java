@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.models.graph.Bubble;
 import nl.defsoftware.mrgb.models.graph.Node;
 import nl.defsoftware.mrgb.models.graph.NodeType;
 
 /**
+ * Implementation of algorithm proposed by Brankovic, L et al. in 2016. Titled:
+ * Linear-time superbubble identification algorithm for genome assembly.
+ * doi:10.1016/j.tcs.2015.10.021
+ * 
  * @author D.L. Ettema
  *
  */
@@ -21,21 +24,26 @@ public class BubbleDetectionAlgorithm {
     private Rib[] previousEntrance;
     private Rib[] alternativeEntrance;
     private int bubbleId = 0;
-    private Int2ObjectLinkedOpenHashMap<Rib> graphData;
-    private int [] outParent;
-    private int [] outChild;
+    private int[] outParent;
+    private int[] outChild;
     private List<Rib> ordD;
-    
-    public void superBubble(Int2ObjectLinkedOpenHashMap<Rib> graphData) {
+
+    /**
+     * graphData.values().toArray(new Rib[graphData.size()])
+     * 
+     * @param orderedNodes
+     */
+    public void superBubble(Rib[] orderedNodes) {
         // TODO make sure that all starting nodes are connected to one source
         // and all leaf nodes are connected to 1 sink node
-        // TODO graphData should be ordD which can give the position of the node v and not use the nodeId.
-        
-        init(graphData);
+
+        topologicalSort();
+        init(orderedNodes);
         preComputeRMQ();
         Rib prevEnt = null;
-        for (int vId = 0; vId < graphData.size(); vId++) {
-            Rib v = graphData.get(vId);
+
+        for (int vId = 0; vId < ordD.size(); vId++) {
+            Rib v = ordD.get(vId);
             alternativeEntrance[vId] = null;
             previousEntrance[vId] = prevEnt;
             if (exit(v)) {
@@ -54,16 +62,6 @@ public class BubbleDetectionAlgorithm {
                 reportSuperBubble(head(), tail());
             }
         }
-    }
-
-    /**
-     * @param graphData
-     */
-    private void init(Int2ObjectLinkedOpenHashMap<Rib> graphData) {
-        this.graphData = graphData;
-        this.ordD = Arrays.asList(graphData.values().toArray(new Rib[graphData.size()]));
-        this.alternativeEntrance = new Rib[graphData.size()];
-        this.previousEntrance = new Rib[graphData.size()];
     }
 
     private void reportSuperBubble(Rib start, Rib exit) {
@@ -115,28 +113,20 @@ public class BubbleDetectionAlgorithm {
             return previousEntrance[vertex(outParentId).getNodeId()];
     }
 
-    private int rangeMax(int start, int end) {
-        ord[v5] = 6;
-        ord[v8] = 12
-        
-        return 0;
-    }
-    
-    private int rangeMin(int start, int end) {
-        for (int i = 0; i < outParent.length; i++) {
-            outParent[i]
-        }
-        return 0;
+    private void init(Rib[] orderedNodes) {
+        this.ordD = Arrays.asList(orderedNodes);
+        this.alternativeEntrance = new Rib[orderedNodes.length];
+        this.previousEntrance = new Rib[orderedNodes.length];
     }
 
     /**
-     * This will compute the Range Minimum Query (RMQ) problem as described in section
-     * 4 of the Brankovic paper.
+     * This will compute the Range Minimum Query (RMQ) problem as described in
+     * section 4 of the Brankovic paper.
      */
     private void preComputeRMQ() {
-        outParent = new int[graphData.size()];
-        outChild = new int[graphData.size()];
-        for(int i = 0; i < ordD.size(); i++) {
+        outParent = new int[ordD.size()];
+        outChild = new int[ordD.size()];
+        for (int i = 0; i < ordD.size(); i++) {
             preComputeRMQParents(ordD.get(i));
             preComputeRMQChilds(ordD.get(i));
         }
@@ -144,6 +134,7 @@ public class BubbleDetectionAlgorithm {
 
     /**
      * OutParent[ordD[v]] = min({ordD[u_i] | (u_i , v) \elem E}),
+     * 
      * @param v
      */
     private void preComputeRMQParents(Rib v) {
@@ -169,21 +160,38 @@ public class BubbleDetectionAlgorithm {
         outChild[ord(v)] = highestId;
     }
 
+    private int rangeMax(int start, int end) {
+        int highestId = Integer.MIN_VALUE;
+        for (int i = start; i < end; i++) {
+            highestId = Integer.max(outParent[i], highestId);
+        }
+        return highestId;
+    }
+
+    private int rangeMin(int start, int end) {
+        int lowestId = Integer.MAX_VALUE;
+        for (int i = start; i < end; i++) {
+            lowestId = Integer.min(outParent[i], lowestId);
+        }
+        return lowestId;
+    }
+
     private int ord(Node v) {
         return ordD.indexOf(v);
     }
-    
+
     private void report(Rib start, Rib exit) {
         detectedBubbles.add(new Bubble(bubbleId, NodeType.ALLELE_BUBBLE, start, exit));
         bubbleId++;
     }
 
     private Rib vertex(int i) {
-        return graphData.get(i);
+        return ordD.get(i);
     }
 
     /**
-     * Lemma-2:
+     * Lemma-2: For any superbubble <s, t> in G, there must exist some parent p
+     * of t such that p has exactly one child t.
      * 
      * @param v
      * @return
@@ -245,4 +253,9 @@ public class BubbleDetectionAlgorithm {
         }
         return null;
     }
+
+    public List<Bubble> getDetectedBubbles() {
+        return detectedBubbles;
+    }
+    
 }

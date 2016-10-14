@@ -134,10 +134,8 @@ public class GraphHandlerUtil {
      */
     private static Bubble createNewBubble(int nodeId, Node sourceNode, HashSet<Node> nestedNodes, Node sinkNode,
             NodeType bubbleType) {
-        Bubble bubble = new Bubble(nodeId, bubbleType);
+        Bubble bubble = new Bubble(nodeId, bubbleType, sourceNode, sinkNode);
         bubble.setNestedNodes(nestedNodes);
-        bubble.addInEdge(sourceNode);
-        bubble.addOutEdge(sinkNode);
         return bubble;
     }
 
