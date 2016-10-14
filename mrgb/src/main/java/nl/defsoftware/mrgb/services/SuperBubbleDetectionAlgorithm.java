@@ -1,8 +1,13 @@
 package nl.defsoftware.mrgb.services;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.models.graph.Bubble;
@@ -17,31 +22,157 @@ import nl.defsoftware.mrgb.models.graph.NodeType;
  * @author D.L. Ettema
  *
  */
-public class BubbleDetectionAlgorithm {
+public class SuperBubbleDetectionAlgorithm {
 
+    private static final Logger log = LoggerFactory.getLogger(SuperBubbleDetectionAlgorithm.class);
+    
+    /* Topological sort maintaining states */
+    private List<Boolean> state;
+    private int order;
+    
+    /* backing nodes data structure */
+    private Rib[] nodeData;
+    /* Topological sorted nodes */
+    private List<Rib> ordD; 
+    /*nodeID, ordering*/
+    private Map<Integer, Integer> ordDM;
+    
+    /* Result of detectedBubbles */
     private List<Bubble> detectedBubbles = new ArrayList<>();
+    
+    /* Maintaining various states during the algorithm */
     private List<Rib> candidates = new ArrayList<>();
     private Rib[] previousEntrance;
     private Rib[] alternativeEntrance;
+    
+    /* ID for the bubbles, has no topological meaning */
     private int bubbleId = 0;
+    
+    /* OutParent[ordD[v]] = min({ordD[u_i] | (u_i , v) \elem  E}) */
     private int[] outParent;
+    /* OutChild[ordD[v]] = max({ordD[u_i] | (v, u_i) \elem E}) */
     private int[] outChild;
-    private List<Rib> ordD;
-
+    
     /**
      * graphData.values().toArray(new Rib[graphData.size()])
      * 
      * @param orderedNodes
      */
-    public void superBubble(Rib[] orderedNodes) {
+    public void detectSuperBubbles(Rib[] orderedNodes) {
         // TODO make sure that all starting nodes are connected to one source
         // and all leaf nodes are connected to 1 sink node
-
-        topologicalSort();
-        init(orderedNodes);
+        this.nodeData = orderedNodes;
+        this.ordD = new ArrayList<>(orderedNodes.length);
+        this.ordDM = new HashMap<>();
+        this.alternativeEntrance = new Rib[orderedNodes.length];
+        this.previousEntrance = new Rib[orderedNodes.length];
+        
+        log.info("Detecting bubbles for {} nodes.", orderedNodes.length);
+        
+        /* Pre-computation */
+//        topologicalSort(orderedNodes);
+        hardCodedTopologicalSort();
         preComputeRMQ();
-        Rib prevEnt = null;
+        
+        /* Main algorithm */
+        superBubble();
+    }
 
+    private void hardCodedTopologicalSort() {
+        ordD.add(nodeData[0]);
+        ordD.add(nodeData[1]);
+        ordD.add(nodeData[2]);
+        ordD.add(nodeData[10]);
+        ordD.add(nodeData[11]);
+        ordD.add(nodeData[4]);
+        ordD.add(nodeData[8]);
+        ordD.add(nodeData[5]);
+        ordD.add(nodeData[9]);
+        ordD.add(nodeData[6]);
+        ordD.add(nodeData[3]);
+        ordD.add(nodeData[7]);
+        ordD.add(nodeData[12]);
+        ordD.add(nodeData[14]);
+        ordD.add(nodeData[13]);
+    }
+
+    private void topologicalSort(Rib[] orderedNodes) {
+        order = orderedNodes.length-1;
+        state = new ArrayList<>();
+        for (int i = 0; i < orderedNodes.length; i++) {
+            state.add(i, Boolean.FALSE);
+        }
+        recursiveTopologicalSort(orderedNodes[0], 0);
+        Collections.reverse(ordD);
+    }
+
+    private void recursiveTopologicalSort(Node rib, int orderingIndex) {
+        state.set(orderingIndex, Boolean.TRUE);
+        for (Node outNode : rib.getOutEdges()) {
+            int index = findOrderingIndex(outNode);
+            if (state.get(index) == Boolean.FALSE) {
+                recursiveTopologicalSort(outNode, index);
+            }
+        }
+        ordD.add((Rib)rib);
+//        ordDM.put(rib.getNodeId(), order);
+        order--;
+    }
+    
+    private int findOrderingIndex(Node outNode) {
+        for (int i = 0; i < nodeData.length; i++) {
+            if (nodeData[i].getNodeId() == outNode.getNodeId()) return i;
+        }
+        return 0;
+    }
+
+    /**
+     * This will compute the Range Minimum Query (RMQ) problem as described in
+     * section 4 of the Brankovic paper.
+     */
+    private void preComputeRMQ() {
+        outParent = new int[ordD.size()];
+        outChild = new int[ordD.size()];
+        for (int i = 0; i < ordD.size(); i++) {
+            preComputeRMQParents(ordD.get(i));
+            preComputeRMQChilds(ordD.get(i));
+        }
+    }
+
+    /**
+     * OutParent[ordD[v]] = min({ordD[u_i] | (u_i , v) \elem E}),
+     * 
+     * @param v
+     */
+    private void preComputeRMQParents(Rib v) {
+        int lowestId = Integer.MAX_VALUE;
+        for (Node parent : v.getInEdges()) {
+            lowestId = Integer.min(ord(parent), lowestId);
+        }
+        outParent[ord(v)] = lowestId;
+    }
+
+    /**
+     * OutChild[ordD[v]] = max({ordD[u_i] | (v, u_i) \elem E}).
+     * 
+     * @param v
+     */
+    private void preComputeRMQChilds(Rib v) {
+        int highestId = Integer.MIN_VALUE;
+        for (Node child : v.getOutEdges()) {
+            if (ord(child) > highestId) {
+                highestId = ord(child);
+            }
+        }
+        outChild[ord(v)] = highestId;
+    }
+    
+    /**
+     * Main entry point for the algorithm.  
+     * @param orderedNodes
+     */
+    private void superBubble() {
+        Rib prevEnt = null;
         for (int vId = 0; vId < ordD.size(); vId++) {
             Rib v = ordD.get(vId);
             alternativeEntrance[vId] = null;
@@ -113,52 +244,7 @@ public class BubbleDetectionAlgorithm {
             return previousEntrance[vertex(outParentId).getNodeId()];
     }
 
-    private void init(Rib[] orderedNodes) {
-        this.ordD = Arrays.asList(orderedNodes);
-        this.alternativeEntrance = new Rib[orderedNodes.length];
-        this.previousEntrance = new Rib[orderedNodes.length];
-    }
-
-    /**
-     * This will compute the Range Minimum Query (RMQ) problem as described in
-     * section 4 of the Brankovic paper.
-     */
-    private void preComputeRMQ() {
-        outParent = new int[ordD.size()];
-        outChild = new int[ordD.size()];
-        for (int i = 0; i < ordD.size(); i++) {
-            preComputeRMQParents(ordD.get(i));
-            preComputeRMQChilds(ordD.get(i));
-        }
-    }
-
-    /**
-     * OutParent[ordD[v]] = min({ordD[u_i] | (u_i , v) \elem E}),
-     * 
-     * @param v
-     */
-    private void preComputeRMQParents(Rib v) {
-        int lowestId = Integer.MAX_VALUE;
-        for (Node parent : v.getInEdges()) {
-            lowestId = Integer.min(ord(parent), lowestId);
-        }
-        outParent[ord(v)] = lowestId;
-    }
-
-    /**
-     * OutChild[ordD[v]] = max({ordD[u_i] | (v, u_i) \elem E}).
-     * 
-     * @param v
-     */
-    private void preComputeRMQChilds(Rib v) {
-        int highestId = Integer.MIN_VALUE;
-        for (Node child : v.getOutEdges()) {
-            if (ord(child) > highestId) {
-                highestId = ord(child);
-            }
-        }
-        outChild[ord(v)] = highestId;
-    }
+    
 
     private int rangeMax(int start, int end) {
         int highestId = Integer.MIN_VALUE;

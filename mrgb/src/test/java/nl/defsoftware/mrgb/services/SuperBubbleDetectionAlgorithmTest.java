@@ -16,7 +16,7 @@ import nl.defsoftware.mrgb.models.graph.Bubble;
  * @author D.L. Ettema
  *
  */
-public class BubbleDetectionAlgorithmTest {
+public class SuperBubbleDetectionAlgorithmTest {
 
     List<Rib> n = new ArrayList<>();
     int v1 = 0;
@@ -41,7 +41,7 @@ public class BubbleDetectionAlgorithmTest {
     @Before
     public void setUp() throws Exception {
         for (int i = 0; i < 15; i++) {
-            n.add(new Rib(i + 1));
+            n.add(new Rib(i+1));
         }
 
         // building a graph according to the example case in figure 1 of
@@ -98,7 +98,8 @@ public class BubbleDetectionAlgorithmTest {
 
         n.get(v14).addInEdge(n.get(v8));
         n.get(v14).addInEdge(n.get(v13));
-        n.get(v14).addInEdge(n.get(v15));
+        Rib node = n.get(v15);
+        n.get(v14).addInEdge(node);
 
         n.get(v15).addInEdge(n.get(v13));
         n.get(v15).addOutEdge(n.get(v14));
@@ -114,15 +115,17 @@ public class BubbleDetectionAlgorithmTest {
 
     /**
      * Test method for
-     * {@link nl.defsoftware.mrgb.services.BubbleDetectionAlgorithm#superBubble(it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap)}.
+     * {@link nl.defsoftware.mrgb.services.SuperBubbleDetectionAlgorithm#superBubble(it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap)}.
      */
     @Test
     public void testSuperBubble() {
         assertEquals(15, n.size());
-        BubbleDetectionAlgorithm b = new BubbleDetectionAlgorithm();
-        b.superBubble(n.toArray(new Rib[n.size()]));
+        SuperBubbleDetectionAlgorithm b = new SuperBubbleDetectionAlgorithm();
+        b.detectSuperBubbles(n.toArray(new Rib[n.size()]));
+        
         List<Bubble> detected = b.getDetectedBubbles();
         System.out.printf("We found %d bubbles", detected.size());
+        
         for (Bubble bubble : detected) {
             System.out.print("start: " + bubble.getStart().getNodeId());
             System.out.print(" end: " + bubble.getStop().getNodeId());
