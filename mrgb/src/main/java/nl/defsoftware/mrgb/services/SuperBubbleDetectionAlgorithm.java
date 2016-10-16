@@ -1,17 +1,11 @@
 package nl.defsoftware.mrgb.services;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +26,6 @@ public class SuperBubbleDetectionAlgorithm {
 
     private static final Logger log = LoggerFactory.getLogger(SuperBubbleDetectionAlgorithm.class);
 
-    /* backing nodes data structure */
-    private Rib[] nodeData;
     /* Topological sorted nodes */
     private List<Rib> ordD;
     /* Arrays that are shadowing the index of Ribs from ordD */
@@ -62,7 +54,6 @@ public class SuperBubbleDetectionAlgorithm {
     public void detectSuperBubbles(Rib[] orderedNodes) {
         // TODO make sure that all starting nodes are connected to one source
         // and all leaf nodes are connected to 1 sink node
-        this.nodeData = orderedNodes;
         this.alternativeEntrance = new Rib[orderedNodes.length];
         this.previousEntrance = new Rib[orderedNodes.length];
         this.outParent = new int[orderedNodes.length];
@@ -72,10 +63,15 @@ public class SuperBubbleDetectionAlgorithm {
 
         /* Pre-computation */
         ordD = SuperBubbleDetectionHelper.topologicalSort(orderedNodes);
+        orderedNodes = null;
         SuperBubbleDetectionHelper.preComputeRMQ(ordD, outParent, outChild);
 
         /* Main algorithm */
         superBubble();
+    }
+
+    public List<Bubble> getDetectedBubbles() {
+        return detectedBubbles;
     }
 
     private void superBubble() {
@@ -132,10 +128,11 @@ public class SuperBubbleDetectionAlgorithm {
         deleteTail();
 
         if (valid != null && valid.equals(s)) {
-            report(s, exit);
+            report(s, exit); // yea we found a bubble!
             while (tail() != null && !tail().equals(s)) {
                 if (exit(tail())) {
-                    reportSuperBubble(next(s), tail());
+                    reportSuperBubble(next(s), tail());// see if there are any
+                                                       // inner superbubbles
                 } else {
                     deleteTail();
                 }
@@ -185,8 +182,21 @@ public class SuperBubbleDetectionAlgorithm {
     }
 
     private void report(Rib start, Rib exit) {
-        detectedBubbles.add(new Bubble(bubbleId, NodeType.ALLELE_BUBBLE, start, exit));
+        Set<Node> innerNodes = new HashSet<>();
+        findInnerNodes(innerNodes, start.getOutEdges(), exit);
+        Bubble b = new Bubble(bubbleId, NodeType.ALLELE_BUBBLE, start, exit);
+        b.setNestedNodes(innerNodes);
+        detectedBubbles.add(b);
         bubbleId++;
+    }
+
+    private void findInnerNodes(Set<Node> innerNodes, Collection<Node> startNodes, Node exit) {
+        for (Node out : startNodes) {
+            if (out.getNodeId() != exit.getNodeId()) {
+                innerNodes.add(out);
+                findInnerNodes(innerNodes, out.getOutEdges(), exit);
+            }
+        }
     }
 
     private Rib vertex(int i) {
@@ -263,9 +273,5 @@ public class SuperBubbleDetectionAlgorithm {
             }
         }
         return null;
-    }
-
-    public List<Bubble> getDetectedBubbles() {
-        return detectedBubbles;
     }
 }

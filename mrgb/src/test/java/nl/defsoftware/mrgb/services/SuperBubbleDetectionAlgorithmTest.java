@@ -12,6 +12,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.models.graph.Bubble;
+import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
  * @author D.L. Ettema
@@ -235,8 +237,11 @@ public class SuperBubbleDetectionAlgorithmTest {
         log.info("15n: We found {} bubbles\n", detected.size());
         
         for (Bubble bubble : detected) {
-            log.info("start: " + bubble.getStart().getNodeId());
-            log.info(" end: " + bubble.getStop().getNodeId());
+            log.info("start({}) and end({}), with {} nested nodes: ", bubble.getStart().getNodeId(), bubble.getStop().getNodeId(), bubble.getNestedNodes().size());
+            for (Node nestedNode : bubble.getNestedNodes()) {
+                System.out.println("NestedNode id: "+ nestedNode.getNodeId());
+                
+            }
         }
     }
     
