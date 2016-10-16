@@ -67,7 +67,7 @@ public class SuperBubbleDetectionAlgorithm {
         this.previousEntrance = new Rib[orderedNodes.length];
         this.outParent = new int[orderedNodes.length];
         this.outChild = new int[orderedNodes.length];
-        
+
         log.info("Detecting bubbles for {} nodes.", orderedNodes.length);
 
         /* Pre-computation */
@@ -79,13 +79,14 @@ public class SuperBubbleDetectionAlgorithm {
     }
 
     private void superBubble() {
-        log.debug("Ordering size: {}", ordD.size()); 
+        log.debug("Ordering size: {}", ordD.size());
         Rib prevEnt = null;
         for (int i = 0; i < ordD.size(); i++) {
             Rib v = ordD.get(i);
             log.debug("Order({}): node({})", i, v.getNodeId());
             alternativeEntrance[i] = null;
-            previousEntrance[i] = prevEnt;//filled according to the ordD ordering
+            previousEntrance[i] = prevEnt;// filled according to the ordD
+                                          // ordering
             if (exit(v)) {
                 log.debug("New exit node({})", v.getNodeId());
                 insertExit(v);
@@ -108,8 +109,9 @@ public class SuperBubbleDetectionAlgorithm {
     }
 
     private void reportSuperBubble(Rib start, Rib exit) {
-        log.debug("start({}) on order: {}\nexit({}) on order: {}", start.getNodeId(), ord(start), exit.getNodeId(), ord(exit));
-        
+        log.debug("start({}) on order: {}\nexit({}) on order: {}", start.getNodeId(), ord(start), exit.getNodeId(),
+                ord(exit));
+
         if (start == null || exit == null || ord(start) >= ord(exit)) {
             deleteTail();
             return;
@@ -146,17 +148,20 @@ public class SuperBubbleDetectionAlgorithm {
         int end = ord(endVertex);
         int outChildId = rangeMax(start, end - 1);
         int outParentId = rangeMin(start + 1, end);
-        
-        log.debug("rangeMax(childID:{}) & end({}), rangeMin(parentID:{}) & start({}) ", outChildId, end, outParentId, start);
-        if (outChildId != end)
-            return null; // -1 according to Brankovic paper, p.380
 
-        if (outParentId == start)
+        log.debug("rangeMax(childID:{}) & end({}), rangeMin(parentID:{}) & start({}) ", outChildId, end, outParentId,
+                start);
+        if (outChildId != end) {
+            return null; // -1 according to Brankovic paper, p.380
+        }
+
+        if (outParentId == start) {
             return startVertex;
-        else if (entrance(vertex(outParentId)))
+        } else if (entrance(vertex(outParentId))) {
             return vertex(outParentId);
-        else
+        } else {
             return previousEntrance[ord(vertex(outParentId))];
+        }
     }
 
     private int rangeMax(int start, int end) {
@@ -216,8 +221,9 @@ public class SuperBubbleDetectionAlgorithm {
      */
     private boolean entrance(Rib s) {
         for (Node c : s.getOutEdges()) {
-            if (c.getInEdges().size() == 1)
+            if (c.getInEdges().size() == 1) {
                 return true;
+            }
         }
         return false;
     }
@@ -237,17 +243,22 @@ public class SuperBubbleDetectionAlgorithm {
     }
 
     private Rib tail() {
-        if (candidates.size() > 0) return candidates.get(candidates.size() - 1);
-        else return null;
+        if (candidates.size() > 0) {
+            return candidates.get(candidates.size() - 1);
+        } else {
+            return null;
+        }
     }
 
     private void deleteTail() {
-        candidates.remove(candidates.size() - 1);
+        if (!candidates.isEmpty()) {
+            candidates.remove(candidates.size() - 1);
+        }
     }
 
     private Rib next(Rib v) {
         for (int i = 0; i < candidates.size(); i++) {
-            if (candidates.get(i).equals(v) && i+1 < candidates.size()) {
+            if (candidates.get(i).equals(v) && i + 1 < candidates.size()) {
                 return candidates.get(i + 1);
             }
         }
@@ -257,5 +268,4 @@ public class SuperBubbleDetectionAlgorithm {
     public List<Bubble> getDetectedBubbles() {
         return detectedBubbles;
     }
-
 }
