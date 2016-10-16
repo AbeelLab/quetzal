@@ -16,6 +16,8 @@ public class Bubble extends AbstractNode implements Node {
     
     public Bubble(int nodeId, NodeType nodeType, Node start, Node stop) {
         super.setNodeId(nodeId);
+        this.start = start;
+        this.stop = stop;
         this.nodeType = nodeType;
     }
     

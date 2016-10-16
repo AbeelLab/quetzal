@@ -3,9 +3,15 @@ package nl.defsoftware.mrgb.services;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.traverse.TopologicalOrderIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,34 +31,30 @@ import nl.defsoftware.mrgb.models.graph.NodeType;
 public class SuperBubbleDetectionAlgorithm {
 
     private static final Logger log = LoggerFactory.getLogger(SuperBubbleDetectionAlgorithm.class);
-    
-    /* Topological sort maintaining states */
-    private List<Boolean> state;
-    private int order;
-    
+
     /* backing nodes data structure */
     private Rib[] nodeData;
     /* Topological sorted nodes */
-    private List<Rib> ordD; 
-    /*nodeID, ordering*/
+    private List<Rib> ordD;
+    /* nodeID, ordering */
     private Map<Integer, Integer> ordDM;
-    
+
     /* Result of detectedBubbles */
     private List<Bubble> detectedBubbles = new ArrayList<>();
-    
+
     /* Maintaining various states during the algorithm */
     private List<Rib> candidates = new ArrayList<>();
     private Rib[] previousEntrance;
     private Rib[] alternativeEntrance;
-    
+
     /* ID for the bubbles, has no topological meaning */
     private int bubbleId = 0;
-    
-    /* OutParent[ordD[v]] = min({ordD[u_i] | (u_i , v) \elem  E}) */
+
+    /* OutParent[ordD[v]] = min({ordD[u_i] | (u_i , v) \elem E}) */
     private int[] outParent;
     /* OutChild[ordD[v]] = max({ordD[u_i] | (v, u_i) \elem E}) */
     private int[] outChild;
-    
+
     /**
      * graphData.values().toArray(new Rib[graphData.size()])
      * 
@@ -62,69 +64,20 @@ public class SuperBubbleDetectionAlgorithm {
         // TODO make sure that all starting nodes are connected to one source
         // and all leaf nodes are connected to 1 sink node
         this.nodeData = orderedNodes;
-        this.ordD = new ArrayList<>(orderedNodes.length);
         this.ordDM = new HashMap<>();
         this.alternativeEntrance = new Rib[orderedNodes.length];
         this.previousEntrance = new Rib[orderedNodes.length];
-        
+
         log.info("Detecting bubbles for {} nodes.", orderedNodes.length);
-        
+
         /* Pre-computation */
-//        topologicalSort(orderedNodes);
-        hardCodedTopologicalSort();
+        ordD = SuperBubbleDetectionHelper.topologicalSort(orderedNodes);
         preComputeRMQ();
-        
+
         /* Main algorithm */
         superBubble();
     }
 
-    private void hardCodedTopologicalSort() {
-        ordD.add(nodeData[0]);
-        ordD.add(nodeData[1]);
-        ordD.add(nodeData[2]);
-        ordD.add(nodeData[10]);
-        ordD.add(nodeData[11]);
-        ordD.add(nodeData[4]);
-        ordD.add(nodeData[8]);
-        ordD.add(nodeData[5]);
-        ordD.add(nodeData[9]);
-        ordD.add(nodeData[6]);
-        ordD.add(nodeData[3]);
-        ordD.add(nodeData[7]);
-        ordD.add(nodeData[12]);
-        ordD.add(nodeData[14]);
-        ordD.add(nodeData[13]);
-    }
-
-    private void topologicalSort(Rib[] orderedNodes) {
-        order = orderedNodes.length-1;
-        state = new ArrayList<>();
-        for (int i = 0; i < orderedNodes.length; i++) {
-            state.add(i, Boolean.FALSE);
-        }
-        recursiveTopologicalSort(orderedNodes[0], 0);
-        Collections.reverse(ordD);
-    }
-
-    private void recursiveTopologicalSort(Node rib, int orderingIndex) {
-        state.set(orderingIndex, Boolean.TRUE);
-        for (Node outNode : rib.getOutEdges()) {
-            int index = findOrderingIndex(outNode);
-            if (state.get(index) == Boolean.FALSE) {
-                recursiveTopologicalSort(outNode, index);
-            }
-        }
-        ordD.add((Rib)rib);
-//        ordDM.put(rib.getNodeId(), order);
-        order--;
-    }
-    
-    private int findOrderingIndex(Node outNode) {
-        for (int i = 0; i < nodeData.length; i++) {
-            if (nodeData[i].getNodeId() == outNode.getNodeId()) return i;
-        }
-        return 0;
-    }
 
     /**
      * This will compute the Range Minimum Query (RMQ) problem as described in
@@ -149,7 +102,8 @@ public class SuperBubbleDetectionAlgorithm {
         for (Node parent : v.getInEdges()) {
             lowestId = Integer.min(ord(parent), lowestId);
         }
-        outParent[ord(v)] = lowestId;
+        if (lowestId != Integer.MAX_VALUE)
+            outParent[ord(v)] = lowestId;
     }
 
     /**
@@ -164,38 +118,49 @@ public class SuperBubbleDetectionAlgorithm {
                 highestId = ord(child);
             }
         }
-        outChild[ord(v)] = highestId;
+        if (highestId != Integer.MIN_VALUE)
+            outChild[ord(v)] = highestId;
     }
-    
+
     /**
-     * Main entry point for the algorithm.  
+     * Main entry point for the algorithm.
+     * 
      * @param orderedNodes
      */
     private void superBubble() {
+        log.info("Ordering size: {}", ordD.size()); 
         Rib prevEnt = null;
-        for (int vId = 0; vId < ordD.size(); vId++) {
-            Rib v = ordD.get(vId);
-            alternativeEntrance[vId] = null;
-            previousEntrance[vId] = prevEnt;
+        for (int i = 0; i < ordD.size(); i++) {
+            Rib v = ordD.get(i);
+            log.info("Order({}): node({})", i, v.getNodeId());
+            alternativeEntrance[i] = null;
+            previousEntrance[i] = prevEnt;
             if (exit(v)) {
+                log.info("New exit node({})", v.getNodeId());
                 insertExit(v);
             }
             if (entrance(v)) {
+                log.info("New entrance node({})", v.getNodeId());
                 insertEntrance(v);
                 prevEnt = v;
             }
         }
 
+        log.info("\nCandidates size: {}", candidates.size());
         while (!candidates.isEmpty()) {
-            if (entrance(tail())) {
+            Rib tail = tail(candidates);
+            if (entrance(tail)) {
+                log.info("Deleting tail node({}) since it is also entrance candidate", tail.getNodeId());
                 deleteTail();
             } else {
-                reportSuperBubble(head(), tail());
+                reportSuperBubble(head(), tail);
             }
         }
     }
 
     private void reportSuperBubble(Rib start, Rib exit) {
+        log.info("start({}) on order: {}\nexit({}) on order: {}", start.getNodeId(), ord(start), exit.getNodeId(), ord(exit));
+        
         if (start == null || exit == null || ord(start) >= ord(exit)) {
             deleteTail();
             return;
@@ -206,20 +171,20 @@ public class SuperBubbleDetectionAlgorithm {
 
         while (ord(s) >= ord(start)) {
             valid = validateSuperBubble(s, exit);
-            if (valid == s || valid == alternativeEntrance[s.getNodeId()] || valid == null) {
+            if (valid == null || valid.equals(s) || valid.equals(alternativeEntrance[ord(s)])) {
                 break;
             }
-            alternativeEntrance[s.getNodeId()] = valid;
+            alternativeEntrance[ord(s)] = valid;
             s = valid;
         }
 
         deleteTail();
 
-        if (valid == s) {
+        if (valid != null && valid.equals(s)) {
             report(s, exit);
-            while (tail() != s) {
-                if (exit(tail())) {
-                    reportSuperBubble(next(s), tail());
+            while (tail(candidates) != null && !tail(candidates).equals(s)) {
+                if (exit(tail(candidates))) {
+                    reportSuperBubble(next(s), tail(candidates));
                 } else {
                     deleteTail();
                 }
@@ -232,7 +197,8 @@ public class SuperBubbleDetectionAlgorithm {
         int end = ord(endVertex);
         int outChildId = rangeMax(start, end - 1);
         int outParentId = rangeMin(start + 1, end);
-
+        
+        log.info("rangeMax(childID:{}) & end({}), rangeMin(parentID:{}) & start({}) ", outChildId, end, outParentId, start);
         if (outChildId != end)
             return null; // -1 according to Brankovic paper, p.380
 
@@ -241,22 +207,20 @@ public class SuperBubbleDetectionAlgorithm {
         else if (entrance(vertex(outParentId)))
             return vertex(outParentId);
         else
-            return previousEntrance[vertex(outParentId).getNodeId()];
+            return previousEntrance[ord(vertex(outParentId))];
     }
-
-    
 
     private int rangeMax(int start, int end) {
         int highestId = Integer.MIN_VALUE;
-        for (int i = start; i < end; i++) {
-            highestId = Integer.max(outParent[i], highestId);
+        for (int i = start; i <= end; i++) {
+            highestId = Integer.max(outChild[i], highestId);
         }
         return highestId;
     }
 
     private int rangeMin(int start, int end) {
         int lowestId = Integer.MAX_VALUE;
-        for (int i = start; i < end; i++) {
+        for (int i = start; i <= end; i++) {
             lowestId = Integer.min(outParent[i], lowestId);
         }
         return lowestId;
@@ -284,7 +248,7 @@ public class SuperBubbleDetectionAlgorithm {
      */
     private boolean exit(Rib t) {
         for (Node p : t.getInEdges()) {
-            if (p.getOutEdges().size() == 1 /* && p.getOutEdges().contains(t) */) {
+            if (p.getOutEdges().size() == 1) {
                 return true;
             }
         }
@@ -295,7 +259,6 @@ public class SuperBubbleDetectionAlgorithm {
      * lemma 3: for any superbubble <s,t> in a DAG G, there must exist some
      * child c of s such that c has exactly one parent s.
      * 
-     * 
      * @param s
      *            is a parent node which childs are checked if they satisfy
      *            lemma-3.
@@ -304,9 +267,8 @@ public class SuperBubbleDetectionAlgorithm {
      */
     private boolean entrance(Rib s) {
         for (Node c : s.getOutEdges()) {
-            if (c.getInEdges().size() == 1 /* && c.getInEdges().contains(s) */) {
+            if (c.getInEdges().size() == 1)
                 return true;
-            }
         }
         return false;
     }
@@ -325,8 +287,9 @@ public class SuperBubbleDetectionAlgorithm {
         return candidates.get(0);
     }
 
-    private Rib tail() {
-        return candidates.get(candidates.size() - 1);
+    private Rib tail(List<Rib> list) {
+        if (list != null && list.size() > 0) return list.get(list.size() - 1);
+        else return null;
     }
 
     private void deleteTail() {
@@ -343,5 +306,5 @@ public class SuperBubbleDetectionAlgorithm {
     public List<Bubble> getDetectedBubbles() {
         return detectedBubbles;
     }
-    
+
 }
