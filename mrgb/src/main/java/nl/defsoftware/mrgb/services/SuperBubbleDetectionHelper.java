@@ -46,4 +46,45 @@ public class SuperBubbleDetectionHelper {
         }
         return 0;
     }
+    
+    /**
+     * This will compute the Range Minimum Query (RMQ) problem as described in
+     * section 4 of the Brankovic paper.
+     */
+    public static void preComputeRMQ(List<Rib> ordD, int[] outParent, int[] outChild) {
+        for (int i = 0; i < ordD.size(); i++) {
+            preComputeRMQParents(ordD, ordD.get(i), outParent);
+            preComputeRMQChilds(ordD, ordD.get(i), outChild);
+        }
+    }
+
+    /**
+     * OutParent[ordD[v]] = min({ordD[u_i] | (u_i , v) \elem E}),
+     * 
+     * @param v
+     */
+    private static void preComputeRMQParents(List<Rib> ordD, Rib v, int[] outParent) {
+        int lowestId = Integer.MAX_VALUE;
+        for (Node parent : v.getInEdges()) {
+            lowestId = Integer.min(ordD.indexOf(parent), lowestId);
+        }
+        if (lowestId != Integer.MAX_VALUE) {
+            outParent[ordD.indexOf(v)] = lowestId;
+        }
+    }
+
+    /**
+     * OutChild[ordD[v]] = max({ordD[u_i] | (v, u_i) \elem E}).
+     * 
+     * @param v
+     */
+    private static void preComputeRMQChilds(List<Rib> ordD, Rib v, int[] outChild) {
+        int highestId = Integer.MIN_VALUE;
+        for (Node child : v.getOutEdges()) {
+            highestId = Integer.max(ordD.indexOf(child), highestId);
+        }
+        if (highestId != Integer.MIN_VALUE) {
+            outChild[ordD.indexOf(v)] = highestId;
+        }
+    }
 }

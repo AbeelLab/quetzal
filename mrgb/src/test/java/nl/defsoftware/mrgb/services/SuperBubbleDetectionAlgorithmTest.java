@@ -94,11 +94,11 @@ public class SuperBubbleDetectionAlgorithmTest {
         return graph.get(id);
     }
     /**
-     * This graph is the example presented in the paper.
+     * This graph is the example presented in the paper with 15 nodes (15n)
      */
     private void setupPaperTestGraph() {
         for (int i = 0; i < 15; i++) {
-            graph15n.add(new Rib(i+1));
+            graph15n.add(new Rib(i+1));//adhering to the id's in the paper 
         }
 
         // building a graph according to the example case in figure 1 of
@@ -187,36 +187,44 @@ public class SuperBubbleDetectionAlgorithmTest {
     
     @Test
     public void testgraph8n() {
+        int expectedNoOfBubbles = 2;
+        int bubble_1_entranceNode = 6;
+        int bubble_1_exitNode = 7;
+        int bubble_2_entranceNode = 2;
+        int bubble_2_exitNode = 4;
         SuperBubbleDetectionAlgorithm b = new SuperBubbleDetectionAlgorithm();
         b.detectSuperBubbles(graph8n.values().toArray(new Rib[graph8n.size()]));
         
         List<Bubble> detected = b.getDetectedBubbles();
         log.info("8n: We found {} bubbles.", detected.size());
+        assertEquals("We should have detected 2 bubbles but found "+ detected.size(), expectedNoOfBubbles, detected.size());
+        Bubble b1 = detected.get(0);
+        Bubble b2 = detected.get(1);
         
-        for (Bubble bubble : detected) {
-            log.info("start: " + bubble.getStart().getNodeId());
-            log.info(" end: " + bubble.getStop().getNodeId());
-        }
+        assertEquals("Bubble 1 has wrong entrance node.", bubble_1_entranceNode, b1.getStart().getNodeId());
+        assertEquals("Bubble 1 has wrong exit node.", bubble_1_exitNode, b1.getStop().getNodeId());
+        assertEquals("Bubble 2 has wrong entrance node.", bubble_2_entranceNode, b2.getStart().getNodeId());
+        assertEquals("Bubble 2 has wrong exit node.", bubble_2_exitNode, b2.getStop().getNodeId());
     }
     
     @Test
     public void testgraph4n() {
+        int expectedNoOfBubbles = 1;
+        int bubble_1_entranceNode = 0;
+        int bubble_1_exitNode = 3;
+        
         SuperBubbleDetectionAlgorithm b = new SuperBubbleDetectionAlgorithm();
         b.detectSuperBubbles(graph4n.values().toArray(new Rib[graph4n.size()]));
         
         List<Bubble> detected = b.getDetectedBubbles();
-        assertEquals("We should have detected 1 bubble but found "+ detected.size(), 1, detected.size());
+        log.info("4n: We found {} bubbles.", detected.size());
+        assertEquals("We should have detected 1 bubble but found "+ detected.size(), expectedNoOfBubbles, detected.size());
         
-        for (Bubble bubble : detected) {
-            log.info("start: " + bubble.getStart().getNodeId());
-            log.info(" end: " + bubble.getStop().getNodeId());
-        }
+        Bubble b1 = detected.get(0);
+        assertEquals("Bubble 1 has wrong entrance node.", bubble_1_entranceNode, b1.getStart().getNodeId());
+        assertEquals("Bubble 1 has wrong exit node.", bubble_1_exitNode, b1.getStop().getNodeId());
     }
     
-    /**
-     * Test method for
-     * {@link nl.defsoftware.mrgb.services.SuperBubbleDetectionAlgorithm#superBubble(it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap)}.
-     */
     @Test
     public void testPaperSuperBubble() {
         assertEquals(15, graph15n.size());
@@ -235,7 +243,7 @@ public class SuperBubbleDetectionAlgorithmTest {
     @Test
     public void testTopologicalOrdering() {
         List<Rib> actualOrdering = SuperBubbleDetectionHelper.topologicalSort(graph15n.toArray(new Rib[graph15n.size()]));
-        assertEquals("Size of ordering does not match", expectedOrdering.size(), actualOrdering.size());
+        assertEquals("Size of actual ordering does not match", expectedOrdering.size(), actualOrdering.size());
         for (int i = 0; i < actualOrdering.size(); i++) {
             assertEquals("Node not in order as expected.", expectedOrdering.get(i).getNodeId(), actualOrdering.get(i).getNodeId());
         }
