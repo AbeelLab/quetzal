@@ -9,10 +9,10 @@ import javafx.scene.shape.Line;
  * @date 27 September 2016
  *
  */
-public class RibbonLine extends Line implements ModelLine {
+public class DrawableEdge extends Line {
 
     
-    public RibbonLine(double xDelta, double yDelta) {
+    public DrawableEdge(double xDelta, double yDelta) {
         
         setEndX(xDelta);
         setEndY(yDelta);
@@ -25,7 +25,7 @@ public class RibbonLine extends Line implements ModelLine {
         setRotate(0.0);
     }
     
-    public RibbonLine(RibbonSequence from, RibbonSequence to) {
+    public DrawableEdge(DrawableSequence from, DrawableSequence to) {
         
         setStrokeWidth(3.0);
         setFill(Paint.valueOf("BLACK"));

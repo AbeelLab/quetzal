@@ -10,14 +10,14 @@ import javafx.scene.shape.StrokeType;
  * @date: 27 September 2016
  *
  */
-public class RibbonCurve extends CubicCurve {
+public class DrawableEdgeCurve extends CubicCurve {
 
     private static final float CURVE_SIZE = 20.0f;
     private static final float NEG_CURVE_SIZE = -20.0f;
     private static final float BASE = 0.0f;
     private static final float X_CORRECTION = 1.5f;
 
-    public RibbonCurve(int rank, int startX, int startY, int endX, int endY, boolean openingCurve) {
+    public DrawableEdgeCurve(int rank, int startX, int startY, int endX, int endY, boolean openingCurve) {
         relocate(startX + X_CORRECTION, startY);
         setBasicShapeProperties(rank, startX, startY, endX, endY,openingCurve);
     }

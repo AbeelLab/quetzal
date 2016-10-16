@@ -14,17 +14,12 @@ import javafx.collections.MapChangeListener;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.services.GraphService;
 import nl.defsoftware.mrgb.view.GraphScrollPane;
 import nl.defsoftware.mrgb.view.actions.ActionStateEnums;
-import nl.defsoftware.mrgb.view.models.GraphModel;
-import nl.defsoftware.mrgb.view.models.ModelLine;
 import nl.defsoftware.mrgb.view.models.RibbonGraphModel;
 
 /**

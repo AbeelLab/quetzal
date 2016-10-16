@@ -83,11 +83,13 @@ public class GraphHandler {
     }
 
     /**
+     * <p>
      * This method will determine any parent nodes previously stored in the
      * 'addEdgesToQueue' in a previous iteration and draw these edges with
      * respect to the location of the parent node and current node
      * 
-     * insertion: 5-6 = 4 5-7 = 5 6-7 = 4
+     * insertion: 5-6 = 4; 5-7 = 5 ; 6-7 = 4;
+     * </p>
      * 
      * @param model
      *            the data model to be filled
