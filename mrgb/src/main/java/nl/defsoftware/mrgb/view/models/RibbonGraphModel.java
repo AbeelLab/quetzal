@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.scene.shape.Shape;
+import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
@@ -19,15 +21,15 @@ import nl.defsoftware.mrgb.models.graph.Node;
 public class RibbonGraphModel extends GraphModel {
 
     private static final int LINE_ENDING_LENGTH = 8;
-    
+
     private List<Shape> allEdges;
     private Map<Integer, DrawableSequence> sequenceMap;
-    
+
     public RibbonGraphModel() {
         super();
         this.clear();
     }
-    
+
     /**
      * TODO
      * 
@@ -35,8 +37,10 @@ public class RibbonGraphModel extends GraphModel {
      * @param parentNode
      * @param rank
      */
-    public void addSequence(Node aNode, Node parentNode, int rank) {
+    @Override
+    public void addSequence(Node aNode, int rank, DoubleProperty scaleYProperty) {
         Set<Node> nodesToDraw = new HashSet<>();
+        addSequence(aNode.getNodeId(), ((Rib)aNode).getXCoordinate(), ((Rib)aNode).getYCoordinate(), scaleYProperty);
         switch (aNode.getNodeType()) {
         case SINGLE_NODE:
             break;
@@ -50,27 +54,35 @@ public class RibbonGraphModel extends GraphModel {
             break;
         }
     }
-    
-    @Override
-    public void addSequence(Integer id, int x, int y) {
-        DrawableSequence seq = new DrawableSequence();
+
+    private void addSequence(Integer id, int x, int y, DoubleProperty scaleYProperty) {
+        DrawableSequence seq = new DrawableSequence(scaleYProperty);
         seq.relocate(x, y);
         sequenceMap.put(id, seq);
         super.addedSequences.add(seq);
     }
     
     @Override
+    public void addSequence(Integer id, int x, int y) {
+        DrawableSequence seq = new DrawableSequence(null);
+        seq.relocate(x, y);
+        sequenceMap.put(id, seq);
+        super.addedSequences.add(seq);
+    }
+
+    @Override
     public void addEdge(int id, int startX, int startY, int endX, int endY, int rank) {
-        if (rank == 0) { //backbone part
+        if (rank == 0) { // backbone part
             DrawableEdge ribbonLine = new DrawableEdge(0, determineLength(startY, endY));
             ribbonLine.relocate(startX, startY);
             allEdges.add(ribbonLine);
         } else {
-            DrawableEdgeCurve ribbon = new DrawableEdgeCurve(rank, startX, startY, endX, endY, isOpeningCurve(startX, endX));
+            DrawableEdgeCurve ribbon = new DrawableEdgeCurve(rank, startX, startY, endX, endY,
+                    isOpeningCurve(startX, endX));
             allEdges.add(ribbon);
         }
     }
-    
+
     public void addEdge(int fromId, int toId, int rank) {
         DrawableSequence from = sequenceMap.get(fromId);
         DrawableSequence to = sequenceMap.get(toId);
@@ -88,11 +100,11 @@ public class RibbonGraphModel extends GraphModel {
     public void merge() {
         super.merge();
     }
-    
+
     public List<Shape> getAllEdges() {
         return this.allEdges;
     }
-    
+
     private int determineLength(int start, int end) {
         return end - start - LINE_ENDING_LENGTH;
     }

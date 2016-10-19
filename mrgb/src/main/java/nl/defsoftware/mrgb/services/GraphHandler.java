@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
+import javafx.beans.property.DoubleProperty;
 import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.view.controllers.MatchingScoreEntry;
 import nl.defsoftware.mrgb.view.models.GraphModel;
@@ -63,21 +64,21 @@ public class GraphHandler {
      * @param graphMap
      * @param genomeNamesMap
      */
-    public void loadAlternateGraphViewModel(GraphModel model) {
+    public void loadAlternateGraphViewModel(GraphModel model, DoubleProperty scaleYProperty) {
 
         int sourceNode = graphData.firstIntKey();
         // int sourceNode = 344;
         Rib firstRib = graphData.get(sourceNode);
 
         GraphHandlerUtil.addEdgesToQueue(edgeQueue, firstRib.getNodeId(), firstRib.getConnectedEdges());
-        drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0);
+        drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0, scaleYProperty);
 
         // for (int i = (sourceNode + 1); i < 500; i++) { //testing purposes
         for (int i = (sourceNode + 1); i < graphData.size(); i++) {
             if (graphData.containsKey(i)) {
                 Rib aRib = graphData.get(i);
                 GraphHandlerUtil.addEdgesToQueue(edgeQueue, aRib.getNodeId(), aRib.getConnectedEdges());
-                drawEdgesAndNodesToParents(model, aRib);
+                drawEdgesAndNodesToParents(model, aRib, scaleYProperty);
             }
         }
     }
@@ -98,7 +99,7 @@ public class GraphHandler {
      * @param aRib
      *            current node
      */
-    private void drawEdgesAndNodesToParents(GraphModel model, Rib aRib) {
+    private void drawEdgesAndNodesToParents(GraphModel model, Rib aRib, DoubleProperty scaleYProperty) {
         if (edgeQueue.containsKey(aRib.getNodeId())) {
             int[] parentNodes = edgeQueue.get(aRib.getNodeId());
             List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aRib,
@@ -107,7 +108,7 @@ public class GraphHandler {
             if (matchedGenomeRanking.size() == 1) {
                 int rank = 0;
                 Rib parentRib = matchedGenomeRanking.get(rank).getParentRib();
-                drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
+                drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank, scaleYProperty);
                 model.addEdge(aRib.getNodeId(), parentRib.getNodeId(), rank);
             } else {
                 // if the matching produces an equal score, they will end up on
@@ -135,7 +136,7 @@ public class GraphHandler {
                         highestYCoord = entry.getParentRib().getYCoordinate();
                     }
                 }
-                drawSequence(model, aRib, xCoord, highestYCoord, nodeRank);
+                drawSequence(model, aRib, xCoord, highestYCoord, nodeRank, scaleYProperty);
 
                 // draw all the edges to this aRib
                 matchedGenomeRanking = GraphHandlerUtil.determineSortedEdgeRanking(aRib, parentNodes, graphData);
@@ -156,12 +157,12 @@ public class GraphHandler {
         }
     }
 
-    private void drawSequence(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
+    private void drawSequence(GraphModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank, DoubleProperty scaleYProperty) {
         int xCoordinate = parentXCoordinate + (HOR_NODE_SPACING * rank);
         int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
 
         aRib.setCoordinates(xCoordinate, yCoordinate);
-        model.addSequence(aRib.getNodeId(), xCoordinate, yCoordinate);
+        model.addSequence(aRib, rank, scaleYProperty);
         // model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10,
         // yCoordinate, 0);
     }
@@ -177,6 +178,15 @@ public class GraphHandler {
         model.addLabel(Integer.toString(aRib.getNodeId()), endX, endY, 2);
     }
 
+    /**
+     * This will update the view
+     */
+    public void updateView() {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    
     /**
      * Layout algorithm for the graphMap data to be set on the model.
      * 
@@ -254,5 +264,4 @@ public class GraphHandler {
             model.addEdge(from, toNodes[i]);
         }
     }
-
 }

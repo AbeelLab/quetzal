@@ -54,7 +54,5 @@
       </menus>
     </MenuBar>
     <ToolBarController fx:id="toolbar" minWidth="400.0" />
-    <!-- <GraphController fx:id="graphController" />-->
-    <!-- <Pane fx:id="graphPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" /> -->
   </children>
 </fx:root>

@@ -8,6 +8,7 @@ package nl.defsoftware.mrgb.view.controllers;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 
 public class MouseGestures {
 

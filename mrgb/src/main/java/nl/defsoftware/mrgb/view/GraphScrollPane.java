@@ -1,14 +1,16 @@
-/**
- * 
- */
 package nl.defsoftware.mrgb.view;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javafx.beans.property.DoubleProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.transform.Scale;
+import nl.defsoftware.mrgb.services.GraphHandler;
 
 /**
  * ZoomableScrollPane
@@ -20,25 +22,30 @@ import javafx.scene.transform.Scale;
  * @date 6 Jun 2016
  */
 public class GraphScrollPane extends ScrollPane {
-	Group zoomGroup;
-	Scale scaleTransform;
-	Node content;
-	double scaleValue = 1.0;
-	double delta = 0.1;
-
+    
+    private static final Logger log = LoggerFactory.getLogger(GraphScrollPane.class);
+    
+	private Group zoomGroup;
+	private Scale scaleTransform;
+	private double scaleValue = 1.0;
+	private double delta = 0.05;
+	
+	//should be interface for listener object so different things can listen to changes
+	private GraphHandler graphHandler;
+	
 	public GraphScrollPane(Node content) {
-		this.content = content;
-		Group contentGroup = new Group();
-		zoomGroup = new Group();
-		contentGroup.getChildren().add(zoomGroup);
-		zoomGroup.getChildren().add(content);
-		setContent(contentGroup);
-		scaleTransform = new Scale(scaleValue, scaleValue, 0, 0);
+	    scaleTransform = new Scale(scaleValue, scaleValue, 0, 0);
+		zoomGroup = new Group(content);
 		zoomGroup.getTransforms().add(scaleTransform);
 		zoomGroup.setOnScroll(new ZoomHandler());
-		this.setManaged(true);
+		
+		setContent(zoomGroup);
+		setManaged(true);
 	}
 
+	public DoubleProperty getScaleYProperty() {
+	    return scaleTransform.yProperty();
+	}
 	public double getScaleValue() {
 		return scaleValue;
 	}
@@ -50,7 +57,8 @@ public class GraphScrollPane extends ScrollPane {
 	public void zoomTo(double scaleValue) {
 		this.scaleValue = scaleValue;
 
-		scaleTransform.setX(scaleValue);
+//		log.info("scaletransform: " + scaleTransform.toString());
+//		scaleTransform.setX(scaleValue);
 		scaleTransform.setY(scaleValue);
 	}
 
@@ -119,4 +127,8 @@ public class GraphScrollPane extends ScrollPane {
 			}
 		}
 	}
+
+    public void setChangeListener(GraphHandler graphHandler) {
+        this.graphHandler = graphHandler;        
+    }
 }

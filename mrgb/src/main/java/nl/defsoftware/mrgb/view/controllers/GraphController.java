@@ -10,13 +10,17 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.collections.MapChangeListener;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.Pane;
+import nl.defsoftware.mrgb.services.GraphHandler;
 import nl.defsoftware.mrgb.services.GraphService;
 import nl.defsoftware.mrgb.view.GraphScrollPane;
 import nl.defsoftware.mrgb.view.actions.ActionStateEnums;
@@ -30,58 +34,53 @@ import nl.defsoftware.mrgb.view.models.RibbonGraphModel;
  * @author D.L. Ettema
  * @date 7 Jun 2016
  */
-public class GraphController extends Group implements Initializable, MapChangeListener<ActionStateEnums, Boolean> {
+public class GraphController implements Initializable, MapChangeListener<ActionStateEnums, Boolean> {
 
     private static final Logger log = LoggerFactory.getLogger(GraphController.class);
 
     private GraphService graphService;
     
-    private RibbonGraphModel model;
-
     private Group groupedNodes;
 
-    private GraphScrollPane scrollPane;
-
     private MouseGestures mouseGestures;
+    
+    private GraphHandler graphHandler;
 
-    /**
-     * the pane wrapper is necessary or else the scrollpane would always align
-     * the top-most and left-most child to the top and left eg when you drag the
-     * top child down, the entire scrollpane would move down
-     */
-    CellLayer cellLayer;
+    private GraphScrollPane scrollPane;
+    
+    private RibbonGraphModel model;
+    
+    private DoubleProperty zoomFactor;
 
-    Canvas canvas;
+    private static final double SCROLL_ZOOM_FACTOR = 0.0025;
+    
+    private CellLayer cellLayer;
+
+    private Canvas canvas;
+    
+    @FXML
+    private Pane topPane;
 
     public GraphController() {
-//        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("fff.fxml"));
-//        fxmlLoader.setRoot(this);
-//        fxmlLoader.setController(this);
-//        try {
-//            fxmlLoader.load();
-//        } catch (IOException exception) {
-//            log.error("Could not load resource related to toolbar.fxml" + exception.getMessage());
-//            throw new RuntimeException(exception);
-//        }
-        
         graphService = new GraphService();
         
         model = new RibbonGraphModel();
         groupedNodes = new Group();
         cellLayer = new CellLayer();
 
-        canvas  = new Canvas(500, 3000);
         groupedNodes.getChildren().add(cellLayer);
-        groupedNodes.getChildren().add(canvas);
 
         mouseGestures = new MouseGestures(this);
 
         scrollPane = new GraphScrollPane(groupedNodes);
-
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
         scrollPane.setHbarPolicy(ScrollBarPolicy.ALWAYS);
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+        
+        scrollPane.setChangeListener(graphHandler);
+        
+        cellLayer.setStyle("-fx-background-color: white;");
     }
     
     @Override
@@ -101,7 +100,8 @@ public class GraphController extends Group implements Initializable, MapChangeLi
             } else if (ActionStateEnums.VIEW_GRAPH == change.getKey()) {
                 beginUpdate();
 //                graphService.loadSequenceModel(model, semanticView);//TODO
-                graphService.loadSequenceModel(model);
+                graphHandler = new GraphHandler(graphService.getParsedSequences(), graphService.getGenomeNames());
+                graphHandler.loadAlternateGraphViewModel(model, scrollPane.getScaleYProperty());
                 endUpdate();
                 log.info("VIEW GRAPH");
             }
@@ -139,18 +139,6 @@ public class GraphController extends Group implements Initializable, MapChangeLi
 
         // add components to graph pane
         
-//        GraphicsContext gc = getCanvas().getGraphicsContext2D();
-//        gc.setStroke(Color.BLUE);
-//        gc.setLineWidth(3);
-//        for (Shape shape : model.getAllEdges()) {
-//            if (shape instanceof ModelLine) {
-//                ModelLine l = (ModelLine) shape;
-//                gc.strokeLine(shape.getLayoutX(), shape.getLayoutY(), shape.getLayoutX(), shape.getLayoutY() + 17);
-//            } else { 
-//                getCellLayer().getChildren().addAll(shape);
-//            }
-//        }
-        
         getCellLayer().getChildren().addAll(model.getAllEdges());
         getCellLayer().getChildren().addAll(model.getAddedSequences());
         getCellLayer().getChildren().addAll(model.getAllLabels());
@@ -160,9 +148,9 @@ public class GraphController extends Group implements Initializable, MapChangeLi
 //        getCellLayer().getChildren().removeAll(model.getRemovedEdges());
 
         // enable dragging of cells
-//        for (Node node : model.getAddedSequences()) {
-//            mouseGestures.makeDraggable(node);
-//        }
+        for (Node node : model.getAddedSequences()) {
+            mouseGestures.makeDraggable(node);
+        }
 
         // every cell must have a parent, if it doesn't, then the graphParent is
         // the parent

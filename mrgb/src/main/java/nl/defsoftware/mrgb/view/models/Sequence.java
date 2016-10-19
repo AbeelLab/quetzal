@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
@@ -20,7 +22,8 @@ public class Sequence extends Circle {
 	private Collection<Edge> edges;
 	private List<Sequence> childSequences = new ArrayList<Sequence>();
 	private List<Sequence> parentSequences = new ArrayList<Sequence>();
-	
+	private DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
+	  
 	public Sequence(Integer id) {
 	    this.id = id;
         this.edges = new ArrayList<Edge>();

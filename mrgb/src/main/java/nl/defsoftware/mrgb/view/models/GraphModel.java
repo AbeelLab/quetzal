@@ -8,9 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
+import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
  *
@@ -79,6 +81,8 @@ public class GraphModel {
         sequence.relocate(x, y);
         addSequence(sequence, x);
     }
+	
+	public void addSequence(Node aNode, int rank, DoubleProperty scaleYProperty) {}
     
     private void addSequence(Sequence sequence, int xCoord) {
         addedSequences.add(sequence);
@@ -140,6 +144,7 @@ public class GraphModel {
      * To be overwritten by subclasses
      */
     public void addEdge(int id, int startX, int startY, int endX, int endY, int rank) {}
+    public void addEdge(int childId, int parentId, int rank, DoubleProperty scaleYProperty) {}
     public void addEdge(int childId, int parentId, int rank) {}
     
 	public void clearAddedLists() {
