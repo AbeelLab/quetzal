@@ -11,6 +11,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.transform.Scale;
 import nl.defsoftware.mrgb.services.GraphHandler;
+import nl.defsoftware.mrgb.view.controllers.GraphController;
 
 /**
  * ZoomableScrollPane
@@ -32,6 +33,7 @@ public class GraphScrollPane extends ScrollPane {
 	
 	//should be interface for listener object so different things can listen to changes
 	private GraphHandler graphHandler;
+	private GraphController graphController;
 	
 	public GraphScrollPane(Node content) {
 	    scaleTransform = new Scale(scaleValue, scaleValue, 0, 0);
@@ -56,10 +58,8 @@ public class GraphScrollPane extends ScrollPane {
 
 	public void zoomTo(double scaleValue) {
 		this.scaleValue = scaleValue;
-
-//		log.info("scaletransform: " + scaleTransform.toString());
-//		scaleTransform.setX(scaleValue);
 		scaleTransform.setY(scaleValue);
+		graphController.updateView();
 	}
 
 	public void zoomActual() {
@@ -130,5 +130,9 @@ public class GraphScrollPane extends ScrollPane {
 
     public void setChangeListener(GraphHandler graphHandler) {
         this.graphHandler = graphHandler;        
+    }
+    
+    public void setController(GraphController graphController) {
+        this.graphController = graphController;
     }
 }

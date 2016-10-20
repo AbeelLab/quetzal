@@ -21,7 +21,6 @@ import nl.defsoftware.mrgb.view.actions.ActionStates;
 public class ToolBarController extends HBox implements Initializable {
 	private static final Logger log = LoggerFactory.getLogger(ToolBarController.class);
 
-	
 	private RootController parentContoller;
 	private ActionStates<ActionStateEnums, Boolean> actionStates;
 
@@ -35,7 +34,6 @@ public class ToolBarController extends HBox implements Initializable {
 	private Button viewGraphButton;
 
 	public ToolBarController() {
-		log.info("init action toolbar Controller");
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("toolbar.fxml"));
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);

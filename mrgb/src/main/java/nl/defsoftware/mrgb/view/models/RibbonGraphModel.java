@@ -3,7 +3,6 @@ package nl.defsoftware.mrgb.view.models;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,7 +17,7 @@ import nl.defsoftware.mrgb.models.graph.Node;
  * @date: 27 September 2016
  *
  */
-public class RibbonGraphModel extends GraphModel {
+public class RibbonGraphModel extends AbstractGraphViewModel implements IGraphViewModel {
 
     private static final int LINE_ENDING_LENGTH = 8;
 
@@ -83,10 +82,16 @@ public class RibbonGraphModel extends GraphModel {
         }
     }
 
-    public void addEdge(int fromId, int toId, int rank) {
-        DrawableSequence from = sequenceMap.get(fromId);
-        DrawableSequence to = sequenceMap.get(toId);
+    @Override
+    public void addEdge(int childId, int parentId, int rank) {
+        DrawableSequence from = sequenceMap.get(parentId);
+        DrawableSequence to = sequenceMap.get(childId);
         allEdges.add(new DrawableEdge(from, to));
+    }
+
+    @Override
+    public void addEdge(int childId, int parentId, int rank, DoubleProperty scaleYProperty) {
+        throw new UnsupportedOperationException("Method not implemented for " + this.getClass().getName());
     }
 
     @Override
@@ -97,10 +102,6 @@ public class RibbonGraphModel extends GraphModel {
     }
 
     @Override
-    public void merge() {
-        super.merge();
-    }
-
     public List<Shape> getAllEdges() {
         return this.allEdges;
     }

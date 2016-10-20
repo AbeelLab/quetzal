@@ -8,7 +8,7 @@ import java.util.Map;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import nl.defsoftware.mrgb.models.Rib;
-import nl.defsoftware.mrgb.view.models.GraphModel;
+import nl.defsoftware.mrgb.view.models.AbstractGraphViewModel;
 
 /**
  * A service that takes care of retrieving and storing graph data.
@@ -34,7 +34,7 @@ public class GraphService {
         return parserService.getParsedEdges();
     }
     
-    public void loadSequenceModel(GraphModel model) {
+    public void loadSequenceModel(AbstractGraphViewModel model) {
     }
     
     public Int2ObjectLinkedOpenHashMap<Rib> getParsedSequences() {

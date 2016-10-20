@@ -22,10 +22,10 @@ public class RootController extends VBox implements Initializable {
 	@FXML
 	private ToolBarController toolbar;
 	
+	@FXML
 	private GraphController graphController;
 
 	public RootController() {
-		log.info("Root Controller constructor");
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("mrgb.fxml"));
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);
@@ -41,8 +41,6 @@ public class RootController extends VBox implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		log.info("Root Controller init");
-		
 		graphController = new GraphController();
         graphController.getScrollPane().prefWidthProperty().bind(this.widthProperty());
         graphController.getScrollPane().prefHeightProperty().bind(this.heightProperty());

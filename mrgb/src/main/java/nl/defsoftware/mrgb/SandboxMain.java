@@ -4,6 +4,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import javafx.application.Application;
@@ -53,15 +57,33 @@ public class SandboxMain extends Application {
 	public static void main(String[] args) {
 		
 		int id = summation();
-		System.out.println("id=" + id + " Integertype="+ Integer.class.isInstance(id));
-//		launch(args);
-		System.exit(0);
+		System.out.println("id=" + id);
+		
 	}
 	
 	private static int summation() {
-		short id = 2;
-		short offset = 5;
-		short arrayOffset = 10;
-		return (id + offset) * arrayOffset;
-	}
+	    List<Integer> input = new ArrayList<>(); 
+	    input.add(123);
+	    input.add(-2);
+	    input.add(477);
+	    input.add(3);
+	    input.add(14);
+	    input.add(6551);
+	    
+	    List<Integer> result = input; 
+	    
+        for (Iterator iter = input.iterator(); iter.hasNext(); ) {
+            Integer inet = (Integer) iter.next();
+            fold(result, inet);
+        }
+        
+        return result.get(result.size() - 1);
+    }
+    
+    private static void fold(List<Integer> result, int add) {
+        for( int i = 0; i < result.size(); i++) {
+            result.set(i, result.get(i) + add);
+        }
+    }
+	
 }
