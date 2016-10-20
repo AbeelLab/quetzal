@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Button?>
-<fx:root type="javafx.scene.layout.HBox" xmlns:fx="http://javafx.com/fxml">
+<fx:root type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml">
   <ToolBar>
     <Button fx:id="loadDataButton" onAction="#loadDataButtonAction" text="Load GFA Data" />
     <Button fx:id="viewGraphButton" onAction="#viewGraphButtonAction" text="View Graph" />
