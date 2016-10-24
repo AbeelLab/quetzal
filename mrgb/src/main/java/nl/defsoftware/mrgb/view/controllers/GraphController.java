@@ -3,7 +3,6 @@
  */
 package nl.defsoftware.mrgb.view.controllers;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -18,10 +17,8 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollBar;
@@ -29,6 +26,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.services.GraphHandler;
 import nl.defsoftware.mrgb.services.GraphService;
 import nl.defsoftware.mrgb.view.GraphScrollPane;
@@ -58,23 +56,21 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
 
     private GraphScrollPane scrollPane;
 
-    private IGraphViewModel model;
+    private IGraphViewModel<Shape> model;
 
     private static final double SCROLL_ZOOM_FACTOR = 0.0025;
-
-    private CellLayer cellLayer;
 
     @FXML
     private AnchorPane mainPane;
 
     @FXML
-    private Pane topPane;
+    private Pane nodePane;
 
     @FXML
     private ScrollBar scrollbar;
 
     @FXML
-    private Canvas topEdgeCanvas;
+    private Canvas edgeCanvas;
 
     @FXML
     private Label showingRange;
@@ -86,8 +82,15 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     public GraphController() {
         graphService = new GraphService();
         model = new RibbonGraphModel();
+        
+        nodePane = new Pane();
+        nodePane.setPrefHeight(500.0);
+        nodePane.setPrefWidth(300.0);
+        nodePane.setStyle("-fx-back-ground-color: white;");
+        
         groupedNodes = new Group();
-        cellLayer = new CellLayer();
+        groupedNodes.getChildren().add(nodePane);
+        
         mouseGestures = new MouseGestures(this);
         scrollPane = new GraphScrollPane(groupedNodes);
         scrollPane.setFitToWidth(true);
@@ -97,56 +100,48 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         scrollPane.setController(this);
         scrollPane.setChangeListener(graphHandler);
 
-        groupedNodes.getChildren().add(cellLayer);
-        cellLayer.setStyle("-fx-background-color: white;");
+        edgeCanvas = new Canvas();
+        mainPane = new AnchorPane();
+        scrollbar = new ScrollBar();
+//        mainPane.getChildren().add(scrollPane);
+//        mainPane.getChildren().add(groupedNodes);
 
         GraphAnimationTimer timer = new GraphAnimationTimer();
         timer.start();
+        graphHandler = new GraphHandler(graphService.getParsedSequences(), graphService.getGenomeNames());
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
     }
 
     public void updateView() {
         needsUpdate = true;
     }
     
-    private class GraphAnimationTimer extends AnimationTimer {
-
-        public GraphAnimationTimer() {
-        }
-
-        @Override
-        public void handle(long now) {
-          if (needsUpdate) {
-            log.info("Updating graph");
-            needsUpdate = false;
-            updateGraph();
-          }
-        }
-    }
-    
     public void updateGraph() {
-//        int viewRange = (int) (mainPane.getHeight() / zoomFactor.get()) + 1;
+//        double viewRange = (mainPane.getHeight() / zoomFactor.get()) + 1;
 //        double viewingStart = Math.max(amountOfLevels.multiply(scrollbar.getValue()).doubleValue(), 0.0);
-//        clear();
-//        
-        beginUpdate();
-        graphHandler = new GraphHandler(graphService.getParsedSequences(), graphService.getGenomeNames());
-        graphHandler.loadAlternateGraphViewModel(model, scrollPane.getScaleYProperty());
+        double dummyRange = 500;
+        double dummyViewingStartCoordinate = 1;
+        clear();
+        zoomFactor.bind(scrollPane.getScaleYProperty());
+        graphHandler.loadAlternateGraphViewModel(
+                nodePane, 
+                edgeCanvas, 
+                model, 
+                dummyViewingStartCoordinate, 
+                dummyRange, 
+                zoomFactor);
         endUpdate();
         log.info("VIEW GRAPH");
         
-//        graphHandler.loadAlternateGraphViewModel(topPane, topEdgeCanvas, model, viewingStart, viewRange);
     }
 
     private void clear() {
-        topPane.getChildren().clear();
-        topEdgeCanvas.getGraphicsContext2D().clearRect(0, 0, topEdgeCanvas.getWidth(), topEdgeCanvas.getWidth());
+        nodePane.getChildren().clear();
+        edgeCanvas.getGraphicsContext2D().clearRect(0, 0, edgeCanvas.getWidth(), edgeCanvas.getWidth());
     }
-    
     
     @Override
     public void onChanged(MapChangeListener.Change<? extends ActionStateEnums, ? extends Boolean> change) {
@@ -174,37 +169,33 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         return this.scrollPane;
     }
 
-    public Pane getCellLayer() {
-        return this.cellLayer;
+    public Pane getMainPane() {
+        return mainPane;
     }
-
-    private void beginUpdate() {
-        getCellLayer().getChildren().clear();
-    }
-
+    
     private void endUpdate() {
 
         // add components to graph pane
 
-        getCellLayer().getChildren().addAll(model.getAllEdges());
-        getCellLayer().getChildren().addAll(model.getAddedSequences());
-        getCellLayer().getChildren().addAll(model.getAllLabels());
+        nodePane.getChildren().addAll(model.getAllEdges());
+        nodePane.getChildren().addAll(model.getAddedSequences());
+        nodePane.getChildren().addAll(model.getAllLabels());
 
         // remove components from graph pane
-        // getCellLayer().getChildren().removeAll(model.getRemovedSequences());
-        // getCellLayer().getChildren().removeAll(model.getRemovedEdges());
+         nodePane.getChildren().removeAll(model.getRemovedSequences());
+         nodePane.getChildren().removeAll(model.getRemovedEdges());
 
         // enable dragging of cells
-        for (Node node : model.getAddedSequences()) {
-            mouseGestures.makeDraggable(node);
-        }
+//        for (Node node : model.getAddedSequences()) {
+//            mouseGestures.makeDraggable(node);
+//        }
 
         // every cell must have a parent, if it doesn't, then the graphParent is
         // the parent
-        // getModel().attachOrphansToGraphParent(model.getAddedSequences());
+        // model.attachOrphansToGraphParent(model.getAddedSequences());
         //
         // // remove reference to graphParent
-        // getModel().disconnectFromGraphParent(model.getRemovedSequences());
+        // model.disconnectFromGraphParent(model.getRemovedSequences());
 
         // merge added & removed cells with all cells
         model.merge();
@@ -213,8 +204,16 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     public double getScale() {
         return this.scrollPane.getScaleValue();
     }
+    
+    private class GraphAnimationTimer extends AnimationTimer {
 
-    public class CellLayer extends Pane {
-
+        @Override
+        public void handle(long now) {
+          if (needsUpdate) {
+            log.info("Updating graph");
+            needsUpdate = false;
+            updateGraph();
+          }
+        }
     }
 }

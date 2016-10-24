@@ -287,4 +287,19 @@ public class GraphHandlerUtil {
         scoresList.add(new MatchingScoreEntry(matchingScore, parentRib, childNodeId));
     }
 
+    public static final int MINUMUM_BASE_SIZE = 150;
+    private static final double DECENT_NODE_HEIGTH = 3.0;
+    
+    public static double calculateNodeHeight(Rib aRib, double zoomFactor) {
+        int nodeSize = aRib.getSequence().length;
+        double heigth = nodeSize * zoomFactor;
+        if (nodeSize < MINUMUM_BASE_SIZE && heigth < DECENT_NODE_HEIGTH) {
+          heigth = MINUMUM_BASE_SIZE * zoomFactor;
+          if (heigth > DECENT_NODE_HEIGTH) {
+            return DECENT_NODE_HEIGTH;
+          }
+        }
+        return heigth;
+      }
+    
 }

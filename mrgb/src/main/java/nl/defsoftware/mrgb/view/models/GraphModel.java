@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import javafx.beans.property.DoubleProperty;
-import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
@@ -18,11 +17,11 @@ import nl.defsoftware.mrgb.models.graph.Node;
  * @author D.L. Ettema
  * @date 8 Jun 2016
  */
-public class GraphModel extends AbstractGraphViewModel implements IGraphViewModel {
+public class GraphModel extends AbstractGraphViewModel<Edge> {
 
-    List<Edge> allEdges;
-    List<Edge> addedEdges;
-    List<Edge> removedEdges;
+    private List<Edge> allEdges;
+    private List<Edge> addedEdges;
+    private List<Edge> removedEdges;
     
     Map<Integer, Sequence> sequenceMap; // <id,Sequence>
     Map<Integer, List<Integer>> xCoordinateMap; // <xCoordinate, ids[]>
@@ -55,14 +54,9 @@ public class GraphModel extends AbstractGraphViewModel implements IGraphViewMode
     }
     
     @Override
-    public List<Shape> getAllEdges() {
-       throw new UnsupportedOperationException("Method not implemented for " + this.getClass().getName());
+    public List<Edge> getAllEdges() {
+       return allEdges;
     }
-    
-//    @Override
-//    public List<Edge> getAllEdges() {
-//       return allEdges;
-//    }
 
     private void addEdge(Integer childId, Integer parentId) {
         Sequence sourceSequence = sequenceMap.get(parentId);
@@ -93,7 +87,7 @@ public class GraphModel extends AbstractGraphViewModel implements IGraphViewMode
     }
 
     @Override
-    public void addSequence(Node aNode, int rank, DoubleProperty scaleYProperty) {
+    public void addSequence(Node aNode, int rank, NodeDrawingData drawingData) {
         throw new UnsupportedOperationException("Method not implemented for " + this.getClass().getName());
     }
 

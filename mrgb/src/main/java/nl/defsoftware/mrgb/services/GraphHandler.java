@@ -12,9 +12,13 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.layout.Pane;
 import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.view.controllers.MatchingScoreEntry;
 import nl.defsoftware.mrgb.view.models.IGraphViewModel;
+import nl.defsoftware.mrgb.view.models.NodeDrawingData;
 
 /**
  * This GraphHandler object is responsible for filling the graph model from
@@ -40,10 +44,14 @@ public class GraphHandler {
     private Short2ObjectOpenHashMap<String> genomeNamesMap = new Short2ObjectOpenHashMap<>();
 
     private Int2ObjectOpenHashMap<int[]> edgeQueue = new Int2ObjectOpenHashMap<>();
-    
+
+    private DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
+    private double drawingStartCoordinate = 0;
+    private double drawingRange = 0;
+
     /**
-     * Given the two datastructures this Handler will input these into the model
-     * and the model will determine the layout
+     * Given the two data-structures this Handler will input these into the
+     * model and the model will determine the layout
      * 
      * @param graphMap
      * @param genomeNamesMap
@@ -51,31 +59,40 @@ public class GraphHandler {
     public GraphHandler(Int2ObjectLinkedOpenHashMap<Rib> graphData, Short2ObjectOpenHashMap<String> genomeNamesMap) {
         this.graphData = graphData;
         this.genomeNamesMap = genomeNamesMap;
-        
+
     }
 
     /**
-     * This will fill the graph based on the graphmap.
      * 
+     * 
+     * @param nodePane
+     * @param edgeCanvas
      * @param model
-     * @param graphMap
-     * @param genomeNamesMap
+     * @param drawingStartCoordinate: where to start drawing.
+     * @param drawingRange: the range of drawing in total which can be bigger then the actual window view
+     * @param zoomFactor
      */
-    public void loadAlternateGraphViewModel(IGraphViewModel model, DoubleProperty scaleYProperty) {
+    public void loadAlternateGraphViewModel(Pane nodePane, Canvas edgeCanvas, IGraphViewModel model,
+            double drawingStartCoordinate, double drawingRange, DoubleProperty zoomFactor) {
+        this.zoomFactor = zoomFactor;
+        this.drawingStartCoordinate = drawingStartCoordinate;
+        this.drawingRange = drawingRange;
 
-        int sourceNode = graphData.firstIntKey();
-        // int sourceNode = 344;
+        int sourceNode = graphData.firstIntKey();// TODO should be viewing range dependent
         Rib firstRib = graphData.get(sourceNode);
 
+        // double paneHeight = nodePane.getPrefHeight();
+        // int rows = Math.floorDiv((int)Math.round(paneHeight), VER_NODE_SPACING);
+
         GraphHandlerUtil.addEdgesToQueue(edgeQueue, firstRib.getNodeId(), firstRib.getConnectedEdges());
-        drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0, scaleYProperty);
+        drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0);
 
         // for (int i = (sourceNode + 1); i < 500; i++) { //testing purposes
         for (int i = (sourceNode + 1); i < graphData.size(); i++) {
             if (graphData.containsKey(i)) {
                 Rib aRib = graphData.get(i);
                 GraphHandlerUtil.addEdgesToQueue(edgeQueue, aRib.getNodeId(), aRib.getConnectedEdges());
-                drawEdgesAndNodesToParents(model, aRib, scaleYProperty);
+                drawEdgesAndNodesToParents(model, aRib);
             }
         }
     }
@@ -96,7 +113,7 @@ public class GraphHandler {
      * @param aRib
      *            current node
      */
-    private void drawEdgesAndNodesToParents(IGraphViewModel model, Rib aRib, DoubleProperty scaleYProperty) {
+    private void drawEdgesAndNodesToParents(IGraphViewModel model, Rib aRib) {
         if (edgeQueue.containsKey(aRib.getNodeId())) {
             int[] parentNodes = edgeQueue.get(aRib.getNodeId());
             List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aRib,
@@ -105,7 +122,7 @@ public class GraphHandler {
             if (matchedGenomeRanking.size() == 1) {
                 int rank = 0;
                 Rib parentRib = matchedGenomeRanking.get(rank).getParentRib();
-                drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank, scaleYProperty);
+                drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
                 model.addEdge(aRib.getNodeId(), parentRib.getNodeId(), rank);
             } else {
                 // if the matching produces an equal score, they will end up on
@@ -114,8 +131,8 @@ public class GraphHandler {
                 // 2. find the one with the highest node id closest to the
                 // aRib.nodeId and draw from those coordinates
 
-                int highestYCoord = 0;
-                int xCoord = 0;
+                double highestYCoord = 0;
+                double xCoord = 0;
                 int nodeRank = 0;
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
@@ -133,7 +150,7 @@ public class GraphHandler {
                         highestYCoord = entry.getParentRib().getYCoordinate();
                     }
                 }
-                drawSequence(model, aRib, xCoord, highestYCoord, nodeRank, scaleYProperty);
+                drawSequence(model, aRib, xCoord, highestYCoord, nodeRank);
 
                 // draw all the edges to this aRib
                 matchedGenomeRanking = GraphHandlerUtil.determineSortedEdgeRanking(aRib, parentNodes, graphData);
@@ -154,22 +171,56 @@ public class GraphHandler {
         }
     }
 
-    private void drawSequence(IGraphViewModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank, DoubleProperty scaleYProperty) {
-        int xCoordinate = parentXCoordinate + (HOR_NODE_SPACING * rank);
-        int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
+    private static final double MIN_VISIBILITY_WIDTH = 2.0;
+    private static final double DEFAULT_SINGLE_NODE_WIDTH = 5.0;
 
-        aRib.setCoordinates(xCoordinate, yCoordinate);
-        model.addSequence(aRib, rank, scaleYProperty);
-        // model.addLabel(Integer.toString(aRib.getNodeId()), xCoordinate + 10,
-        // yCoordinate, 0);
+    private void drawSequence(IGraphViewModel model, Rib aRib, double parentXCoordinate, double parentYCoordinate, int rank) {
+        double height = GraphHandlerUtil.calculateNodeHeight(aRib, zoomFactor.get());
+        double width = zoomFactor.multiply(DEFAULT_SINGLE_NODE_WIDTH).get(); // if it is a bubble, then different.
+
+        if (!isInView(aRib, drawingStartCoordinate, drawingRange)) {
+            return;
+        } else if (height < MIN_VISIBILITY_WIDTH) {
+            // aRib.unpop();
+            // heatmapColorer.drawHeatmap(node, startLevel);
+            return;
+        }
+
+        //Here we assume the node is in the drawable region
+        NodeDrawingData drawingData = new NodeDrawingData();
+        drawingData.height = height;
+        drawingData.width = width;
+        drawingData.xCoordinate = parentXCoordinate + (HOR_NODE_SPACING * rank);
+        drawingData.yCoordinate = parentYCoordinate + VER_NODE_SPACING;
+
+        // happens in the model
+        // IViewGraphNode viewNode = ViewNodeBuilder.buildNode(node, width, height);
+        // double fade = calculateBubbleFadeFactor(node, width);
+
+         addSequenceToModel(model, aRib, parentXCoordinate, parentYCoordinate, rank, drawingData);
+    }
+
+    private void addSequenceToModel(IGraphViewModel model, Rib aRib, double parentXCoordinate, double parentYCoordinate, int rank, NodeDrawingData drawingData) {
+//        int xCoordinate = parentXCoordinate + (HOR_NODE_SPACING * rank);
+//        int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
+        
+        aRib.setCoordinates(drawingData.xCoordinate, drawingData.yCoordinate);
+        model.addSequence(aRib, rank, drawingData);
+    }
+
+    private boolean isInView(Rib aRib, double startLevel, double endLevel) {
+        return true;
+        // int nodeStart = aRib.getLevel() - aRib.getSequence().length;
+        // int nodeEnd = node.getLevel();
+        // return nodeStart < endLevel && nodeEnd > startLevel;
     }
 
     private void drawEdge(IGraphViewModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
         int startX = parentXCoordinate;
         int startY = parentYCoordinate + Y_CORRECTION;
 
-        int endX = aRib.getXCoordinate();
-        int endY = aRib.getYCoordinate() + Y_CORRECTION;
+        int endX = (int)Math.round(aRib.getXCoordinate());
+        int endY = (int)Math.round(aRib.getYCoordinate()) + Y_CORRECTION;
 
         model.addEdge(aRib.getNodeId(), startX, startY, endX, endY, rank);
         model.addLabel(Integer.toString(aRib.getNodeId()), endX, endY, 2);

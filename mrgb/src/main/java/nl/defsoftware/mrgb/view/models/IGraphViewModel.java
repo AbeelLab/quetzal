@@ -1,6 +1,7 @@
 package nl.defsoftware.mrgb.view.models;
 
 import java.util.List;
+import java.util.Set;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.control.Label;
@@ -11,10 +12,10 @@ import nl.defsoftware.mrgb.models.graph.Node;
  * @author D.L. Ettema
  *
  */
-public interface IGraphViewModel {
+public interface IGraphViewModel<V> {
 
     //current
-    public void addSequence(Node aNode, int rank, DoubleProperty scaleYProperty);
+    public void addSequence(Node aNode, int rank, NodeDrawingData drawingData);
     
     public void addSequence(Integer id, int x, int y);
     
@@ -32,13 +33,19 @@ public interface IGraphViewModel {
     
     public void merge();
     
-    public List<Shape> getAllSequences();
+    public Set<Shape> getAllSequences();
     
-    public List<Shape> getAddedSequences();
+    public Set<Shape> getAddedSequences();
 
+    public List<Shape> getRemovedSequences();
+    
 //    public List<Edge> getAllEdges(); //for GraphModel class only.
     
-    public List<Shape> getAllEdges();
+    public List<V> getAllEdges();
+    
+    public List<V> getAddedEdges();
+
+    public List<V> getRemovedEdges();
     
     public List<Label> getAllLabels();
 }

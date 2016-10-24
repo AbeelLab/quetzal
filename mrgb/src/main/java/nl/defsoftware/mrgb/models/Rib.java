@@ -18,8 +18,8 @@ public class Rib extends AbstractNode implements Node {
                                                 // file
     private int[] connectedEdges = new int[0];
     private Int2IntOpenHashMap edgeWeights = new Int2IntOpenHashMap();
-    private int xCoordinate;
-    private int yCoordinate;
+    private double xCoordinate;
+    private double yCoordinate;
     
     // private List<String> crdctg; //unknown what to use for. Not yet
     // implemented
@@ -50,7 +50,7 @@ public class Rib extends AbstractNode implements Node {
         return genomeIds.length;
     }
 
-    public void setCoordinates(int xCoord, int yCoord) {
+    public void setCoordinates(double xCoord, double yCoord) {
         xCoordinate = xCoord;
         yCoordinate = yCoord;
     }
@@ -91,19 +91,19 @@ public class Rib extends AbstractNode implements Node {
         this.referenceGenomeCoordinates = referenceGenomeCoordinates;
     }
 
-    public int getXCoordinate() {
+    public double getXCoordinate() {
         return xCoordinate;
     }
 
-    public void setXCoordinate(int xCoordinate) {
+    public void setXCoordinate(double xCoordinate) {
         this.xCoordinate = xCoordinate;
     }
 
-    public int getYCoordinate() {
+    public double getYCoordinate() {
         return yCoordinate;
     }
 
-    public void setYCoordinate(int yCoordinate) {
+    public void setYCoordinate(double yCoordinate) {
         this.yCoordinate = yCoordinate;
     }
 

@@ -1,6 +1,5 @@
 package nl.defsoftware.mrgb.view.models;
 
-import javafx.beans.property.DoubleProperty;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
@@ -11,12 +10,12 @@ import javafx.scene.shape.Rectangle;
 public class DrawableSequence extends Rectangle {
     
     
-    public DrawableSequence(DoubleProperty scaleYProperty) {
+    public DrawableSequence(NodeDrawingData nodeDrawingData) {
         
-        setWidth(3.0);
-        setHeight(5.0);
+        setWidth(nodeDrawingData.width);
+        setHeight(nodeDrawingData.height);
 
         setFill(Paint.valueOf("DARKRED"));
-        setOpacity(0.5);
+        setOpacity(0.7);
     }
 }

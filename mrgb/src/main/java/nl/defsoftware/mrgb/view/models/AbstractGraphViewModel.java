@@ -1,17 +1,19 @@
 package nl.defsoftware.mrgb.view.models;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javafx.scene.control.Label;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 
-public abstract class AbstractGraphViewModel implements IGraphViewModel {
+public abstract class AbstractGraphViewModel<V> implements IGraphViewModel<V> {
 
     protected Sequence graphParent;
-    protected List<Shape> allSequences;
-    protected List<Shape> addedSequences;
+    protected Set<Shape> allSequences;
+    protected Set<Shape> addedSequences;
     protected List<Shape> removedSequences;
     protected List<Label> allLabels;
     
@@ -21,8 +23,8 @@ public abstract class AbstractGraphViewModel implements IGraphViewModel {
 
     public void clear() {
         graphParent = new Sequence(new Integer(0));
-    	allSequences = new ArrayList<>();
-    	addedSequences = new ArrayList<>();
+    	allSequences = new HashSet<>();
+    	addedSequences = new HashSet<>();
     	removedSequences = new ArrayList<>();
     	allLabels = new ArrayList<>();
     }
@@ -48,7 +50,7 @@ public abstract class AbstractGraphViewModel implements IGraphViewModel {
         allLabels.add(label);
     }    
     
-    public List<Shape> getAllSequences() {
+    public Set<Shape> getAllSequences() {
     	return allSequences;
     }
 
@@ -56,7 +58,7 @@ public abstract class AbstractGraphViewModel implements IGraphViewModel {
         return allLabels;
     }
     
-    public List<Shape> getAddedSequences() {
+    public Set<Shape> getAddedSequences() {
         return addedSequences;
     }
 

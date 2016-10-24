@@ -17,11 +17,13 @@ import nl.defsoftware.mrgb.models.graph.Node;
  * @date: 27 September 2016
  *
  */
-public class RibbonGraphModel extends AbstractGraphViewModel implements IGraphViewModel {
+public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
 
     private static final int LINE_ENDING_LENGTH = 8;
 
     private List<Shape> allEdges;
+    private List<Shape> addedEdges;
+    private List<Shape> removedEdges;
     private Map<Integer, DrawableSequence> sequenceMap;
 
     public RibbonGraphModel() {
@@ -30,16 +32,14 @@ public class RibbonGraphModel extends AbstractGraphViewModel implements IGraphVi
     }
 
     /**
-     * TODO
-     * 
      * @param aNode
      * @param parentNode
      * @param rank
      */
     @Override
-    public void addSequence(Node aNode, int rank, DoubleProperty scaleYProperty) {
+    public void addSequence(Node aNode, int rank, NodeDrawingData drawingData) {
         Set<Node> nodesToDraw = new HashSet<>();
-        addSequence(aNode.getNodeId(), ((Rib)aNode).getXCoordinate(), ((Rib)aNode).getYCoordinate(), scaleYProperty);
+        addSequence(aNode.getNodeId(), ((Rib)aNode).getXCoordinate(), ((Rib)aNode).getYCoordinate(), drawingData);
         switch (aNode.getNodeType()) {
         case SINGLE_NODE:
             break;
@@ -54,19 +54,24 @@ public class RibbonGraphModel extends AbstractGraphViewModel implements IGraphVi
         }
     }
 
-    private void addSequence(Integer id, int x, int y, DoubleProperty scaleYProperty) {
-        DrawableSequence seq = new DrawableSequence(scaleYProperty);
+    private void addSequence(Integer id, double x, double y, NodeDrawingData drawingData) {
+        DrawableSequence seq = new DrawableSequence(drawingData);
         seq.relocate(x, y);
         sequenceMap.put(id, seq);
         super.addedSequences.add(seq);
     }
     
+    private int determineLength(int start, int end) {
+        return end - start - LINE_ENDING_LENGTH;
+    }
+
+    private boolean isOpeningCurve(int startX, int endX) {
+        return endX - startX > 0;
+    }
+    
     @Override
     public void addSequence(Integer id, int x, int y) {
-        DrawableSequence seq = new DrawableSequence(null);
-        seq.relocate(x, y);
-        sequenceMap.put(id, seq);
-        super.addedSequences.add(seq);
+        addSequence(id, x, y, null);
     }
 
     @Override
@@ -99,6 +104,8 @@ public class RibbonGraphModel extends AbstractGraphViewModel implements IGraphVi
         super.clear();
         allEdges = new ArrayList<>();
         sequenceMap = new HashMap<>();
+        removedEdges = new ArrayList<>();
+        addedEdges = new ArrayList<>();
     }
 
     @Override
@@ -106,11 +113,24 @@ public class RibbonGraphModel extends AbstractGraphViewModel implements IGraphVi
         return this.allEdges;
     }
 
-    private int determineLength(int start, int end) {
-        return end - start - LINE_ENDING_LENGTH;
+    @Override
+    public void merge() {
+        super.merge();
+        // edges
+        allEdges.addAll(addedEdges);
+        allEdges.removeAll(removedEdges);
+    
+        addedEdges.clear();
+        removedEdges.clear();
+    }
+    
+    @Override
+    public List<Shape> getAddedEdges() {
+        return addedEdges;
     }
 
-    private boolean isOpeningCurve(int startX, int endX) {
-        return endX - startX > 0;
+    @Override
+    public List<Shape> getRemovedEdges() {
+        return removedEdges;
     }
 }
