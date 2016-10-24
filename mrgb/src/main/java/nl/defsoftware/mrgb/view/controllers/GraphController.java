@@ -26,6 +26,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.services.GraphHandler;
 import nl.defsoftware.mrgb.services.GraphService;
@@ -108,7 +109,6 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
 
         GraphAnimationTimer timer = new GraphAnimationTimer();
         timer.start();
-        graphHandler = new GraphHandler(graphService.getParsedSequences(), graphService.getGenomeNames());
     }
 
     @Override
@@ -120,6 +120,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     }
     
     public void updateGraph() {
+        graphHandler = new GraphHandler(graphService.getParsedSequences(), graphService.getGenomeNames());
 //        double viewRange = (mainPane.getHeight() / zoomFactor.get()) + 1;
 //        double viewingStart = Math.max(amountOfLevels.multiply(scrollbar.getValue()).doubleValue(), 0.0);
         double dummyRange = 500;
@@ -153,6 +154,15 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
                 log.info("LOAD DATA AND PARSE");
             } else if (ActionStateEnums.VIEW_GRAPH == change.getKey()) {
                 updateGraph();
+            } else if (ActionStateEnums.DUMMY_ACTION == change.getKey()) {
+                Rectangle r = new Rectangle(30, 70, 10, 10);
+                Rectangle r2 = new Rectangle(30, 45, 20, 20);
+                Rectangle r3 = new Rectangle(30, 90, 10, 10);
+                r3.setScaleX(2);
+                r3.setScaleY(2);
+                nodePane.getChildren().add(r);
+                nodePane.getChildren().add(r2);
+                nodePane.getChildren().add(r3);
             }
         }
         printMemoryUsage();
@@ -177,7 +187,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
 
         // add components to graph pane
 
-        nodePane.getChildren().addAll(model.getAllEdges());
+        nodePane.getChildren().addAll(model.getAddedEdges());
         nodePane.getChildren().addAll(model.getAddedSequences());
         nodePane.getChildren().addAll(model.getAllLabels());
 

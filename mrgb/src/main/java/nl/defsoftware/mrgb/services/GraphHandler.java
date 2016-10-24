@@ -74,6 +74,7 @@ public class GraphHandler {
      */
     public void loadAlternateGraphViewModel(Pane nodePane, Canvas edgeCanvas, IGraphViewModel model,
             double drawingStartCoordinate, double drawingRange, DoubleProperty zoomFactor) {
+        log.info("Zoomfactor: " + zoomFactor.get());
         this.zoomFactor = zoomFactor;
         this.drawingStartCoordinate = drawingStartCoordinate;
         this.drawingRange = drawingRange;
@@ -172,39 +173,38 @@ public class GraphHandler {
     }
 
     private static final double MIN_VISIBILITY_WIDTH = 2.0;
-    private static final double DEFAULT_SINGLE_NODE_WIDTH = 5.0;
+    private static final double DEFAULT_SINGLE_NODE_WIDTH = 15.0;
+    private static final double DEFAULT_SINGLE_NODE_HEIGHT = 9.0;
 
     private void drawSequence(IGraphViewModel model, Rib aRib, double parentXCoordinate, double parentYCoordinate, int rank) {
-        double height = GraphHandlerUtil.calculateNodeHeight(aRib, zoomFactor.get());
-        double width = zoomFactor.multiply(DEFAULT_SINGLE_NODE_WIDTH).get(); // if it is a bubble, then different.
-
+//        double height = GraphHandlerUtil.calculateNodeHeight(aRib, zoomFactor.get());
+        double height = DEFAULT_SINGLE_NODE_HEIGHT + Math.exp(zoomFactor.get());
+        double width = DEFAULT_SINGLE_NODE_WIDTH + Math.exp(zoomFactor.get());
+        
         if (!isInView(aRib, drawingStartCoordinate, drawingRange)) {
             return;
         } else if (height < MIN_VISIBILITY_WIDTH) {
             // aRib.unpop();
             // heatmapColorer.drawHeatmap(node, startLevel);
-            return;
+//            return;
         }
 
         //Here we assume the node is in the drawable region
         NodeDrawingData drawingData = new NodeDrawingData();
         drawingData.height = height;
         drawingData.width = width;
+        
         drawingData.xCoordinate = parentXCoordinate + (HOR_NODE_SPACING * rank);
         drawingData.yCoordinate = parentYCoordinate + VER_NODE_SPACING;
-
+        
+        drawingData.scale = Math.max(zoomFactor.get(), 1.0);
+        
         // happens in the model
         // IViewGraphNode viewNode = ViewNodeBuilder.buildNode(node, width, height);
         // double fade = calculateBubbleFadeFactor(node, width);
-
-         addSequenceToModel(model, aRib, parentXCoordinate, parentYCoordinate, rank, drawingData);
-    }
-
-    private void addSequenceToModel(IGraphViewModel model, Rib aRib, double parentXCoordinate, double parentYCoordinate, int rank, NodeDrawingData drawingData) {
-//        int xCoordinate = parentXCoordinate + (HOR_NODE_SPACING * rank);
-//        int yCoordinate = parentYCoordinate + VER_NODE_SPACING;
         
         aRib.setCoordinates(drawingData.xCoordinate, drawingData.yCoordinate);
+        
         model.addSequence(aRib, rank, drawingData);
     }
 

@@ -5,8 +5,10 @@ package nl.defsoftware.mrgb.view.models;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javafx.beans.property.DoubleProperty;
 import nl.defsoftware.mrgb.models.graph.Node;
@@ -19,8 +21,8 @@ import nl.defsoftware.mrgb.models.graph.Node;
  */
 public class GraphModel extends AbstractGraphViewModel<Edge> {
 
-    private List<Edge> allEdges;
-    private List<Edge> addedEdges;
+    private Set<Edge> allEdges;
+    private Set<Edge> addedEdges;
     private List<Edge> removedEdges;
     
     Map<Integer, Sequence> sequenceMap; // <id,Sequence>
@@ -34,8 +36,8 @@ public class GraphModel extends AbstractGraphViewModel<Edge> {
     @Override
     public void clear() {
         super.clear();
-        allEdges = new ArrayList<>();
-        addedEdges = new ArrayList<>();
+        allEdges = new HashSet<>();
+        addedEdges = new HashSet<>();
         removedEdges = new ArrayList<>();
         
         sequenceMap = new HashMap<Integer, Sequence>(); // <id,Sequence>
@@ -54,7 +56,7 @@ public class GraphModel extends AbstractGraphViewModel<Edge> {
     }
     
     @Override
-    public List<Edge> getAllEdges() {
+    public Set<Edge> getAllEdges() {
        return allEdges;
     }
 
@@ -112,7 +114,7 @@ public class GraphModel extends AbstractGraphViewModel<Edge> {
         addedEdges.clear();
     }
 
-    public List<Edge> getAddedEdges() {
+    public Set<Edge> getAddedEdges() {
         return addedEdges;
     }
 

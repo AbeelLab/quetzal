@@ -29,6 +29,7 @@ public abstract class AbstractGraphViewModel<V> implements IGraphViewModel<V> {
     	allLabels = new ArrayList<>();
     }
 
+    @Override
     public void merge() {
         // Sequences
         allSequences.addAll(addedSequences);

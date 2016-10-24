@@ -32,6 +32,9 @@ public class ToolBarController extends HBox implements Initializable {
 
 	@FXML
 	private Button viewGraphButton;
+	
+	@FXML
+	private Button dummyButton;
 
 	public ToolBarController() {
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("toolbar.fxml"));
@@ -62,6 +65,11 @@ public class ToolBarController extends HBox implements Initializable {
 	@FXML
 	private void viewGraphButtonAction(ActionEvent event) {
 	    actionStates.setState(ActionStateEnums.VIEW_GRAPH, Boolean.TRUE);
+	}
+	
+	@FXML
+	private void dummyButtonAction(ActionEvent event) {
+	    actionStates.setState(ActionStateEnums.DUMMY_ACTION, Boolean.TRUE);
 	}
 
     public void addObserver(MapChangeListener<ActionStateEnums, Boolean> o) {

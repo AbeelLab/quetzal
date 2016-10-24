@@ -29,7 +29,7 @@ public class GraphScrollPane extends ScrollPane {
 	private Group zoomGroup;
 	private Scale scaleTransform;
 	private double scaleValue = 1.0;
-	private double delta = 0.05;
+	private double delta = 1;
 	
 	//should be interface for listener object so different things can listen to changes
 	private GraphHandler graphHandler;

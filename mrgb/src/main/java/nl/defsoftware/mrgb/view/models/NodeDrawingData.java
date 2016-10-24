@@ -22,4 +22,6 @@ public class NodeDrawingData {
     
     public double xCoordinate;
     public double yCoordinate;
+    
+    public double scale;
 }

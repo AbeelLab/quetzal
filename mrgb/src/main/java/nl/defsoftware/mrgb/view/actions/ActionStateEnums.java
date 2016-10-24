@@ -15,5 +15,8 @@ public enum ActionStateEnums {
     RELOAD_DATA, 
     
     /* View the data in the main screen */
-    VIEW_GRAPH;
+    VIEW_GRAPH,
+    
+    /* testing purposes */
+    DUMMY_ACTION;
 }

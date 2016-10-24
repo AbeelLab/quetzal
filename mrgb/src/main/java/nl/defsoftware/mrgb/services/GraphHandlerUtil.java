@@ -205,18 +205,18 @@ public class GraphHandlerUtil {
      * 
      * @param aRib
      * @param parentNodes
-     * @param graphMap
+     * @param graphData
      * @return List<MatchingScoreEntry>
      */
     public static List<MatchingScoreEntry> determineSortedNodeRanking(Rib aRib, int[] parentNodes,
-            Int2ObjectLinkedOpenHashMap<Rib> graphMap) {
+            Int2ObjectLinkedOpenHashMap<Rib> graphData) {
         List<MatchingScoreEntry> scoring = new ArrayList<>();
 
         for (int i = 0; i < parentNodes.length; i++) {
-            Rib parentRib = graphMap.get(parentNodes[i]);
+            Rib parentRib = graphData.get(parentNodes[i]);
             int[] siblingIds = parentRib.getConnectedEdges();
             for (int j = 0; j < siblingIds.length; j++) {
-                Rib siblingRib = graphMap.get(siblingIds[j]);
+                Rib siblingRib = graphData.get(siblingIds[j]);
                 if (siblingRib != null) {
                     calculateMatchingScore(scoring, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
                 }
@@ -288,18 +288,18 @@ public class GraphHandlerUtil {
     }
 
     public static final int MINUMUM_BASE_SIZE = 150;
-    private static final double DECENT_NODE_HEIGTH = 3.0;
     
-    public static double calculateNodeHeight(Rib aRib, double zoomFactor) {
-        int nodeSize = aRib.getSequence().length;
-        double heigth = nodeSize * zoomFactor;
-        if (nodeSize < MINUMUM_BASE_SIZE && heigth < DECENT_NODE_HEIGTH) {
-          heigth = MINUMUM_BASE_SIZE * zoomFactor;
-          if (heigth > DECENT_NODE_HEIGTH) {
-            return DECENT_NODE_HEIGTH;
-          }
-        }
-        return heigth;
-      }
+    
+//    public static double calculateNodeHeight(Rib aRib, double zoomFactor) {
+//        int nodeSize = aRib.getSequence().length;
+//        double height = nodeSize * zoomFactor;
+//        if (nodeSize < MINUMUM_BASE_SIZE && height < DECENT_NODE_HEIGHT) {
+//          height = MINUMUM_BASE_SIZE * zoomFactor;
+//          if (height > DECENT_NODE_HEIGHT) {
+//            return DECENT_NODE_HEIGHT;
+//          }
+//        }
+//        return height;
+//      }
     
 }

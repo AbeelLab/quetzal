@@ -5,7 +5,7 @@
   <ToolBar>
     <Button fx:id="loadDataButton" onAction="#loadDataButtonAction" text="Load GFA Data" />
     <Button fx:id="viewGraphButton" onAction="#viewGraphButtonAction" text="View Graph" />
-    <Button text="y" />
+    <Button  fx:id="dummyButton" onAction="#dummyButtonAction" text="dummy" />
     <Button text="z" />
   </ToolBar>
 </fx:root>

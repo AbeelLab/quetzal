@@ -41,9 +41,9 @@ public interface IGraphViewModel<V> {
     
 //    public List<Edge> getAllEdges(); //for GraphModel class only.
     
-    public List<V> getAllEdges();
+    public Set<V> getAllEdges();
     
-    public List<V> getAddedEdges();
+    public Set<V> getAddedEdges();
 
     public List<V> getRemovedEdges();
     

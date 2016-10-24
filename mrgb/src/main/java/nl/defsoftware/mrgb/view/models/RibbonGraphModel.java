@@ -9,7 +9,6 @@ import java.util.Set;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.shape.Shape;
-import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
@@ -21,8 +20,8 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
 
     private static final int LINE_ENDING_LENGTH = 8;
 
-    private List<Shape> allEdges;
-    private List<Shape> addedEdges;
+    private Set<Shape> allEdges;
+    private Set<Shape> addedEdges;
     private List<Shape> removedEdges;
     private Map<Integer, DrawableSequence> sequenceMap;
 
@@ -39,7 +38,7 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
     @Override
     public void addSequence(Node aNode, int rank, NodeDrawingData drawingData) {
         Set<Node> nodesToDraw = new HashSet<>();
-        addSequence(aNode.getNodeId(), ((Rib)aNode).getXCoordinate(), ((Rib)aNode).getYCoordinate(), drawingData);
+        addSequence(aNode.getNodeId(), drawingData.xCoordinate, drawingData.yCoordinate, drawingData);
         switch (aNode.getNodeType()) {
         case SINGLE_NODE:
             break;
@@ -55,9 +54,23 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
     }
 
     private void addSequence(Integer id, double x, double y, NodeDrawingData drawingData) {
-        DrawableSequence seq = new DrawableSequence(drawingData);
-        seq.relocate(x, y);
-        sequenceMap.put(id, seq);
+        DrawableSequence seq;
+        if (sequenceMap.containsKey(id)) {
+            seq = sequenceMap.get(id);
+            seq.setHeight(drawingData.height);
+            seq.setWidth(drawingData.width);
+            seq.setLayoutX(drawingData.xCoordinate);
+            seq.setLayoutY(drawingData.yCoordinate);
+//            seq.setLayoutX(drawingData.xCoordinate - seq.getBoundsInLocal().getMinX());
+//            seq.setLayoutY(drawingData.yCoordinate - seq.getBoundsInLocal().getMinY());
+//            seq.relocate(drawingData.xCoordinate, drawingData.yCoordinate);
+            seq.setScaleX(drawingData.scale);
+            seq.setScaleY(drawingData.scale);
+        } else {
+            seq = new DrawableSequence(drawingData);
+//            seq.relocate(drawingData.xCoordinate, drawingData.yCoordinate);
+            sequenceMap.put(id, seq);
+        }
         super.addedSequences.add(seq);
     }
     
@@ -79,11 +92,11 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
         if (rank == 0) { // backbone part
             DrawableEdge ribbonLine = new DrawableEdge(0, determineLength(startY, endY));
             ribbonLine.relocate(startX, startY);
-            allEdges.add(ribbonLine);
+            addedEdges.add(ribbonLine);
         } else {
             DrawableEdgeCurve ribbon = new DrawableEdgeCurve(rank, startX, startY, endX, endY,
                     isOpeningCurve(startX, endX));
-            allEdges.add(ribbon);
+            addedEdges.add(ribbon);
         }
     }
 
@@ -91,7 +104,7 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
     public void addEdge(int childId, int parentId, int rank) {
         DrawableSequence from = sequenceMap.get(parentId);
         DrawableSequence to = sequenceMap.get(childId);
-        allEdges.add(new DrawableEdge(from, to));
+        addedEdges.add(new DrawableEdge(from, to));
     }
 
     @Override
@@ -102,14 +115,14 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
     @Override
     public void clear() {
         super.clear();
-        allEdges = new ArrayList<>();
         sequenceMap = new HashMap<>();
+        allEdges = new HashSet<>();
         removedEdges = new ArrayList<>();
-        addedEdges = new ArrayList<>();
+        addedEdges = new HashSet<>();
     }
 
     @Override
-    public List<Shape> getAllEdges() {
+    public Set<Shape> getAllEdges() {
         return this.allEdges;
     }
 
@@ -125,7 +138,7 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
     }
     
     @Override
-    public List<Shape> getAddedEdges() {
+    public Set<Shape> getAddedEdges() {
         return addedEdges;
     }
 
