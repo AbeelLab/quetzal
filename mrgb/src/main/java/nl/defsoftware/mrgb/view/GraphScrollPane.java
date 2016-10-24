@@ -38,7 +38,7 @@ public class GraphScrollPane extends ScrollPane {
 	public GraphScrollPane(Node content) {
 	    scaleTransform = new Scale(scaleValue, scaleValue, 0, 0);
 		zoomGroup = new Group(content);
-		zoomGroup.getTransforms().add(scaleTransform);
+//		zoomGroup.getTransforms().add(scaleTransform);
 		zoomGroup.setOnScroll(new ZoomHandler());
 		
 		setContent(zoomGroup);
@@ -115,8 +115,7 @@ public class GraphScrollPane extends ScrollPane {
 	private class ZoomHandler implements EventHandler<ScrollEvent> {
 		@Override
 		public void handle(ScrollEvent scrollEvent) {
-			// if (scrollEvent.isControlDown())
-			{
+			if (scrollEvent.isControlDown()) {
 				if (scrollEvent.getDeltaY() < 0) {
 					scaleValue -= delta;
 				} else {
