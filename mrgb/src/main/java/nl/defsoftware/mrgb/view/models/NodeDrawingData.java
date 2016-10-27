@@ -24,4 +24,10 @@ public class NodeDrawingData {
     public double yCoordinate;
     
     public double scale;
+    
+    public double parentXCoordinate;
+    public double parentYCoordinate;
+    public double parentHeight;
+    public double parentWidth;
+    public double parentRadius;
 }

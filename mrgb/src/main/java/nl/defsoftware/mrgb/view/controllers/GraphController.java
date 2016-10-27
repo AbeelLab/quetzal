@@ -158,6 +158,12 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
                 Rectangle r = new Rectangle(30, 70, 10, 10);
                 Rectangle r2 = new Rectangle(30, 45, 20, 20);
                 Rectangle r3 = new Rectangle(30, 90, 10, 10);
+                log.info("layout: " + r.getLayoutX() + " y: " + r.getLayoutY());
+                log.info("bounds: " + r.getBoundsInParent().toString());
+                r.setLayoutX(100.0);
+                r.setLayoutY(100.0);
+                log.info("layout: " + r.getLayoutX() + " y: " + r.getLayoutY());
+                log.info("bounds: " + r.getBoundsInParent().toString());
                 r3.setScaleX(2);
                 r3.setScaleY(2);
                 nodePane.getChildren().add(r);

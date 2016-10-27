@@ -86,7 +86,13 @@ public class GraphHandler {
         // int rows = Math.floorDiv((int)Math.round(paneHeight), VER_NODE_SPACING);
 
         GraphHandlerUtil.addEdgesToQueue(edgeQueue, firstRib.getNodeId(), firstRib.getConnectedEdges());
-        drawSequence(model, firstRib, BACKBONE_X_BASELINE, BACKBONE_Y_BASELINE, 0);
+        NodeDrawingData drawingData = new NodeDrawingData();
+        drawingData.xCoordinate = BACKBONE_X_BASELINE;
+        drawingData.yCoordinate = BACKBONE_Y_BASELINE;
+        drawingData.width = 0;
+        drawingData.height = 0;
+        drawingData.scale = Math.max(zoomFactor.get(), 1.0);
+        drawSequence(model, firstRib, drawingData, 0);
 
         // for (int i = (sourceNode + 1); i < 500; i++) { //testing purposes
         for (int i = (sourceNode + 1); i < graphData.size(); i++) {
@@ -120,10 +126,18 @@ public class GraphHandler {
             List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aRib,
                     parentNodes, graphData);
 
+            NodeDrawingData drawingData = new NodeDrawingData();
+            drawingData.scale = Math.max(zoomFactor.get(), 1.0);
             if (matchedGenomeRanking.size() == 1) {
                 int rank = 0;
                 Rib parentRib = matchedGenomeRanking.get(rank).getParentRib();
-                drawSequence(model, aRib, parentRib.getXCoordinate(), parentRib.getYCoordinate(), rank);
+                drawingData.parentXCoordinate = parentRib.getXCoordinate();
+                drawingData.parentYCoordinate = parentRib.getYCoordinate();
+                drawingData.parentHeight = parentRib.getHeight();
+                drawingData.parentWidth = parentRib.getWidth();
+                drawingData.parentRadius = parentRib.getRadius();
+                
+                drawSequence(model, aRib, drawingData, rank);
                 model.addEdge(aRib.getNodeId(), parentRib.getNodeId(), rank);
             } else {
                 // if the matching produces an equal score, they will end up on
@@ -143,15 +157,20 @@ public class GraphHandler {
                     if (entry.getChildNodeId() == aRib.getNodeId() && xCoord == 0) {
                         xCoord = entry.getParentRib().getXCoordinate();
                         nodeRank = rank;
+                        drawingData.parentWidth = entry.getParentRib().getWidth();
                     }
 
                     // Find highest y coordinate from this child's parents so
                     // its drawn at an adequate Y distance.
                     if (highestYCoord < entry.getParentRib().getYCoordinate()) {
                         highestYCoord = entry.getParentRib().getYCoordinate();
+                        drawingData.parentHeight = entry.getParentRib().getHeight();
                     }
                 }
-                drawSequence(model, aRib, xCoord, highestYCoord, nodeRank);
+                
+                drawingData.parentXCoordinate = xCoord;
+                drawingData.parentYCoordinate = highestYCoord;
+                drawSequence(model, aRib, drawingData, nodeRank);
 
                 // draw all the edges to this aRib
                 matchedGenomeRanking = GraphHandlerUtil.determineSortedEdgeRanking(aRib, parentNodes, graphData);
@@ -176,34 +195,18 @@ public class GraphHandler {
     private static final double DEFAULT_SINGLE_NODE_WIDTH = 15.0;
     private static final double DEFAULT_SINGLE_NODE_HEIGHT = 9.0;
 
-    private void drawSequence(IGraphViewModel model, Rib aRib, double parentXCoordinate, double parentYCoordinate, int rank) {
+    private void drawSequence(IGraphViewModel model, Rib aRib, NodeDrawingData drawingData, int rank) {
 //        double height = GraphHandlerUtil.calculateNodeHeight(aRib, zoomFactor.get());
-        double height = DEFAULT_SINGLE_NODE_HEIGHT + Math.exp(zoomFactor.get());
-        double width = DEFAULT_SINGLE_NODE_WIDTH + Math.exp(zoomFactor.get());
-        
-        if (!isInView(aRib, drawingStartCoordinate, drawingRange)) {
-            return;
-        } else if (height < MIN_VISIBILITY_WIDTH) {
-            // aRib.unpop();
-            // heatmapColorer.drawHeatmap(node, startLevel);
-//            return;
-        }
 
-        //Here we assume the node is in the drawable region
-        NodeDrawingData drawingData = new NodeDrawingData();
-        drawingData.height = height;
-        drawingData.width = width;
         
-        drawingData.xCoordinate = parentXCoordinate + (HOR_NODE_SPACING * rank);
-        drawingData.yCoordinate = parentYCoordinate + VER_NODE_SPACING;
+//        if (!isInView(aRib, drawingStartCoordinate, drawingRange)) {
+//            return;
+//        } else if (height < MIN_VISIBILITY_WIDTH) {
+//            // aRib.unpop();
+//            // heatmapColorer.drawHeatmap(node, startLevel);
+//            return;
+//        }
         
-        drawingData.scale = Math.max(zoomFactor.get(), 1.0);
-        
-        // happens in the model
-        // IViewGraphNode viewNode = ViewNodeBuilder.buildNode(node, width, height);
-        // double fade = calculateBubbleFadeFactor(node, width);
-        
-        aRib.setCoordinates(drawingData.xCoordinate, drawingData.yCoordinate);
         
         model.addSequence(aRib, rank, drawingData);
     }

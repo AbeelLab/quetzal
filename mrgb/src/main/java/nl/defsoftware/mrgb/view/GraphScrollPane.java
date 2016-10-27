@@ -9,6 +9,9 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Paint;
 import javafx.scene.transform.Scale;
 import nl.defsoftware.mrgb.services.GraphHandler;
 import nl.defsoftware.mrgb.view.controllers.GraphController;
@@ -29,7 +32,7 @@ public class GraphScrollPane extends ScrollPane {
 	private Group zoomGroup;
 	private Scale scaleTransform;
 	private double scaleValue = 1.0;
-	private double delta = 1;
+	private double delta = .5;
 	
 	//should be interface for listener object so different things can listen to changes
 	private GraphHandler graphHandler;
@@ -43,6 +46,7 @@ public class GraphScrollPane extends ScrollPane {
 		
 		setContent(zoomGroup);
 		setManaged(true);
+		this.setBackground(new Background(new BackgroundFill(Paint.valueOf("white"),null, null)));
 	}
 
 	public DoubleProperty getScaleYProperty() {
