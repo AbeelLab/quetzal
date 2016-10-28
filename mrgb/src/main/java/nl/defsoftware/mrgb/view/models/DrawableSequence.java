@@ -12,7 +12,6 @@ public class DrawableSequence extends Rectangle {
     
     
     public DrawableSequence(NodeDrawingData nodeDrawingData) {
-        super(nodeDrawingData.xCoordinate, nodeDrawingData.yCoordinate, nodeDrawingData.width, nodeDrawingData.height);
         setFill(Paint.valueOf("DARKRED"));
         setOpacity(0.7);
         

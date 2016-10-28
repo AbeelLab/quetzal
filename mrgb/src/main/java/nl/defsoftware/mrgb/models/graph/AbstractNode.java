@@ -18,6 +18,11 @@ public abstract class AbstractNode implements Node {
     private Set<Node> outEdges;
     private boolean isExitNode = false;
     private boolean isEntranceNode = false;
+    private double xCoordinate;
+    private double yCoordinate;
+    private double width;
+    private double height;
+    private double radius;
 
     protected AbstractNode() {
         this.inEdges = new HashSet<>();
@@ -100,5 +105,50 @@ public abstract class AbstractNode implements Node {
 
     public boolean isEntranceNode() {
         return isEntranceNode;
+    }
+
+    public void setCoordinates(double xCoord, double yCoord) {
+        xCoordinate = xCoord;
+        yCoordinate = yCoord;
+    }
+
+    public double getXCoordinate() {
+        return xCoordinate;
+    }
+
+    public void setXCoordinate(double xCoordinate) {
+        this.xCoordinate = xCoordinate;
+    }
+
+    public double getYCoordinate() {
+        return yCoordinate;
+    }
+
+    public void setYCoordinate(double yCoordinate) {
+        this.yCoordinate = yCoordinate;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public void setWidth(double width) {
+        this.width = width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
     }
 }

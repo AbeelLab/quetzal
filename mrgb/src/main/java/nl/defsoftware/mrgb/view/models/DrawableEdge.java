@@ -2,6 +2,7 @@ package nl.defsoftware.mrgb.view.models;
 
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Shape;
 
 /**
  * 
@@ -29,7 +30,7 @@ public class DrawableEdge extends Line {
         setRotate(0.0);
     }
     
-    public DrawableEdge(DrawableSequence from, DrawableSequence to) {
+    public DrawableEdge(Shape from, Shape to) {
         setStrokeWidth(3.0);
         setFill(Paint.valueOf("BLACK"));
         setOpacity(0.5);

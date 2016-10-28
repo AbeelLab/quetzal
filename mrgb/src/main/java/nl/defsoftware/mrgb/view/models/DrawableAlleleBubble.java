@@ -10,10 +10,9 @@ import javafx.scene.shape.Circle;
 public class DrawableAlleleBubble extends Circle {
     
     
-    public DrawableAlleleBubble(int radius) {
-        setRadius(radius);
+    public DrawableAlleleBubble() {
         setFill(Paint.valueOf("PURPLE"));
-        setOpacity(1);
+        setOpacity(0.7);
     }
     
     public void onChanged() {
