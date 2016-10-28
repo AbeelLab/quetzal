@@ -173,19 +173,19 @@ public class GraphHandlerUtil {
      * An array is filled with node id's that may be used to visit these nodes
      * later for edge drawing.
      * 
-     * @param edgeQueue
+     * @param edgeMapping
      * @param fromId
      * @param toId
      */
-    public static void addEdgesToQueue(Int2ObjectOpenHashMap<int[]> edgeQueue, int fromId, int[] toId) {
+    public static void addEdgesToQueue(Int2ObjectOpenHashMap<int[]> edgeMapping, int fromId, int[] toId) {
         for (int i = 0; i < toId.length; i++) {
-            if (edgeQueue.containsKey(toId[i])) {
-                int[] fromEdges = edgeQueue.get(toId[i]);
+            if (edgeMapping.containsKey(toId[i])) {
+                int[] fromEdges = edgeMapping.get(toId[i]);
                 int[] tmpFromEdges = Arrays.copyOf(fromEdges, fromEdges.length + 1);
                 tmpFromEdges[tmpFromEdges.length - 1] = fromId;
-                edgeQueue.put(toId[i], tmpFromEdges);
+                edgeMapping.put(toId[i], tmpFromEdges);
             } else {
-                edgeQueue.put(toId[i], new int[] { fromId });
+                edgeMapping.put(toId[i], new int[] { fromId });
             }
         }
     }
@@ -208,7 +208,7 @@ public class GraphHandlerUtil {
      * @param graphData
      * @return List<MatchingScoreEntry>
      */
-    public static List<MatchingScoreEntry> determineSortedNodeRanking(Rib aRib, int[] parentNodes,
+    public static List<MatchingScoreEntry> determineSortedNodeRanking(Node aRib, int[] parentNodes,
             Int2ObjectLinkedOpenHashMap<Rib> graphData) {
         List<MatchingScoreEntry> scoring = new ArrayList<>();
 
@@ -237,7 +237,7 @@ public class GraphHandlerUtil {
      * @param graphMap
      * @return
      */
-    public static List<MatchingScoreEntry> determineSortedEdgeRanking(Rib aRib, int[] parentNodes,
+    public static List<MatchingScoreEntry> determineSortedEdgeRanking(Node aRib, int[] parentNodes,
             Int2ObjectLinkedOpenHashMap<Rib> graphMap) {
         List<MatchingScoreEntry> scoring = new ArrayList<>();
 

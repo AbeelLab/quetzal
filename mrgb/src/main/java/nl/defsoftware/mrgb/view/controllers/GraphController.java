@@ -127,9 +127,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         double dummyViewingStartCoordinate = 1;
         clear();
         zoomFactor.bind(scrollPane.getScaleYProperty());
-        graphHandler.loadAlternateGraphViewModel(
-                nodePane, 
-                edgeCanvas, 
+        graphHandler.loadGraphViewModel(
                 model, 
                 dummyViewingStartCoordinate, 
                 dummyRange, 

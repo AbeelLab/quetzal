@@ -27,16 +27,16 @@ public class SuperBubbleDetectionAlgorithm {
     private static final Logger log = LoggerFactory.getLogger(SuperBubbleDetectionAlgorithm.class);
 
     /* Topological sorted nodes */
-    private List<Rib> ordD;
+    private List<Node> ordD;
     /* Arrays that are shadowing the index of Ribs from ordD */
-    private Rib[] previousEntrance;
-    private Rib[] alternativeEntrance;
+    private Node[] previousEntrance;
+    private Node[] alternativeEntrance;
 
     /* Result of detectedBubbles */
     private List<Bubble> detectedBubbles = new ArrayList<>();
 
     /* Maintaining candidate bubble nodes during the algorithm */
-    private List<Rib> candidates = new ArrayList<>();
+    private List<Node> candidates = new ArrayList<>();
 
     /* ID for the bubbles, has no topological meaning */
     private int bubbleId = 0;
@@ -51,11 +51,11 @@ public class SuperBubbleDetectionAlgorithm {
      * 
      * @param orderedNodes
      */
-    public void detectSuperBubbles(Rib[] orderedNodes) {
+    public void detectSuperBubbles(Node[] orderedNodes) {
         // TODO make sure that all starting nodes are connected to one source
         // and all leaf nodes are connected to 1 sink node
-        this.alternativeEntrance = new Rib[orderedNodes.length];
-        this.previousEntrance = new Rib[orderedNodes.length];
+        this.alternativeEntrance = new Node[orderedNodes.length];
+        this.previousEntrance = new Node[orderedNodes.length];
         this.outParent = new int[orderedNodes.length];
         this.outChild = new int[orderedNodes.length];
 
@@ -76,9 +76,9 @@ public class SuperBubbleDetectionAlgorithm {
 
     private void superBubble() {
         log.debug("Ordering size: {}", ordD.size());
-        Rib prevEnt = null;
+        Node prevEnt = null;
         for (int i = 0; i < ordD.size(); i++) {
-            Rib v = ordD.get(i);
+            Node v = ordD.get(i);
             log.debug("Order({}): node({})", i, v.getNodeId());
             alternativeEntrance[i] = null;
             previousEntrance[i] = prevEnt;// filled according to the ordD
@@ -104,7 +104,7 @@ public class SuperBubbleDetectionAlgorithm {
         }
     }
 
-    private void reportSuperBubble(Rib start, Rib exit) {
+    private void reportSuperBubble(Node start, Node exit) {
         log.debug("start({}) on order: {}\nexit({}) on order: {}", start.getNodeId(), ord(start), exit.getNodeId(),
                 ord(exit));
 
@@ -113,8 +113,8 @@ public class SuperBubbleDetectionAlgorithm {
             return;
         }
 
-        Rib valid = null;
-        Rib s = previousEntrance[ord(exit)];
+        Node valid = null;
+        Node s = previousEntrance[ord(exit)];
 
         while (ord(s) >= ord(start)) {
             valid = validateSuperBubble(s, exit);
@@ -140,7 +140,7 @@ public class SuperBubbleDetectionAlgorithm {
         }
     }
 
-    private Rib validateSuperBubble(Rib startVertex, Rib endVertex) {
+    private Node validateSuperBubble(Node startVertex, Node endVertex) {
         int start = ord(startVertex);
         int end = ord(endVertex);
         int outChildId = rangeMax(start, end - 1);
@@ -181,7 +181,7 @@ public class SuperBubbleDetectionAlgorithm {
         return ordD.indexOf(v);
     }
 
-    private void report(Rib start, Rib exit) {
+    private void report(Node start, Node exit) {
         Set<Node> innerNodes = new HashSet<>();
         findInnerNodes(innerNodes, start.getOutEdges(), exit);
         Bubble b = new Bubble(bubbleId, NodeType.ALLELE_BUBBLE, start, exit);
@@ -199,7 +199,7 @@ public class SuperBubbleDetectionAlgorithm {
         }
     }
 
-    private Rib vertex(int i) {
+    private Node vertex(int i) {
         return ordD.get(i);
     }
 
@@ -210,7 +210,7 @@ public class SuperBubbleDetectionAlgorithm {
      * @param v
      * @return
      */
-    private boolean exit(Rib t) {
+    private boolean exit(Node t) {
         for (Node p : t.getInEdges()) {
             if (p.getOutEdges().size() == 1) {
                 return true;
@@ -229,7 +229,7 @@ public class SuperBubbleDetectionAlgorithm {
      * 
      * @return true if there is such a child c from s that has only 1 parent s.
      */
-    private boolean entrance(Rib s) {
+    private boolean entrance(Node s) {
         for (Node c : s.getOutEdges()) {
             if (c.getInEdges().size() == 1) {
                 return true;
@@ -238,21 +238,21 @@ public class SuperBubbleDetectionAlgorithm {
         return false;
     }
 
-    private void insertExit(Rib v) {
+    private void insertExit(Node v) {
         v.setAsBubbleExitNode();
         candidates.add(v);
     }
 
-    private void insertEntrance(Rib v) {
+    private void insertEntrance(Node v) {
         v.setAsBubbleEntranceNode();
         candidates.add(v);
     }
 
-    private Rib head() {
+    private Node head() {
         return candidates.get(0);
     }
 
-    private Rib tail() {
+    private Node tail() {
         if (candidates.size() > 0) {
             return candidates.get(candidates.size() - 1);
         } else {
@@ -266,7 +266,7 @@ public class SuperBubbleDetectionAlgorithm {
         }
     }
 
-    private Rib next(Rib v) {
+    private Node next(Node v) {
         for (int i = 0; i < candidates.size(); i++) {
             if (candidates.get(i).equals(v) && i + 1 < candidates.size()) {
                 return candidates.get(i + 1);

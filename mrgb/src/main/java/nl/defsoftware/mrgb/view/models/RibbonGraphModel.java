@@ -10,7 +10,6 @@ import java.util.Set;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.models.graph.Node;
-import nl.defsoftware.mrgb.models.Rib;
 
 /**
  * @author D.L. Ettema
@@ -23,98 +22,139 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
     private static final int HOR_NODE_SPACING = 20;
     private static final int VER_NODE_SPACING = 25;
     private static final int VER_NODE_BASELINE = 200;
+    private static final double DEFAULT_SINGLE_NODE_WIDTH = 15.0;
+    private static final double DEFAULT_SINGLE_NODE_HEIGHT = 10.0;
+    private static final double DEFAULT_SINGLE_NODE_RADIUS = 10.0;
     
     private Set<Shape> allEdges;
     private Set<Shape> addedEdges;
     private List<Shape> removedEdges;
-    private Map<Integer, DrawableSequence> sequenceMap;
+    private Map<Integer, Shape> sequenceMap;
+    
+    private List<Integer> subGraphNodesAllowedToDraw = new ArrayList<>();
 
     public RibbonGraphModel() {
         super();
         this.clear();
     }
 
-    /**
-     * @param aNode
-     * @param parentNode
-     * @param rank
-     */
-    @Override
-    public void addSequence(Node aNode, int rank, NodeDrawingData drawingData) {
-        
-        double DEFAULT_SINGLE_NODE_WIDTH = 15.0;
-        double DEFAULT_SINGLE_NODE_HEIGHT = 9.0;
-        
+    private void createSingleSequence(Node aNode, int rank, NodeDrawingData drawingData) {
         DrawableSequence seq;
-        double width = DEFAULT_SINGLE_NODE_WIDTH + Math.exp(drawingData.scale);
-        double height = DEFAULT_SINGLE_NODE_HEIGHT + Math.exp(drawingData.scale);
+        drawingData.width = DEFAULT_SINGLE_NODE_WIDTH;
+        drawingData.height = DEFAULT_SINGLE_NODE_HEIGHT;
         if (sequenceMap.containsKey(aNode.getNodeId())) {
-            seq = sequenceMap.get(aNode.getNodeId());
+            seq = (DrawableSequence)sequenceMap.get(aNode.getNodeId());
             
-            seq.setWidth(width);
-            seq.setHeight(height);
+            if (drawingData.parentXCoordinate == 0.0) {
+                drawingData.xCoordinate = seq.getLayoutX() + ((HOR_NODE_SPACING + (drawingData.width/2) + (Math.max(drawingData.parentWidth, drawingData.radius)/2)) * rank);
+            } else {
+                drawingData.xCoordinate = drawingData.parentXCoordinate + ((HOR_NODE_SPACING + (drawingData.width/2) + (Math.max(drawingData.parentWidth, drawingData.radius)/2)) * rank);
+            }
+            drawingData.yCoordinate = drawingData.parentYCoordinate + (Math.max(drawingData.parentHeight, drawingData.radius)/2) + (VER_NODE_SPACING) + (drawingData.height/2);
             
-//            position: width parentnode/2 + default edge length + width childnode/2
-            double x = drawingData.parentXCoordinate + ((HOR_NODE_SPACING + (width/2) + (drawingData.parentWidth/2)) * rank);
-            double y = drawingData.parentYCoordinate + (drawingData.parentHeight/2) + (VER_NODE_SPACING * 2) + (height/2);
+            seq.setLayoutX(drawingData.xCoordinate);
+            seq.setLayoutY(drawingData.yCoordinate);
             
-            seq.setLayoutX(x);
-            seq.setLayoutY(y);
-            ((Rib)aNode).setCoordinates(x, y);
-            ((Rib)aNode).setWidth(width);
-            ((Rib)aNode).setHeight(height);
         } else {
-            drawingData.width = width;
-            drawingData.height = height;
             drawingData.xCoordinate = drawingData.xCoordinate + drawingData.parentXCoordinate + (HOR_NODE_SPACING * rank);
-            drawingData.yCoordinate = drawingData.yCoordinate + drawingData.parentYCoordinate + DEFAULT_SINGLE_NODE_HEIGHT + (height / 2);
-            ((Rib)aNode).setCoordinates(drawingData.xCoordinate, drawingData.yCoordinate);
-            ((Rib)aNode).setWidth(width);
-            ((Rib)aNode).setHeight(height);
+            drawingData.yCoordinate = drawingData.yCoordinate + drawingData.parentYCoordinate + VER_NODE_SPACING + (drawingData.parentHeight / 2);
+            
             seq = new DrawableSequence(drawingData);
-//            seq.relocate(x, y);
-            sequenceMap.put(aNode.getNodeId(), seq);
-        }
-        super.addedSequences.add(seq);
-        
-        
-        
-//        Set<Node> nodesToDraw = new HashSet<>();
-//        addSequence(aNode.getNodeId(), drawingData.xCoordinate, drawingData.yCoordinate, drawingData);
-//        switch (aNode.getNodeType()) {
-//        case SINGLE_NODE:
-//            break;
-//        case SNP_BUBBLE:
-//            break;
-//        case INDEL_BUBBLE:
-//            break;
-//        case ALLELE_BUBBLE:
-//            break;
-//        default:
-//            break;
-//        }
-    }
-
-    private void addSequence(Integer id, double x, double y, NodeDrawingData drawingData) {
-        DrawableSequence seq;
-        if (sequenceMap.containsKey(id)) {
-            seq = sequenceMap.get(id);
+            seq.setLayoutX(drawingData.xCoordinate);
+            seq.setLayoutY(drawingData.yCoordinate);
             seq.setWidth(drawingData.width);
             seq.setHeight(drawingData.height);
-            seq.setScaleX(drawingData.scale);
-            seq.setScaleY(drawingData.scale);
-            x = drawingData.xCoordinate - seq.getBoundsInParent().getMinX() + (drawingData.width);
-            y = drawingData.yCoordinate - seq.getBoundsInParent().getMinY() + (drawingData.height);
-            seq.setLayoutX(x);
-            seq.setLayoutY(y);
-        } else {
-            seq = new DrawableSequence(drawingData);
-            seq.relocate(drawingData.xCoordinate, drawingData.yCoordinate);
-            sequenceMap.put(id, seq);
+            sequenceMap.put(aNode.getNodeId(), seq);
         }
+        setDrawingDataToNode(aNode, drawingData);
         super.addedSequences.add(seq);
     }
+
+    private void createAlleleBubble(Node aNode, int rank, NodeDrawingData drawingData) {
+        DrawableAlleleBubble bubble;
+        drawingData.radius = DEFAULT_SINGLE_NODE_RADIUS + Math.exp(drawingData.scale);
+        if (sequenceMap.containsKey(aNode.getNodeId())) {
+            bubble = (DrawableAlleleBubble)sequenceMap.get(aNode.getNodeId());
+            if (drawingData.parentXCoordinate == 0.0) {
+                drawingData.xCoordinate = bubble.getLayoutX() + ((HOR_NODE_SPACING + (drawingData.radius) + (Math.max(drawingData.parentWidth/2, drawingData.radius))) * rank);
+            } else {
+                drawingData.xCoordinate = drawingData.parentXCoordinate + ((HOR_NODE_SPACING + (drawingData.radius) + (Math.max(drawingData.parentWidth/2, drawingData.radius))) * rank);
+            }
+            drawingData.yCoordinate = drawingData.parentYCoordinate + Math.max(drawingData.parentHeight/2, drawingData.radius) + (VER_NODE_SPACING) + (drawingData.radius);
+            
+            bubble.setRadius(drawingData.radius);
+            bubble.setLayoutX(drawingData.xCoordinate);
+            bubble.setLayoutY(drawingData.yCoordinate);
+            
+        } else {
+            drawingData.xCoordinate = drawingData.xCoordinate + drawingData.parentXCoordinate + (HOR_NODE_SPACING * rank);
+            drawingData.yCoordinate = drawingData.yCoordinate + drawingData.parentYCoordinate + VER_NODE_SPACING + (drawingData.radius);
+            bubble = new DrawableAlleleBubble();
+            bubble.setRadius(drawingData.radius);
+            bubble.setLayoutX(drawingData.xCoordinate);
+            bubble.setLayoutY(drawingData.yCoordinate);
+            
+            sequenceMap.put(aNode.getNodeId(), bubble);
+        }
+        setDrawingDataToNode(aNode, drawingData);
+        super.addedSequences.add(bubble);
+    }
     
+    
+    private void setDrawingDataToNode(Node aNode, NodeDrawingData data) {
+        aNode.setCoordinates(data.xCoordinate, data.yCoordinate);
+        aNode.setWidth(data.width);
+        aNode.setHeight(data.height);
+        aNode.setRadius(data.radius);
+    }
+    
+    @Override
+    public void addSequence(Node node, int rank, NodeDrawingData drawingData) {
+      Set<Node> nodesToDraw = new HashSet<>();
+      switch (node.getNodeType()) {
+      case SINGLE_NODE:
+//          createSingleSequence(node, rank, drawingData);
+          createAlleleBubble(node, rank, drawingData);
+          break;
+      case SNP_BUBBLE:
+          createSNPBubble(node, rank, drawingData);
+          break;
+      case INDEL_BUBBLE:
+          break;
+      case ALLELE_BUBBLE:
+          break;
+      default:
+          break;
+      }
+    }
+    
+    private void createSNPBubble(Node aNode, int rank, NodeDrawingData drawingData) {
+        DrawableSNPBubble snp;
+        if (sequenceMap.containsKey(aNode.getNodeId())) {
+            snp = (DrawableSNPBubble) sequenceMap.get(aNode.getNodeId());
+            if (drawingData.parentXCoordinate == 0.0) {
+                drawingData.xCoordinate = snp.getLayoutX() + ((HOR_NODE_SPACING + (drawingData.radius) + drawingData.parentWidth/2) * rank);
+            } else {
+                drawingData.xCoordinate = drawingData.parentXCoordinate + ((HOR_NODE_SPACING + (drawingData.radius) + drawingData.parentWidth/2) * rank);
+            }
+            drawingData.yCoordinate = drawingData.parentYCoordinate + Math.max(drawingData.parentHeight/2, drawingData.radius) + (VER_NODE_SPACING);
+            
+            snp.setLayoutX(drawingData.xCoordinate);
+            snp.setLayoutY(drawingData.yCoordinate);
+            
+        } else {
+            drawingData.xCoordinate = drawingData.xCoordinate + drawingData.parentXCoordinate + (HOR_NODE_SPACING * rank);
+            drawingData.yCoordinate = drawingData.yCoordinate + drawingData.parentYCoordinate + VER_NODE_SPACING;
+            snp = new DrawableSNPBubble();
+            snp.setLayoutX(drawingData.xCoordinate);
+            snp.setLayoutY(drawingData.yCoordinate);
+            
+            sequenceMap.put(aNode.getNodeId(), snp);
+        }
+        setDrawingDataToNode(aNode, drawingData);
+        super.addedSequences.add(snp);
+    }
+
     private int determineLength(int start, int end) {
         return end - start - LINE_ENDING_LENGTH;
     }
@@ -125,7 +165,7 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
     
     @Override
     public void addSequence(Integer id, int x, int y) {
-        addSequence(id, x, y, null);
+        throw new UnsupportedOperationException("addSequence method not implemented");
     }
 
     @Override
@@ -135,16 +175,15 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
             ribbonLine.relocate(startX, startY);
             addedEdges.add(ribbonLine);
         } else {
-            DrawableEdgeCurve ribbon = new DrawableEdgeCurve(rank, startX, startY, endX, endY,
-                    isOpeningCurve(startX, endX));
+            DrawableEdgeCurve ribbon = new DrawableEdgeCurve(rank, startX, startY, endX, endY, isOpeningCurve(startX, endX));
             addedEdges.add(ribbon);
         }
     }
 
     @Override
     public void addEdge(int childId, int parentId, int rank) {
-        DrawableSequence from = sequenceMap.get(parentId);
-        DrawableSequence to = sequenceMap.get(childId);
+        Shape from = sequenceMap.get(parentId);
+        Shape to = sequenceMap.get(childId);
         addedEdges.add(new DrawableEdge(from, to));
     }
 

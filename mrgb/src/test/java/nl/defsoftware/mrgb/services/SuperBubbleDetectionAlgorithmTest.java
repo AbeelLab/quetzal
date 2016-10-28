@@ -32,10 +32,10 @@ public class SuperBubbleDetectionAlgorithmTest {
 
     private static final Logger log = LoggerFactory.getLogger(SuperBubbleDetectionAlgorithmTest.class);
     
-    private List<Rib> graph15n = new ArrayList<>();
-    private Map<Integer,Rib> graph8n = new HashMap<>();
-    private  Map<Integer,Rib> graph4n = new HashMap<>();
-    List<Rib> expectedOrdering = new ArrayList<>();
+    private List<Node> graph15n = new ArrayList<>();
+    private Map<Integer,Node> graph8n = new HashMap<>();
+    private Map<Integer,Node> graph4n = new HashMap<>();
+    private List<Node> expectedOrdering = new ArrayList<>();
     int v1 = 0;
     int v2 = 1;
     int v3 = 2;
@@ -69,15 +69,15 @@ public class SuperBubbleDetectionAlgorithmTest {
         loadTestSampleGraphs(file, graph4n);
     }
 
-    private void loadTestSampleGraphs(File sampleFile, Map<Integer, Rib> graph) throws IOException {
+    private void loadTestSampleGraphs(File sampleFile, Map<Integer, Node> graph) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(sampleFile), "UTF-8"));
         Scanner scanner = new Scanner(reader);
         Pattern pattern = Pattern.compile(" ");
         String[] aLine = pattern.split(scanner.nextLine(), 0);
         while (scanner.hasNextLine()) {
             aLine = pattern.split(scanner.nextLine(), 0);
-            Rib from = findOrCreateRib(graph, Integer.parseInt(aLine[0]));
-            Rib to = findOrCreateRib(graph, Integer.parseInt(aLine[1]));
+            Node from = findOrCreateRib(graph, Integer.parseInt(aLine[0]));
+            Node to = findOrCreateRib(graph, Integer.parseInt(aLine[1]));
             from.addOutEdge(to);
             to.addInEdge(from);
         }
@@ -85,7 +85,7 @@ public class SuperBubbleDetectionAlgorithmTest {
         reader.close();
     }
 
-    private Rib findOrCreateRib(Map<Integer, Rib> graph, Integer id) {
+    private Node findOrCreateRib(Map<Integer, Node> graph, Integer id) {
         if (!graph.containsKey(id)) 
             graph.put(id, new Rib(id));
         return graph.get(id);
@@ -242,7 +242,7 @@ public class SuperBubbleDetectionAlgorithmTest {
     
     @Test
     public void testTopologicalOrdering() {
-        List<Rib> actualOrdering = SuperBubbleDetectionHelper.topologicalSort(graph15n.toArray(new Rib[graph15n.size()]));
+        List<Node> actualOrdering = SuperBubbleDetectionHelper.topologicalSort(graph15n.toArray(new Rib[graph15n.size()]));
         assertEquals("Size of actual ordering does not match", expectedOrdering.size(), actualOrdering.size());
         for (int i = 0; i < actualOrdering.size(); i++) {
             assertEquals("Node not in order as expected.", expectedOrdering.get(i).getNodeId(), actualOrdering.get(i).getNodeId());

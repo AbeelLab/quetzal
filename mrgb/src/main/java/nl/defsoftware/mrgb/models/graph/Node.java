@@ -37,4 +37,24 @@ public interface Node {
     public void setAsBubbleEntranceNode() ;
     
     public boolean isEntranceNode();
+    
+    public double getXCoordinate();
+
+    public double getYCoordinate();
+    
+    public void setWidth(double width);
+    
+    public double getWidth();
+    
+    public void setHeight(double height);
+    
+    public double getHeight();
+    
+    public void setRadius(double radius);
+    
+    public double getRadius();
+    
+    public void setCoordinates(double x, double y);
+    
+    
 }

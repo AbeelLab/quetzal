@@ -18,11 +18,7 @@ public class Rib extends AbstractNode implements Node {
                                                 // file
     private int[] connectedEdges = new int[0];
     private Int2IntOpenHashMap edgeWeights = new Int2IntOpenHashMap();
-    private double xCoordinate;
-    private double yCoordinate;
-    private double width;
-    private double height;
-    private double radius;
+    
     
     // private List<String> crdctg; //unknown what to use for. Not yet
     // implemented
@@ -51,11 +47,6 @@ public class Rib extends AbstractNode implements Node {
 
     public int amountOfGenomes() {
         return genomeIds.length;
-    }
-
-    public void setCoordinates(double xCoord, double yCoord) {
-        xCoordinate = xCoord;
-        yCoordinate = yCoord;
     }
 
     public short getRankedWeightOfEdge(int nodeId) {
@@ -92,46 +83,6 @@ public class Rib extends AbstractNode implements Node {
 
     public void setReferenceGenomeCoordinates(Integer referenceGenomeCoordinates) {
         this.referenceGenomeCoordinates = referenceGenomeCoordinates;
-    }
-
-    public double getXCoordinate() {
-        return xCoordinate;
-    }
-
-    public void setXCoordinate(double xCoordinate) {
-        this.xCoordinate = xCoordinate;
-    }
-
-    public double getYCoordinate() {
-        return yCoordinate;
-    }
-
-    public void setYCoordinate(double yCoordinate) {
-        this.yCoordinate = yCoordinate;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public void setWidth(double width) {
-        this.width = width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
-    }
-
-    public double getRadius() {
-        return radius;
-    }
-
-    public void setRadius(double radius) {
-        this.radius = radius;
     }
 
     @Override

@@ -13,9 +13,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.layout.Pane;
 import nl.defsoftware.mrgb.models.Rib;
+import nl.defsoftware.mrgb.models.graph.AbstractNode;
+import nl.defsoftware.mrgb.models.graph.Node;
 import nl.defsoftware.mrgb.view.controllers.MatchingScoreEntry;
 import nl.defsoftware.mrgb.view.models.IGraphViewModel;
 import nl.defsoftware.mrgb.view.models.NodeDrawingData;
@@ -43,7 +43,7 @@ public class GraphHandler {
     private Int2ObjectLinkedOpenHashMap<Rib> graphData = new Int2ObjectLinkedOpenHashMap<>();
     private Short2ObjectOpenHashMap<String> genomeNamesMap = new Short2ObjectOpenHashMap<>();
 
-    private Int2ObjectOpenHashMap<int[]> edgeQueue = new Int2ObjectOpenHashMap<>();
+    private Int2ObjectOpenHashMap<int[]> edgeMapping = new Int2ObjectOpenHashMap<>();
 
     private DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
     private double drawingStartCoordinate = 0;
@@ -65,15 +65,13 @@ public class GraphHandler {
     /**
      * 
      * 
-     * @param nodePane
      * @param edgeCanvas
      * @param model
      * @param drawingStartCoordinate: where to start drawing.
      * @param drawingRange: the range of drawing in total which can be bigger then the actual window view
      * @param zoomFactor
      */
-    public void loadAlternateGraphViewModel(Pane nodePane, Canvas edgeCanvas, IGraphViewModel model,
-            double drawingStartCoordinate, double drawingRange, DoubleProperty zoomFactor) {
+    public void loadGraphViewModel(IGraphViewModel model, double drawingStartCoordinate, double drawingRange, DoubleProperty zoomFactor) {
         log.info("Zoomfactor: " + zoomFactor.get());
         this.zoomFactor = zoomFactor;
         this.drawingStartCoordinate = drawingStartCoordinate;
@@ -85,7 +83,7 @@ public class GraphHandler {
         // double paneHeight = nodePane.getPrefHeight();
         // int rows = Math.floorDiv((int)Math.round(paneHeight), VER_NODE_SPACING);
 
-        GraphHandlerUtil.addEdgesToQueue(edgeQueue, firstRib.getNodeId(), firstRib.getConnectedEdges());
+        GraphHandlerUtil.addEdgesToQueue(edgeMapping, firstRib.getNodeId(), firstRib.getConnectedEdges());
         NodeDrawingData drawingData = new NodeDrawingData();
         drawingData.xCoordinate = BACKBONE_X_BASELINE;
         drawingData.yCoordinate = BACKBONE_Y_BASELINE;
@@ -98,7 +96,7 @@ public class GraphHandler {
         for (int i = (sourceNode + 1); i < graphData.size(); i++) {
             if (graphData.containsKey(i)) {
                 Rib aRib = graphData.get(i);
-                GraphHandlerUtil.addEdgesToQueue(edgeQueue, aRib.getNodeId(), aRib.getConnectedEdges());
+                GraphHandlerUtil.addEdgesToQueue(edgeMapping, aRib.getNodeId(), aRib.getConnectedEdges());
                 drawEdgesAndNodesToParents(model, aRib);
             }
         }
@@ -120,9 +118,9 @@ public class GraphHandler {
      * @param aRib
      *            current node
      */
-    private void drawEdgesAndNodesToParents(IGraphViewModel model, Rib aRib) {
-        if (edgeQueue.containsKey(aRib.getNodeId())) {
-            int[] parentNodes = edgeQueue.get(aRib.getNodeId());
+    private void drawEdgesAndNodesToParents(IGraphViewModel model, AbstractNode aRib) {
+        if (edgeMapping.containsKey(aRib.getNodeId())) {
+            int[] parentNodes = edgeMapping.get(aRib.getNodeId());
             List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aRib,
                     parentNodes, graphData);
 
@@ -130,7 +128,7 @@ public class GraphHandler {
             drawingData.scale = Math.max(zoomFactor.get(), 1.0);
             if (matchedGenomeRanking.size() == 1) {
                 int rank = 0;
-                Rib parentRib = matchedGenomeRanking.get(rank).getParentRib();
+                Node parentRib = matchedGenomeRanking.get(rank).getParentRib();
                 drawingData.parentXCoordinate = parentRib.getXCoordinate();
                 drawingData.parentYCoordinate = parentRib.getYCoordinate();
                 drawingData.parentHeight = parentRib.getHeight();
@@ -195,10 +193,7 @@ public class GraphHandler {
     private static final double DEFAULT_SINGLE_NODE_WIDTH = 15.0;
     private static final double DEFAULT_SINGLE_NODE_HEIGHT = 9.0;
 
-    private void drawSequence(IGraphViewModel model, Rib aRib, NodeDrawingData drawingData, int rank) {
-//        double height = GraphHandlerUtil.calculateNodeHeight(aRib, zoomFactor.get());
-
-        
+    private void drawSequence(IGraphViewModel model, AbstractNode aRib, NodeDrawingData drawingData, int rank) {
 //        if (!isInView(aRib, drawingStartCoordinate, drawingRange)) {
 //            return;
 //        } else if (height < MIN_VISIBILITY_WIDTH) {
@@ -207,18 +202,17 @@ public class GraphHandler {
 //            return;
 //        }
         
-        
         model.addSequence(aRib, rank, drawingData);
     }
 
-    private boolean isInView(Rib aRib, double startLevel, double endLevel) {
+    private boolean isInView(AbstractNode aRib, double startLevel, double endLevel) {
         return true;
         // int nodeStart = aRib.getLevel() - aRib.getSequence().length;
         // int nodeEnd = node.getLevel();
         // return nodeStart < endLevel && nodeEnd > startLevel;
     }
 
-    private void drawEdge(IGraphViewModel model, Rib aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
+    private void drawEdge(IGraphViewModel model, AbstractNode aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
         int startX = parentXCoordinate;
         int startY = parentYCoordinate + Y_CORRECTION;
 

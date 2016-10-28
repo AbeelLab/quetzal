@@ -1,6 +1,7 @@
 package nl.defsoftware.mrgb.view.controllers;
 
-import nl.defsoftware.mrgb.models.Rib;
+import nl.defsoftware.mrgb.models.graph.AbstractNode;
+import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
  * Utility class to maintain a score and a reference
@@ -10,10 +11,10 @@ import nl.defsoftware.mrgb.models.Rib;
 public class MatchingScoreEntry implements Comparable<MatchingScoreEntry>{
     
     private short score;
-    private Rib parentRib;
+    private Node parentRib;
     private int childNodeId;
     
-    public MatchingScoreEntry(short score, Rib parentRib, int childNodeId) {
+    public MatchingScoreEntry(short score, Node parentRib, int childNodeId) {
         this.score = score;
         this.parentRib = parentRib;
         this.childNodeId = childNodeId;
@@ -32,11 +33,11 @@ public class MatchingScoreEntry implements Comparable<MatchingScoreEntry>{
         this.score = score;
     }
 
-    public Rib getParentRib() {
+    public Node getParentRib() {
         return parentRib;
     }
 
-    public void setParentNodeId(Rib parentRib) {
+    public void setParentNodeId(Node parentRib) {
         this.parentRib = parentRib;
     }
 
