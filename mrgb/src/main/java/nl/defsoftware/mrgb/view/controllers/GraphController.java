@@ -120,7 +120,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     }
     
     public void updateGraph() {
-        graphHandler = new GraphHandler(graphService.getParsedSequences(), graphService.getGenomeNames());
+        graphHandler = new GraphHandler(graphService.getParsedSequences(), graphService.getGenomeNames(), graphService.getDetectedBubbles());
 //        double viewRange = (mainPane.getHeight() / zoomFactor.get()) + 1;
 //        double viewingStart = Math.max(amountOfLevels.multiply(scrollbar.getValue()).doubleValue(), 0.0);
         double dummyRange = 500;

@@ -16,6 +16,8 @@ public abstract class AbstractNode implements Node {
     private int nodeId;
     private Set<Node> inEdges;
     private Set<Node> outEdges;
+    private short[] genomeIds; // ORI attribute in the GFA file
+    
     private boolean isExitNode = false;
     private boolean isEntranceNode = false;
     private double xCoordinate;
@@ -150,5 +152,13 @@ public abstract class AbstractNode implements Node {
 
     public void setRadius(double radius) {
         this.radius = radius;
+    }
+    
+    public short[] getGenomeIds() {
+        return genomeIds;
+    }
+
+    public void setGenomeIds(short[] genomeIds) {
+        this.genomeIds = genomeIds;
     }
 }

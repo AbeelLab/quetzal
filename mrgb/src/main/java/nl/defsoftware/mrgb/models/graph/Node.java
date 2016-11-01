@@ -56,5 +56,11 @@ public interface Node {
     
     public void setCoordinates(double x, double y);
     
+    public int[] getConnectedEdges();
+
+    public void setConnectedEdges(int[] connectedEdges);
     
+    public short[] getGenomeIds();
+    
+    public void setGenomeIds(short[] genomeIds);
 }

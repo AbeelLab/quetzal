@@ -23,6 +23,7 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import nl.defsoftware.mrgb.Constants;
 import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.models.Sequence;
+import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
  *  *Deprecated* A GFA parser that takes the GFA file and finds the links and sequences and
@@ -72,7 +73,7 @@ public class GraphGFAParser implements FileParser {
     }
     
     @Override
-    public Int2ObjectLinkedOpenHashMap<Rib> getParsedSequences() {
+    public Int2ObjectLinkedOpenHashMap<Node> getParsedSequences() {
         return null; //not yet implemented
     }
     

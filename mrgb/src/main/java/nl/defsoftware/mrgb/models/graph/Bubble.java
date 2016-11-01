@@ -62,4 +62,14 @@ public class Bubble extends AbstractNode implements Node {
     public void setStop(Node stop) {
         this.stop = stop;
     }
+
+    @Override
+    public int[] getConnectedEdges() {
+        return null;
+    }
+
+    @Override
+    public void setConnectedEdges(int[] connectedEdges) {
+        
+    }
 }

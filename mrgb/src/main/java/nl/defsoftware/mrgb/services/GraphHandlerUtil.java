@@ -209,14 +209,14 @@ public class GraphHandlerUtil {
      * @return List<MatchingScoreEntry>
      */
     public static List<MatchingScoreEntry> determineSortedNodeRanking(Node aRib, int[] parentNodes,
-            Int2ObjectLinkedOpenHashMap<Rib> graphData) {
+            Int2ObjectLinkedOpenHashMap<Node> graphData) {
         List<MatchingScoreEntry> scoring = new ArrayList<>();
 
         for (int i = 0; i < parentNodes.length; i++) {
-            Rib parentRib = graphData.get(parentNodes[i]);
+            Node parentRib = graphData.get(parentNodes[i]);
             int[] siblingIds = parentRib.getConnectedEdges();
             for (int j = 0; j < siblingIds.length; j++) {
-                Rib siblingRib = graphData.get(siblingIds[j]);
+                Node siblingRib = graphData.get(siblingIds[j]);
                 if (siblingRib != null) {
                     calculateMatchingScore(scoring, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
                 }
@@ -238,15 +238,15 @@ public class GraphHandlerUtil {
      * @return
      */
     public static List<MatchingScoreEntry> determineSortedEdgeRanking(Node aRib, int[] parentNodes,
-            Int2ObjectLinkedOpenHashMap<Rib> graphMap) {
+            Int2ObjectLinkedOpenHashMap<Node> graphMap) {
         List<MatchingScoreEntry> scoring = new ArrayList<>();
 
         for (int i = 0; i < parentNodes.length; i++) {
-            Rib parentRib = graphMap.get(parentNodes[i]);
+            Node parentRib = graphMap.get(parentNodes[i]);
             int[] siblingIds = parentRib.getConnectedEdges();
 
             for (int j = 0; j < siblingIds.length; j++) {
-                Rib siblingRib = graphMap.get(siblingIds[j]);
+                Node siblingRib = graphMap.get(siblingIds[j]);
                 if (siblingRib != null && siblingIsNotAParentNode(siblingIds[j], parentNodes)) {
                     calculateMatchingScore(scoring, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
                 }
@@ -273,8 +273,7 @@ public class GraphHandlerUtil {
         return true;
     }
 
-    private static void calculateMatchingScore(List<MatchingScoreEntry> scoresList, int childNodeId,
-            short[] childGenomeIds, Rib parentRib) {
+    private static void calculateMatchingScore(List<MatchingScoreEntry> scoresList, int childNodeId, short[] childGenomeIds, Node parentRib) {
         short matchingScore = 0;
         short[] parentGenomeIds = parentRib.getGenomeIds();
         for (int j = 0; j < parentGenomeIds.length; j++) {
@@ -287,9 +286,7 @@ public class GraphHandlerUtil {
         scoresList.add(new MatchingScoreEntry(matchingScore, parentRib, childNodeId));
     }
 
-    public static final int MINUMUM_BASE_SIZE = 150;
-    
-    
+//    public static final int MINUMUM_BASE_SIZE = 150;
 //    public static double calculateNodeHeight(Rib aRib, double zoomFactor) {
 //        int nodeSize = aRib.getSequence().length;
 //        double height = nodeSize * zoomFactor;

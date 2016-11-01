@@ -9,7 +9,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.defsoftware.mrgb.models.Rib;
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import nl.defsoftware.mrgb.models.graph.Bubble;
 import nl.defsoftware.mrgb.models.graph.Node;
 import nl.defsoftware.mrgb.models.graph.NodeType;
@@ -33,7 +33,7 @@ public class SuperBubbleDetectionAlgorithm {
     private Node[] alternativeEntrance;
 
     /* Result of detectedBubbles */
-    private List<Bubble> detectedBubbles = new ArrayList<>();
+    private Int2ObjectLinkedOpenHashMap<Bubble> detectedBubbles = new Int2ObjectLinkedOpenHashMap<>();
 
     /* Maintaining candidate bubble nodes during the algorithm */
     private List<Node> candidates = new ArrayList<>();
@@ -70,7 +70,12 @@ public class SuperBubbleDetectionAlgorithm {
         superBubble();
     }
 
-    public List<Bubble> getDetectedBubbles() {
+    /**
+     * Retrieve the detected bubbles.
+     * 
+     * @return List of <code>Bubble</code>'s
+     */
+    public Int2ObjectLinkedOpenHashMap<Bubble> getDetectedBubbles() {
         return detectedBubbles;
     }
 
@@ -184,10 +189,10 @@ public class SuperBubbleDetectionAlgorithm {
     private void report(Node start, Node exit) {
         Set<Node> innerNodes = new HashSet<>();
         findInnerNodes(innerNodes, start.getOutEdges(), exit);
-        Bubble b = new Bubble(bubbleId, NodeType.ALLELE_BUBBLE, start, exit);
+        Bubble b = new Bubble(start.getNodeId(), NodeType.ALLELE_BUBBLE, start, exit);
         b.setNestedNodes(innerNodes);
-        detectedBubbles.add(b);
-        bubbleId++;
+        detectedBubbles.put(start.getNodeId(), b);
+//        bubbleId++;
     }
 
     private void findInnerNodes(Set<Node> innerNodes, Collection<Node> startNodes, Node exit) {

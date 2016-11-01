@@ -21,6 +21,7 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
 import nl.defsoftware.mrgb.Constants;
 import nl.defsoftware.mrgb.models.Rib;
+import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
  * A parser that as a result delivers one data structure that contains the links, nodes, sequences and the strains.
@@ -54,7 +55,7 @@ public class GFAFileParser2 implements FileParser {
 
     private Map<Integer, int[]> edgesMap = new HashMap<>();
 //    private Int2ObjectOpenHashMap<Rib> sequencesMap = new Int2ObjectOpenHashMap<>();
-    private Int2ObjectLinkedOpenHashMap<Rib> sequencesMap = new Int2ObjectLinkedOpenHashMap<>();
+    private Int2ObjectLinkedOpenHashMap<Node> sequencesMap = new Int2ObjectLinkedOpenHashMap<>();
     
     private Short2ObjectOpenHashMap<String> genomeNamesMap = new Short2ObjectOpenHashMap<>();
 
@@ -74,7 +75,7 @@ public class GFAFileParser2 implements FileParser {
     }
     
     @Override
-    public Int2ObjectLinkedOpenHashMap<Rib> getParsedSequences() {
+    public Int2ObjectLinkedOpenHashMap<Node> getParsedSequences() {
         return sequencesMap;
     }
 
@@ -133,7 +134,7 @@ public class GFAFileParser2 implements FileParser {
         Pattern pattern = Pattern.compile("(:|;)");
         for (int i = 0; i < aLine.length; i++) {
             int fromNodeId = Integer.parseInt(aLine[GFA_FROM_NODE]);
-            Rib aSequence = getOrCreateRib(fromNodeId);
+            Rib aSequence = getOrCreateNode(fromNodeId);
             aSequence.setSequence(aLine[GFA_SEQUENCE].toCharArray());
             aSequence.setGenomeIds(extractGenomeIds(pattern.split(aLine[GFA_ORI])));
             aSequence.setReferenceGenomeId(extractReferenceGenome(pattern.split(aLine[GFA_CRD])));
@@ -143,9 +144,9 @@ public class GFAFileParser2 implements FileParser {
         }
     }
 
-    private Rib getOrCreateRib(int nodeId) {
+    private Rib getOrCreateNode(int nodeId) {
         if (sequencesMap.containsKey(nodeId)) {
-            return sequencesMap.get(nodeId);
+            return (Rib) sequencesMap.get(nodeId);
         } else {
             return new Rib(nodeId);
         }
@@ -199,12 +200,12 @@ public class GFAFileParser2 implements FileParser {
         int fromNodeId = Integer.parseInt(aLine[GFA_FROM_NODE]);
         int toNodeId = Integer.parseInt(aLine[GFA_TO_NODE]);
         if (sequencesMap.containsKey(fromNodeId)) {
-            Rib parentRib = sequencesMap.get(fromNodeId);
+            Node parentRib = sequencesMap.get(fromNodeId);
             int[] edges = Arrays.copyOf(parentRib.getConnectedEdges(), parentRib.getConnectedEdges().length + 1);
             edges[edges.length - 1] = toNodeId;
             parentRib.setConnectedEdges(edges);
             
-            Rib childRib = getOrCreateRib(toNodeId);
+            Node childRib = getOrCreateNode(toNodeId);
             parentRib.addOutEdge(childRib);
             childRib.addInEdge(parentRib);
             sequencesMap.put(toNodeId, childRib);

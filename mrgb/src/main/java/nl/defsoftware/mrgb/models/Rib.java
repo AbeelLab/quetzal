@@ -12,7 +12,6 @@ import nl.defsoftware.mrgb.models.graph.NodeType;
 public class Rib extends AbstractNode implements Node {
 
     private char[] sequence;
-    private short[] genomeIds; // ORI attribute in the GFA file
     private short referenceGenomeId; // CRD attribute in the GFA file
     private Integer referenceGenomeCoordinates; // START attribute in the GFA
                                                 // file
@@ -28,7 +27,7 @@ public class Rib extends AbstractNode implements Node {
             Integer referenceGenomeCoordinates) {
         super.setNodeId(nodeId);
         this.sequence = sequence;
-        this.genomeIds = genomeIds;
+        setGenomeIds(genomeIds);
         this.referenceGenomeId = referenceGenomeId;
         this.referenceGenomeCoordinates = referenceGenomeCoordinates;
     }
@@ -37,16 +36,18 @@ public class Rib extends AbstractNode implements Node {
         super.setNodeId(nodeId);
     }
 
+    @Override
     public void setConnectedEdges(int[] connectedEdges) {
         this.connectedEdges = connectedEdges;
     }
 
+    @Override
     public int[] getConnectedEdges() {
         return connectedEdges;
     }
 
     public int amountOfGenomes() {
-        return genomeIds.length;
+        return getGenomeIds().length;
     }
 
     public short getRankedWeightOfEdge(int nodeId) {
@@ -59,14 +60,6 @@ public class Rib extends AbstractNode implements Node {
 
     public void setSequence(char[] sequence) {
         this.sequence = sequence;
-    }
-
-    public short[] getGenomeIds() {
-        return genomeIds;
-    }
-
-    public void setGenomeIds(short[] genomeIds) {
-        this.genomeIds = genomeIds;
     }
 
     public short getReferenceGenomeId() {

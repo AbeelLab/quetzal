@@ -28,17 +28,24 @@ public class SuperBubbleDetectionHelper {
         return result;
     }
 
-    private static void recursiveTopologicalSort(List<Node> resultOrdering, Node[] orderedNodes, Node rib, int orderingIndex) {
+    private static void recursiveTopologicalSort(List<Node> resultOrdering, Node[] orderedNodes, Node aNode, int orderingIndex) {
         state.set(orderingIndex, Boolean.TRUE);
-        for (Node outNode : rib.getOutEdges()) {
+        for (Node outNode : aNode.getOutEdges()) {
             int index = findOrderingIndex(orderedNodes, outNode);
             if (state.get(index) == Boolean.FALSE) {
                 recursiveTopologicalSort(resultOrdering, orderedNodes, outNode, index);
             }
         }
-        resultOrdering.add((Rib) rib);
+        resultOrdering.add((Rib) aNode);
     }
 
+    /**
+     * TODO can be optimised to work with a depleting stack.
+     * 
+     * @param orderedNodes
+     * @param outNode
+     * @return
+     */
     private static int findOrderingIndex(Node[] orderedNodes, Node outNode) {
         for (int i = 0; i < orderedNodes.length; i++) {
             if (orderedNodes[i].getNodeId() == outNode.getNodeId())

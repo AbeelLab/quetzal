@@ -4,6 +4,7 @@
 package nl.defsoftware.mrgb.services;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +14,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import nl.defsoftware.mrgb.models.Rib;
-import nl.defsoftware.mrgb.models.graph.AbstractNode;
+import nl.defsoftware.mrgb.models.graph.Bubble;
 import nl.defsoftware.mrgb.models.graph.Node;
 import nl.defsoftware.mrgb.view.controllers.MatchingScoreEntry;
 import nl.defsoftware.mrgb.view.models.IGraphViewModel;
@@ -36,12 +36,13 @@ public class GraphHandler {
     private static final int VER_NODE_BASELINE = 200;
 
     private static final int BACKBONE_X_BASELINE = 200;
-    private static final int BACKBONE_Y_BASELINE = 200;
+    private static final int BACKBONE_Y_BASELINE = 100;
 
     private static final int Y_CORRECTION = 5;
 
-    private Int2ObjectLinkedOpenHashMap<Rib> graphData = new Int2ObjectLinkedOpenHashMap<>();
-    private Short2ObjectOpenHashMap<String> genomeNamesMap = new Short2ObjectOpenHashMap<>();
+    private Int2ObjectLinkedOpenHashMap<Node> graphData;
+    private Short2ObjectOpenHashMap<String> genomeNamesMap;
+    private Int2ObjectLinkedOpenHashMap<Bubble> bubbles;
 
     private Int2ObjectOpenHashMap<int[]> edgeMapping = new Int2ObjectOpenHashMap<>();
 
@@ -56,10 +57,10 @@ public class GraphHandler {
      * @param graphMap
      * @param genomeNamesMap
      */
-    public GraphHandler(Int2ObjectLinkedOpenHashMap<Rib> graphData, Short2ObjectOpenHashMap<String> genomeNamesMap) {
+    public GraphHandler(Int2ObjectLinkedOpenHashMap<Node> graphData, Short2ObjectOpenHashMap<String> genomeNamesMap, Int2ObjectLinkedOpenHashMap<Bubble> bubbles) {
         this.graphData = graphData;
         this.genomeNamesMap = genomeNamesMap;
-
+        this.bubbles = bubbles;
     }
 
     /**
@@ -77,29 +78,33 @@ public class GraphHandler {
         this.drawingStartCoordinate = drawingStartCoordinate;
         this.drawingRange = drawingRange;
 
-        int sourceNode = graphData.firstIntKey();// TODO should be viewing range dependent
-        Rib firstRib = graphData.get(sourceNode);
+     // TODO should be viewing range dependent
+        Node firstNode = getNodeOrBubble(graphData.firstIntKey());
 
         // double paneHeight = nodePane.getPrefHeight();
         // int rows = Math.floorDiv((int)Math.round(paneHeight), VER_NODE_SPACING);
 
-        GraphHandlerUtil.addEdgesToQueue(edgeMapping, firstRib.getNodeId(), firstRib.getConnectedEdges());
+        GraphHandlerUtil.addEdgesToQueue(edgeMapping, firstNode.getNodeId(), firstNode.getConnectedEdges());
         NodeDrawingData drawingData = new NodeDrawingData();
         drawingData.xCoordinate = BACKBONE_X_BASELINE;
         drawingData.yCoordinate = BACKBONE_Y_BASELINE;
         drawingData.width = 0;
         drawingData.height = 0;
         drawingData.scale = Math.max(zoomFactor.get(), 1.0);
-        drawSequence(model, firstRib, drawingData, 0);
+        drawSequence(model, firstNode, drawingData, 0);
 
         // for (int i = (sourceNode + 1); i < 500; i++) { //testing purposes
-        for (int i = (sourceNode + 1); i < graphData.size(); i++) {
+        for (int i = (firstNode.getNodeId() + 1); i < graphData.size(); i++) {
             if (graphData.containsKey(i)) {
-                Rib aRib = graphData.get(i);
-                GraphHandlerUtil.addEdgesToQueue(edgeMapping, aRib.getNodeId(), aRib.getConnectedEdges());
-                drawEdgesAndNodesToParents(model, aRib);
+                Node aNode = graphData.get(i);
+                GraphHandlerUtil.addEdgesToQueue(edgeMapping, aNode.getNodeId(), aNode.getConnectedEdges());
+                drawEdgesAndNodesToParents(model, aNode);
             }
         }
+    }
+    
+    private Node getNodeOrBubble(int sourceNode) {
+        return bubbles.containsKey(sourceNode) ? bubbles.get(sourceNode) : graphData.get(sourceNode);
     }
 
     /**
@@ -118,11 +123,10 @@ public class GraphHandler {
      * @param aRib
      *            current node
      */
-    private void drawEdgesAndNodesToParents(IGraphViewModel model, AbstractNode aRib) {
+    private void drawEdgesAndNodesToParents(IGraphViewModel model, Node aRib) {
         if (edgeMapping.containsKey(aRib.getNodeId())) {
             int[] parentNodes = edgeMapping.get(aRib.getNodeId());
-            List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aRib,
-                    parentNodes, graphData);
+            List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aRib, parentNodes, graphData);
 
             NodeDrawingData drawingData = new NodeDrawingData();
             drawingData.scale = Math.max(zoomFactor.get(), 1.0);
@@ -193,7 +197,7 @@ public class GraphHandler {
     private static final double DEFAULT_SINGLE_NODE_WIDTH = 15.0;
     private static final double DEFAULT_SINGLE_NODE_HEIGHT = 9.0;
 
-    private void drawSequence(IGraphViewModel model, AbstractNode aRib, NodeDrawingData drawingData, int rank) {
+    private void drawSequence(IGraphViewModel model, Node aNode, NodeDrawingData drawingData, int rank) {
 //        if (!isInView(aRib, drawingStartCoordinate, drawingRange)) {
 //            return;
 //        } else if (height < MIN_VISIBILITY_WIDTH) {
@@ -202,17 +206,17 @@ public class GraphHandler {
 //            return;
 //        }
         
-        model.addSequence(aRib, rank, drawingData);
+        model.addSequence(aNode, rank, drawingData);
     }
 
-    private boolean isInView(AbstractNode aRib, double startLevel, double endLevel) {
+    private boolean isInView(Node aRib, double startLevel, double endLevel) {
         return true;
         // int nodeStart = aRib.getLevel() - aRib.getSequence().length;
         // int nodeEnd = node.getLevel();
         // return nodeStart < endLevel && nodeEnd > startLevel;
     }
 
-    private void drawEdge(IGraphViewModel model, AbstractNode aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
+    private void drawEdge(IGraphViewModel model, Node aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
         int startX = parentXCoordinate;
         int startY = parentYCoordinate + Y_CORRECTION;
 
