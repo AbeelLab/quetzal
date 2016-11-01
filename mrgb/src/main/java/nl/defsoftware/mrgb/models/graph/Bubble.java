@@ -4,6 +4,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * The more nestedNodes this bubble will become already visible at a lower zoom level. 
+ * The less nestedNodes, this bubble will become visible not untill a higher zoom level.
+ * 
  * @author D.L. Ettema
  *
  */
