@@ -17,15 +17,15 @@ public class SuperBubbleDetectionHelper {
     private static List<Boolean> state;
 
     public static List<Node> topologicalSort(Node[] orderedNodes) {
-        List<Node> resultOrdering = new ArrayList<>(orderedNodes.length);
+        List<Node> result = new ArrayList<>(orderedNodes.length);
         state = new ArrayList<>();
         for (int i = 0; i < orderedNodes.length; i++) {
             state.add(i, Boolean.FALSE);
         }
-        recursiveTopologicalSort(resultOrdering, orderedNodes, orderedNodes[0], 0);
-        Collections.reverse(resultOrdering);
+        recursiveTopologicalSort(result, orderedNodes, orderedNodes[0], 0);
+        Collections.reverse(result);
         
-        return resultOrdering;
+        return result;
     }
 
     private static void recursiveTopologicalSort(List<Node> resultOrdering, Node[] orderedNodes, Node rib, int orderingIndex) {
