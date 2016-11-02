@@ -191,6 +191,7 @@ public class SuperBubbleDetectionAlgorithm {
         findInnerNodes(innerNodes, start.getOutEdges(), exit);
         Bubble b = new Bubble(start.getNodeId(), NodeType.ALLELE_BUBBLE, start, exit);
         b.setNestedNodes(innerNodes);
+        log.info("Bubble, startId({}) and stopId({})", start.getNodeId(), exit.getNodeId());
         detectedBubbles.put(start.getNodeId(), b);
 //        bubbleId++;
     }

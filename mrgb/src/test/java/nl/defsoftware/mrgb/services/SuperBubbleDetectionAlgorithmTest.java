@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import nl.defsoftware.mrgb.models.Rib;
 import nl.defsoftware.mrgb.models.graph.Bubble;
 import nl.defsoftware.mrgb.models.graph.Node;
@@ -192,7 +193,7 @@ public class SuperBubbleDetectionAlgorithmTest {
         SuperBubbleDetectionAlgorithm b = new SuperBubbleDetectionAlgorithm();
         b.detectSuperBubbles(graph8n.values().toArray(new Rib[graph8n.size()]));
         
-        List<Bubble> detected = b.getDetectedBubbles();
+        Int2ObjectLinkedOpenHashMap<Bubble> detected = b.getDetectedBubbles();
         log.info("8n: We found {} bubbles.", detected.size());
         assertEquals("We should have detected 2 bubbles but found "+ detected.size(), expectedNoOfBubbles, detected.size());
         Bubble b1 = detected.get(0);
@@ -213,7 +214,7 @@ public class SuperBubbleDetectionAlgorithmTest {
         SuperBubbleDetectionAlgorithm b = new SuperBubbleDetectionAlgorithm();
         b.detectSuperBubbles(graph4n.values().toArray(new Rib[graph4n.size()]));
         
-        List<Bubble> detected = b.getDetectedBubbles();
+        Int2ObjectLinkedOpenHashMap<Bubble> detected = b.getDetectedBubbles();
         log.info("4n: We found {} bubbles.", detected.size());
         assertEquals("We should have detected 1 bubble but found "+ detected.size(), expectedNoOfBubbles, detected.size());
         
@@ -228,10 +229,10 @@ public class SuperBubbleDetectionAlgorithmTest {
         SuperBubbleDetectionAlgorithm b = new SuperBubbleDetectionAlgorithm();
         b.detectSuperBubbles(graph15n.toArray(new Rib[graph15n.size()]));
         
-        List<Bubble> detected = b.getDetectedBubbles();
+        Int2ObjectLinkedOpenHashMap<Bubble> detected = b.getDetectedBubbles();
         log.info("15n: We found {} bubbles\n", detected.size());
         
-        for (Bubble bubble : detected) {
+        for (Bubble bubble : detected.values()) {
             log.info("start({}) and end({}), with {} nested nodes: ", bubble.getStart().getNodeId(), bubble.getStop().getNodeId(), bubble.getNestedNodes().size());
             for (Node nestedNode : bubble.getNestedNodes()) {
                 System.out.println("NestedNode id: "+ nestedNode.getNodeId());

@@ -7,6 +7,7 @@ package nl.defsoftware.mrgb.view.models;
  */
 public class NodeDrawingData {
     
+    public int id;
     public double relativeYPos;
     public double maxHeight;
     

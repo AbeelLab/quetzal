@@ -3,8 +3,11 @@
  */
 package nl.defsoftware.mrgb.services;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +19,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import nl.defsoftware.mrgb.models.graph.Bubble;
 import nl.defsoftware.mrgb.models.graph.Node;
+import nl.defsoftware.mrgb.models.graph.NodeType;
 import nl.defsoftware.mrgb.view.controllers.MatchingScoreEntry;
 import nl.defsoftware.mrgb.view.models.IGraphViewModel;
 import nl.defsoftware.mrgb.view.models.NodeDrawingData;
@@ -43,6 +47,7 @@ public class GraphHandler {
     private Int2ObjectLinkedOpenHashMap<Node> graphData;
     private Short2ObjectOpenHashMap<String> genomeNamesMap;
     private Int2ObjectLinkedOpenHashMap<Bubble> bubbles;
+    private Set<Integer> drawnSubGraphNodeIds;
 
     private Int2ObjectOpenHashMap<int[]> edgeMapping = new Int2ObjectOpenHashMap<>();
 
@@ -61,6 +66,7 @@ public class GraphHandler {
         this.graphData = graphData;
         this.genomeNamesMap = genomeNamesMap;
         this.bubbles = bubbles;
+        this.drawnSubGraphNodeIds = new HashSet<>();
     }
 
     /**
@@ -80,11 +86,10 @@ public class GraphHandler {
 
      // TODO should be viewing range dependent
         Node firstNode = getNodeOrBubble(graphData.firstIntKey());
-
         // double paneHeight = nodePane.getPrefHeight();
         // int rows = Math.floorDiv((int)Math.round(paneHeight), VER_NODE_SPACING);
 
-        GraphHandlerUtil.addEdgesToQueue(edgeMapping, firstNode.getNodeId(), firstNode.getConnectedEdges());
+        GraphHandlerUtil.addEdgesToQueue(edgeMapping, firstNode.getNodeId(), getConnectedEdges(firstNode));
         NodeDrawingData drawingData = new NodeDrawingData();
         drawingData.xCoordinate = BACKBONE_X_BASELINE;
         drawingData.yCoordinate = BACKBONE_Y_BASELINE;
@@ -96,15 +101,37 @@ public class GraphHandler {
         // for (int i = (sourceNode + 1); i < 500; i++) { //testing purposes
         for (int i = (firstNode.getNodeId() + 1); i < graphData.size(); i++) {
             if (graphData.containsKey(i)) {
-                Node aNode = graphData.get(i);
-                GraphHandlerUtil.addEdgesToQueue(edgeMapping, aNode.getNodeId(), aNode.getConnectedEdges());
-                drawEdgesAndNodesToParents(model, aNode);
+//                Node aNode = graphData.get(i);
+                Node aNode = getNodeOrBubble(i);
+                if (!drawnSubGraphNodeIds.contains(aNode.getNodeId())) {
+                    GraphHandlerUtil.addEdgesToQueue(edgeMapping, aNode.getNodeId(), getConnectedEdges(aNode));
+                    drawEdgesAndNodesToParents(model, aNode);
+                }
             }
         }
     }
     
+    private int[] getConnectedEdges(Node node) {
+        if (NodeType.SINGLE_NODE.equals(node.getNodeType())) {
+            return node.getConnectedEdges();
+        } else {
+            Node stop = ((Bubble)node).getStop();
+            return getConnectedEdges(stop);
+        }
+    }
+
     private Node getNodeOrBubble(int sourceNode) {
-        return bubbles.containsKey(sourceNode) ? bubbles.get(sourceNode) : graphData.get(sourceNode);
+        if (bubbles.containsKey(sourceNode)) {
+            log.info("bubbleID({})", sourceNode);
+            Bubble bubble = bubbles.get(sourceNode);
+            drawnSubGraphNodeIds.add(bubble.getStop().getNodeId());
+            for (Node node : bubble.getNestedNodes()) {
+                drawnSubGraphNodeIds.add(node.getNodeId());
+            }
+            return bubble;
+        } else {
+            return graphData.get(sourceNode);
+        }
     }
 
     /**
@@ -120,27 +147,27 @@ public class GraphHandler {
      *            the data model to be filled
      * @param graphMap
      *            map containing all the nodes in the graph
-     * @param aRib
+     * @param aNode
      *            current node
      */
-    private void drawEdgesAndNodesToParents(IGraphViewModel model, Node aRib) {
-        if (edgeMapping.containsKey(aRib.getNodeId())) {
-            int[] parentNodes = edgeMapping.get(aRib.getNodeId());
-            List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aRib, parentNodes, graphData);
+    private void drawEdgesAndNodesToParents(IGraphViewModel model, Node aNode) {
+        if (edgeMapping.containsKey(aNode.getNodeId())) {
+            int[] parentNodes = edgeMapping.get(aNode.getNodeId());
+            List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aNode, parentNodes, graphData);
 
             NodeDrawingData drawingData = new NodeDrawingData();
             drawingData.scale = Math.max(zoomFactor.get(), 1.0);
             if (matchedGenomeRanking.size() == 1) {
                 int rank = 0;
-                Node parentRib = matchedGenomeRanking.get(rank).getParentRib();
-                drawingData.parentXCoordinate = parentRib.getXCoordinate();
-                drawingData.parentYCoordinate = parentRib.getYCoordinate();
-                drawingData.parentHeight = parentRib.getHeight();
-                drawingData.parentWidth = parentRib.getWidth();
-                drawingData.parentRadius = parentRib.getRadius();
+                Node parentNode = matchedGenomeRanking.get(rank).getParentNode();
+                drawingData.parentXCoordinate = parentNode.getXCoordinate();
+                drawingData.parentYCoordinate = parentNode.getYCoordinate();
+                drawingData.parentHeight = parentNode.getHeight();
+                drawingData.parentWidth = parentNode.getWidth();
+                drawingData.parentRadius = parentNode.getRadius();
                 
-                drawSequence(model, aRib, drawingData, rank);
-                model.addEdge(aRib.getNodeId(), parentRib.getNodeId(), rank);
+                drawSequence(model, aNode, drawingData, rank);
+                model.addEdge(aNode.getNodeId(), parentNode.getNodeId(), rank);
             } else {
                 // if the matching produces an equal score, they will end up on
                 // a different rank. We must determine the true rank based on:
@@ -156,37 +183,37 @@ public class GraphHandler {
                     // Find the first occurrence of aRib on its main axis by
                     // aligning it up with the parent that has the highest rank
                     // with this aRib.
-                    if (entry.getChildNodeId() == aRib.getNodeId() && xCoord == 0) {
-                        xCoord = entry.getParentRib().getXCoordinate();
+                    if (entry.getChildNodeId() == aNode.getNodeId() && xCoord == 0) {
+                        xCoord = entry.getParentNode().getXCoordinate();
                         nodeRank = rank;
-                        drawingData.parentWidth = entry.getParentRib().getWidth();
+                        drawingData.parentWidth = entry.getParentNode().getWidth();
                     }
 
                     // Find highest y coordinate from this child's parents so
                     // its drawn at an adequate Y distance.
-                    if (highestYCoord < entry.getParentRib().getYCoordinate()) {
-                        highestYCoord = entry.getParentRib().getYCoordinate();
-                        drawingData.parentHeight = entry.getParentRib().getHeight();
+                    if (highestYCoord < entry.getParentNode().getYCoordinate()) {
+                        highestYCoord = entry.getParentNode().getYCoordinate();
+                        drawingData.parentHeight = entry.getParentNode().getHeight();
                     }
                 }
                 
                 drawingData.parentXCoordinate = xCoord;
                 drawingData.parentYCoordinate = highestYCoord;
-                drawSequence(model, aRib, drawingData, nodeRank);
+                drawSequence(model, aNode, drawingData, nodeRank);
 
                 // draw all the edges to this aRib
-                matchedGenomeRanking = GraphHandlerUtil.determineSortedEdgeRanking(aRib, parentNodes, graphData);
+                matchedGenomeRanking = GraphHandlerUtil.determineSortedEdgeRanking(aNode, parentNodes, graphData);
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
-                    if (entry.getChildNodeId() == aRib.getNodeId()) {
-                        model.addEdge(aRib.getNodeId(), entry.getParentRib().getNodeId(), rank);
+                    if (entry.getChildNodeId() == aNode.getNodeId()) {
+                        model.addEdge(aNode.getNodeId(), entry.getParentNode().getNodeId(), rank);
                     }
                 }
                 matchedGenomeRanking = null;
             }
 
         } else {
-            log.info("Rib({}) has no parent edges, new parent", aRib.getNodeId());
+            log.info("Rib({}) has no parent edges, new parent", aNode.getNodeId());
             // contains a node with no parent which means it is a strain that
             // starts at this position.
             // TODO: not yet implemented

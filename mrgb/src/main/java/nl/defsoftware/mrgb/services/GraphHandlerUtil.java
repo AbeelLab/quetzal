@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import nl.defsoftware.mrgb.models.Rib;
@@ -23,6 +26,8 @@ import nl.defsoftware.mrgb.view.controllers.MatchingScoreEntry;
  */
 public class GraphHandlerUtil {
 
+    private static final Logger log = LoggerFactory.getLogger(GraphHandlerUtil.class);
+    
     /**
      * <p>
      * Definition of a simple bubble: Given a grid on which we draw a DAG where
@@ -179,6 +184,9 @@ public class GraphHandlerUtil {
      */
     public static void addEdgesToQueue(Int2ObjectOpenHashMap<int[]> edgeMapping, int fromId, int[] toId) {
         for (int i = 0; i < toId.length; i++) {
+            if (toId[i] >= 285) {
+                log.info("edgesToQueue to: {} fromId: {}", toId[i], fromId);
+            }
             if (edgeMapping.containsKey(toId[i])) {
                 int[] fromEdges = edgeMapping.get(toId[i]);
                 int[] tmpFromEdges = Arrays.copyOf(fromEdges, fromEdges.length + 1);
@@ -208,8 +216,7 @@ public class GraphHandlerUtil {
      * @param graphData
      * @return List<MatchingScoreEntry>
      */
-    public static List<MatchingScoreEntry> determineSortedNodeRanking(Node aRib, int[] parentNodes,
-            Int2ObjectLinkedOpenHashMap<Node> graphData) {
+    public static List<MatchingScoreEntry> determineSortedNodeRanking(Node aRib, int[] parentNodes, Int2ObjectLinkedOpenHashMap<Node> graphData) {
         List<MatchingScoreEntry> scoring = new ArrayList<>();
 
         for (int i = 0; i < parentNodes.length; i++) {
