@@ -149,7 +149,7 @@ public class GraphHandlerUtil {
      * only child is the sink for a possible bubble.
      * 
      * @param node
-     * @return The node that is the sink for a bubble.
+     * @return The node that is the sink for a bubble or <code>null</code> if otherwise
      */
     private static Node findSinkNodeForSimpleBubble(Node node) {
         if (node.getInEdges().size() == 1 && node.getOutEdges().size() == 1) {
@@ -182,11 +182,11 @@ public class GraphHandlerUtil {
      * @param fromId
      * @param toId
      */
-    public static void addEdgesToQueue(Int2ObjectOpenHashMap<int[]> edgeMapping, int fromId, int[] toId) {
+    public static void mapEdges(Int2ObjectOpenHashMap<int[]> edgeMapping, int fromId, int[] toId) {
         for (int i = 0; i < toId.length; i++) {
-            if (toId[i] >= 285) {
-                log.info("edgesToQueue to: {} fromId: {}", toId[i], fromId);
-            }
+//            if (toId[i] >= 285) {
+//                log.info("edgesToQueue to: {} fromId: {}", toId[i], fromId);
+//            }
             if (edgeMapping.containsKey(toId[i])) {
                 int[] fromEdges = edgeMapping.get(toId[i]);
                 int[] tmpFromEdges = Arrays.copyOf(fromEdges, fromEdges.length + 1);
@@ -225,6 +225,7 @@ public class GraphHandlerUtil {
             for (int j = 0; j < siblingIds.length; j++) {
                 Node siblingRib = graphData.get(siblingIds[j]);
                 if (siblingRib != null) {
+//                    calculateHeaviestSiblingMatchingScore(scoring, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
                     calculateMatchingScore(scoring, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
                 }
             }
@@ -244,8 +245,7 @@ public class GraphHandlerUtil {
      * @param graphMap
      * @return
      */
-    public static List<MatchingScoreEntry> determineSortedEdgeRanking(Node aRib, int[] parentNodes,
-            Int2ObjectLinkedOpenHashMap<Node> graphMap) {
+    public static List<MatchingScoreEntry> determineSortedEdgeRanking(Node aRib, int[] parentNodes, Int2ObjectLinkedOpenHashMap<Node> graphMap) {
         List<MatchingScoreEntry> scoring = new ArrayList<>();
 
         for (int i = 0; i < parentNodes.length; i++) {
@@ -281,7 +281,7 @@ public class GraphHandlerUtil {
     }
 
     private static void calculateMatchingScore(List<MatchingScoreEntry> scoresList, int childNodeId, short[] childGenomeIds, Node parentRib) {
-        short matchingScore = 0;
+        int matchingScore = 0;
         short[] parentGenomeIds = parentRib.getGenomeIds();
         for (int j = 0; j < parentGenomeIds.length; j++) {
             for (int k = 0; k < childGenomeIds.length; k++) {
@@ -291,6 +291,10 @@ public class GraphHandlerUtil {
             }
         }
         scoresList.add(new MatchingScoreEntry(matchingScore, parentRib, childNodeId));
+    }
+    
+    private static void calculateHeaviestSiblingMatchingScore(List<MatchingScoreEntry> scoresList, int childNodeId, short[] childGenomeIds, Node parentRib) {
+        scoresList.add(new MatchingScoreEntry((int)parentRib.getXCoordinate(), parentRib, childNodeId));
     }
 
 //    public static final int MINUMUM_BASE_SIZE = 150;

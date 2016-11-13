@@ -39,8 +39,8 @@ public class GraphHandler {
     private static final int VER_NODE_SPACING = 25;
     private static final int VER_NODE_BASELINE = 200;
 
-    private static final int BACKBONE_X_BASELINE = 200;
-    private static final int BACKBONE_Y_BASELINE = 100;
+    private static final int BACKBONE_X_BASELINE = 100;
+    private static final int BACKBONE_Y_BASELINE = 25;
 
     private static final int Y_CORRECTION = 5;
 
@@ -84,12 +84,31 @@ public class GraphHandler {
         this.drawingStartCoordinate = drawingStartCoordinate;
         this.drawingRange = drawingRange;
 
-     // TODO should be viewing range dependent
-        Node firstNode = getNodeOrBubble(graphData.firstIntKey());
-        // double paneHeight = nodePane.getPrefHeight();
-        // int rows = Math.floorDiv((int)Math.round(paneHeight), VER_NODE_SPACING);
+        int sourceNodeId = drawSourceNode(model, zoomFactor);
 
-        GraphHandlerUtil.addEdgesToQueue(edgeMapping, firstNode.getNodeId(), getConnectedEdges(firstNode));
+        // for (int i = (sourceNode + 1); i < 500; i++) { //testing purposes
+        for (int i = (sourceNodeId  + 1); i < graphData.size(); i++) {
+            if (graphData.containsKey(i)) {
+            
+                Node aNode = graphData.get(i);
+//                Node aNode = getNodeOrBubble(i);
+//                if (!drawnSubGraphNodeIds.contains(aNode.getNodeId())) {
+                    GraphHandlerUtil.mapEdges(edgeMapping, aNode.getNodeId(), getConnectedEdges(aNode));
+                    drawGreedy(model, aNode);
+//                }
+            }
+        }
+    }
+
+    /**
+     * @param model
+     * @param zoomFactor
+     * @return
+     */
+    private int drawSourceNode(IGraphViewModel model, DoubleProperty zoomFactor) {
+        Node firstNode = getNodeOrBubble(graphData.firstIntKey());
+
+        GraphHandlerUtil.mapEdges(edgeMapping, firstNode.getNodeId(), getConnectedEdges(firstNode));
         NodeDrawingData drawingData = new NodeDrawingData();
         drawingData.xCoordinate = BACKBONE_X_BASELINE;
         drawingData.yCoordinate = BACKBONE_Y_BASELINE;
@@ -97,18 +116,7 @@ public class GraphHandler {
         drawingData.height = 0;
         drawingData.scale = Math.max(zoomFactor.get(), 1.0);
         drawSequence(model, firstNode, drawingData, 0);
-
-        // for (int i = (sourceNode + 1); i < 500; i++) { //testing purposes
-        for (int i = (firstNode.getNodeId() + 1); i < graphData.size(); i++) {
-            if (graphData.containsKey(i)) {
-//                Node aNode = graphData.get(i);
-                Node aNode = getNodeOrBubble(i);
-                if (!drawnSubGraphNodeIds.contains(aNode.getNodeId())) {
-                    GraphHandlerUtil.addEdgesToQueue(edgeMapping, aNode.getNodeId(), getConnectedEdges(aNode));
-                    drawEdgesAndNodesToParents(model, aNode);
-                }
-            }
-        }
+        return firstNode.getNodeId();
     }
     
     private int[] getConnectedEdges(Node node) {
@@ -122,7 +130,7 @@ public class GraphHandler {
 
     private Node getNodeOrBubble(int sourceNode) {
         if (bubbles.containsKey(sourceNode)) {
-            log.info("bubbleID({})", sourceNode);
+//            log.info("bubbleID({})", sourceNode);
             Bubble bubble = bubbles.get(sourceNode);
             drawnSubGraphNodeIds.add(bubble.getStop().getNodeId());
             for (Node node : bubble.getNestedNodes()) {
@@ -150,7 +158,7 @@ public class GraphHandler {
      * @param aNode
      *            current node
      */
-    private void drawEdgesAndNodesToParents(IGraphViewModel model, Node aNode) {
+    private void drawGreedy(IGraphViewModel model, Node aNode) {
         if (edgeMapping.containsKey(aNode.getNodeId())) {
             int[] parentNodes = edgeMapping.get(aNode.getNodeId());
             List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aNode, parentNodes, graphData);
@@ -183,6 +191,8 @@ public class GraphHandler {
                     // Find the first occurrence of aRib on its main axis by
                     // aligning it up with the parent that has the highest rank
                     // with this aRib.
+                    //TODO: Since we using a greedy algo, we have a drawing bug where the 
+                    //graph gently moves towards the right, due to the structural complexity of the graph.
                     if (entry.getChildNodeId() == aNode.getNodeId() && xCoord == 0) {
                         xCoord = entry.getParentNode().getXCoordinate();
                         nodeRank = rank;
@@ -190,7 +200,7 @@ public class GraphHandler {
                     }
 
                     // Find highest y coordinate from this child's parents so
-                    // its drawn at an adequate Y distance.
+                    // its drawn at an adequate Y distance. (to alleviate the problem of InDel nodes)
                     if (highestYCoord < entry.getParentNode().getYCoordinate()) {
                         highestYCoord = entry.getParentNode().getYCoordinate();
                         drawingData.parentHeight = entry.getParentNode().getHeight();
@@ -225,14 +235,6 @@ public class GraphHandler {
     private static final double DEFAULT_SINGLE_NODE_HEIGHT = 9.0;
 
     private void drawSequence(IGraphViewModel model, Node aNode, NodeDrawingData drawingData, int rank) {
-//        if (!isInView(aRib, drawingStartCoordinate, drawingRange)) {
-//            return;
-//        } else if (height < MIN_VISIBILITY_WIDTH) {
-//            // aRib.unpop();
-//            // heatmapColorer.drawHeatmap(node, startLevel);
-//            return;
-//        }
-        
         model.addSequence(aNode, rank, drawingData);
     }
 

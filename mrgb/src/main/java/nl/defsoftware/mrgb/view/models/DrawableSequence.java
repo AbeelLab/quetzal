@@ -22,6 +22,11 @@ public class DrawableSequence extends Rectangle {
         setStrokeWidth(2.0);
         setStroke(Paint.valueOf("BLACK"));
         
+        setLayoutX(nodeDrawingData.xCoordinate);
+        setLayoutY(nodeDrawingData.yCoordinate);
+        setWidth(nodeDrawingData.width);
+        setHeight(nodeDrawingData.height);
+        
         this.addEventFilter(MouseEvent.MOUSE_ENTERED, new EventHandler<MouseEvent>() {
             public void handle(MouseEvent event) { 
                 System.out.println(nodeDrawingData.id);

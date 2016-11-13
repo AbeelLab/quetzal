@@ -9,9 +9,14 @@ import javafx.scene.shape.Ellipse;
  */
 public class DrawableAlleleBubble extends Ellipse {
 
-    public DrawableAlleleBubble() {
+    public DrawableAlleleBubble(NodeDrawingData nodeDrawingData) {
         setFill(Paint.valueOf("PURPLE"));
         setOpacity(0.7);
+        
+        setLayoutX(nodeDrawingData.xCoordinate);
+        setLayoutY(nodeDrawingData.yCoordinate);
+        setWidth(nodeDrawingData.width);
+        setHeight(nodeDrawingData.height);
     }
 
     public void onChanged() {
@@ -31,6 +36,6 @@ public class DrawableAlleleBubble extends Ellipse {
     }
     
     public void setHeight(double height) {
-        setRadiusY(height/2);
+        setRadiusY(height / 2);
     }
 }

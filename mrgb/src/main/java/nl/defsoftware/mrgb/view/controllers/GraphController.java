@@ -6,6 +6,7 @@ package nl.defsoftware.mrgb.view.controllers;
 import java.net.URL;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,12 +86,18 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         model = new RibbonGraphModel();
         
         nodePane = new Pane();
-        nodePane.setPrefHeight(500.0);
         nodePane.setPrefWidth(300.0);
+        nodePane.setPrefHeight(500.0);
         nodePane.setStyle("-fx-back-ground-color: white;");
+        
+        edgeCanvas = new Canvas();
+        edgeCanvas.setWidth(300.0);
+        edgeCanvas.setHeight(500.0);
+        edgeCanvas.setStyle("-fx-back-ground-color: white;");
         
         groupedNodes = new Group();
         groupedNodes.getChildren().add(nodePane);
+//        groupedNodes.getChildren().add(edgeCanvas);
         
         mouseGestures = new MouseGestures(this);
         scrollPane = new GraphScrollPane(groupedNodes);
@@ -101,7 +108,6 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         scrollPane.setController(this);
         scrollPane.setChangeListener(graphHandler);
 
-        edgeCanvas = new Canvas();
         mainPane = new AnchorPane();
         scrollbar = new ScrollBar();
 //        mainPane.getChildren().add(scrollPane);
@@ -139,7 +145,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
 
     private void clear() {
         nodePane.getChildren().clear();
-        edgeCanvas.getGraphicsContext2D().clearRect(0, 0, edgeCanvas.getWidth(), edgeCanvas.getWidth());
+        edgeCanvas.getGraphicsContext2D().clearRect(0, 0, edgeCanvas.getWidth(), edgeCanvas.getHeight());
     }
     
     @Override
@@ -190,7 +196,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     private void endUpdate() {
 
         // add components to graph pane
-
+//        drawLinesOnCanvas(model.getAddedEdges());
         nodePane.getChildren().addAll(model.getAddedEdges());
         nodePane.getChildren().addAll(model.getAddedSequences());
         nodePane.getChildren().addAll(model.getAllLabels());
@@ -213,6 +219,13 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
 
         // merge added & removed cells with all cells
         model.merge();
+    }
+
+    private void drawLinesOnCanvas(Set<Shape> addedEdges) {
+        edgeCanvas.getGraphicsContext2D().clearRect(0,  0,  edgeCanvas.getWidth(), edgeCanvas.getHeight());     
+        for (Shape shape : addedEdges) {
+            edgeCanvas.getGraphicsContext2D().strokeLine(shape.getLayoutBounds().getMinX(), shape.getLayoutBounds().getMinY(), shape.getLayoutBounds().getMaxX(), shape.getLayoutBounds().getMaxY());        
+        }
     }
 
     public double getScale() {
