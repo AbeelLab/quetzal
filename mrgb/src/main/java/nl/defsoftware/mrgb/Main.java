@@ -7,6 +7,7 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import nl.defsoftware.mrgb.view.controllers.RootController;
 
@@ -29,7 +30,7 @@ public class Main extends Application {
 	}
 
 	private void createStage(Stage mainWindow, Pane root) {
-		Scene container = new Scene(root, 1024, 768);
+		Scene container = new Scene(root, 1024, 1000, Paint.valueOf("white"));
 		root.prefWidthProperty().bind(container.widthProperty());
 		root.prefHeightProperty().bind(container.heightProperty());
 		container.getStylesheets().add(getClass().getResource("/css/application.css").toExternalForm());

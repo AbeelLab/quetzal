@@ -59,7 +59,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     private GraphScrollPane scrollPane;
 
     private IGraphViewModel<Shape> model;
-
+    
     private static final double SCROLL_ZOOM_FACTOR = 0.0025;
 
     @FXML
@@ -92,7 +92,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         
         edgeCanvas = new Canvas();
         edgeCanvas.setWidth(300.0);
-        edgeCanvas.setHeight(500.0);
+        edgeCanvas.setHeight(600.0);
         edgeCanvas.setStyle("-fx-back-ground-color: white;");
         
         groupedNodes = new Group();
@@ -119,6 +119,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        graphHandler = new GraphHandler(graphService.getParsedSequences(), graphService.getGenomeNames(), graphService.getDetectedBubbles());
     }
 
     public void updateView() {
@@ -126,11 +127,14 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     }
     
     public void updateGraph() {
-        graphHandler = new GraphHandler(graphService.getParsedSequences(), graphService.getGenomeNames(), graphService.getDetectedBubbles());
+        if (graphHandler == null) {
+            initialize(null, null);
+        }
 //        double viewRange = (mainPane.getHeight() / zoomFactor.get()) + 1;
 //        double viewingStart = Math.max(amountOfLevels.multiply(scrollbar.getValue()).doubleValue(), 0.0);
-        double dummyRange = 500;
-        double dummyViewingStartCoordinate = 1;
+        int dummyRange = graphService.getParsedSequences().size();
+//        int dummyRange = 300;
+        int dummyViewingStartCoordinate = 1;//270;
         clear();
         zoomFactor.bind(scrollPane.getScaleYProperty());
         graphHandler.loadGraphViewModel(
@@ -155,7 +159,8 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
             if (ActionStateEnums.LOAD_DATA_AND_PARSE == change.getKey()) {
                 // @TODO do this work in another thread.
                 graphService.loadDataAndParse();
-                log.info("LOAD DATA AND PARSE");
+                initialize(null, null);
+                log.info("Ready to view");
             } else if (ActionStateEnums.VIEW_GRAPH == change.getKey()) {
                 updateGraph();
             } else if (ActionStateEnums.DUMMY_ACTION == change.getKey()) {

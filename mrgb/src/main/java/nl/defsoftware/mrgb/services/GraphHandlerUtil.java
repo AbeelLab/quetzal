@@ -225,7 +225,7 @@ public class GraphHandlerUtil {
             for (int j = 0; j < siblingIds.length; j++) {
                 Node siblingRib = graphData.get(siblingIds[j]);
                 if (siblingRib != null) {
-//                    calculateHeaviestSiblingMatchingScore(scoring, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
+//                    calculateNaiveRanking(scoring, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
                     calculateMatchingScore(scoring, siblingRib.getNodeId(), siblingRib.getGenomeIds(), parentRib);
                 }
             }
@@ -293,7 +293,7 @@ public class GraphHandlerUtil {
         scoresList.add(new MatchingScoreEntry(matchingScore, parentRib, childNodeId));
     }
     
-    private static void calculateHeaviestSiblingMatchingScore(List<MatchingScoreEntry> scoresList, int childNodeId, short[] childGenomeIds, Node parentRib) {
+    private static void calculateNaiveRanking(List<MatchingScoreEntry> scoresList, int childNodeId, short[] childGenomeIds, Node parentRib) {
         scoresList.add(new MatchingScoreEntry((int)parentRib.getXCoordinate(), parentRib, childNodeId));
     }
 

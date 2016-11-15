@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.models.graph.Bubble;
@@ -19,19 +22,18 @@ import nl.defsoftware.mrgb.models.graph.Node;
  */
 public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
 
+    private static final Logger log = LoggerFactory.getLogger(RibbonGraphModel.class);
+    
     private static final int LINE_ENDING_LENGTH = 8;
     private static final int HOR_NODE_SPACING = 20;
-    private static final int VER_NODE_SPACING = 25;
-    private static final int VER_NODE_BASELINE = 200;
+    private static final int VER_NODE_SPACING = 20;
     private static final double DEFAULT_SINGLE_NODE_WIDTH = 15.0;
     private static final double DEFAULT_SINGLE_NODE_HEIGHT = 10.0;
-    private static final double DEFAULT_SINGLE_NODE_RADIUS = 10.0;
 
     private Set<Shape> allEdges;
     private Set<Shape> addedEdges;
     private List<Shape> removedEdges;
     private Map<Integer, Shape> drawnSequencesMap;
-    private Set<Integer> drawnSubGraphNodeIds;
 
     public RibbonGraphModel() {
         super();
@@ -42,9 +44,7 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
     public void addSequence(Node node, int rank, NodeDrawingData drawingData) {
         switch (node.getNodeType()) {
         case SINGLE_NODE:
-//            if (!drawnSubGraphNodeIds.contains(node.getNodeId())) {
-                createSingleSequence(node, rank, drawingData);
-//            }
+            createSingleSequence(node, rank, drawingData);
             break;
         case SNP_BUBBLE:
             createSNPBubble(node, rank, drawingData);
@@ -61,22 +61,22 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
     
     private void createSingleSequence(Node aNode, int rank, NodeDrawingData drawingData) {
         DrawableSequence seq;
-//        drawingData.width = DEFAULT_SINGLE_NODE_WIDTH;
-//        drawingData.height = DEFAULT_SINGLE_NODE_HEIGHT;
-        drawingData.width = DEFAULT_SINGLE_NODE_WIDTH +  Math.exp(drawingData.scale);
-        drawingData.height = DEFAULT_SINGLE_NODE_HEIGHT + Math.exp(drawingData.scale);
+        drawingData.width = DEFAULT_SINGLE_NODE_WIDTH / drawingData.scale;
+        drawingData.height = DEFAULT_SINGLE_NODE_HEIGHT / drawingData.scale;
+        double verNodeSpacing = VER_NODE_SPACING / drawingData.scale;
+        double horNodeSpacing = HOR_NODE_SPACING;// / drawingData.scale;
         drawingData.id = aNode.getNodeId();
         if (drawnSequencesMap.containsKey(aNode.getNodeId())) {
             seq = (DrawableSequence) drawnSequencesMap.get(aNode.getNodeId());
             // determine initial offset
-            if (drawingData.parentXCoordinate == 0.0) {
-                drawingData.xCoordinate = seq.getLayoutX() + (((drawingData.parentWidth / 2) + HOR_NODE_SPACING + (drawingData.width / 2)) * rank);
+            if (Double.compare(drawingData.parentXCoordinate, 0.0) == 0) {
+                drawingData.xCoordinate = seq.getLayoutX() + (((drawingData.parentWidth / 2) + horNodeSpacing + (drawingData.width / 2)) * rank);
             } else {
-                drawingData.xCoordinate = drawingData.parentXCoordinate + (((drawingData.parentWidth / 2) + HOR_NODE_SPACING + (drawingData.width / 2)) * rank);
+                drawingData.xCoordinate = drawingData.parentXCoordinate + (((drawingData.parentWidth / 2) + horNodeSpacing + (drawingData.width / 2)) * rank);
             }
             // determine location based on node spacing, width or radius of
             // parent node and of itself multiplied by the ranking of the node
-            drawingData.yCoordinate = drawingData.yCoordinate + drawingData.parentYCoordinate + (drawingData.parentHeight / 2) + VER_NODE_SPACING + (drawingData.height / 2);
+            drawingData.yCoordinate = drawingData.yCoordinate + drawingData.parentYCoordinate + (drawingData.parentHeight / 2) + verNodeSpacing + (drawingData.height / 2);
 
             seq.setWidth(drawingData.width);
             seq.setHeight(drawingData.height);
@@ -84,8 +84,8 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
             seq.setLayoutY(drawingData.yCoordinate);
 
         } else {
-            drawingData.xCoordinate = drawingData.xCoordinate + drawingData.parentXCoordinate + ((HOR_NODE_SPACING + (drawingData.width/2) + (drawingData.parentWidth/2)) * rank);
-            drawingData.yCoordinate = drawingData.yCoordinate + drawingData.parentYCoordinate + (drawingData.parentHeight / 2) + VER_NODE_SPACING + (drawingData.height / 2) ;
+            drawingData.xCoordinate += drawingData.parentXCoordinate + ((horNodeSpacing + (drawingData.width/2) + (drawingData.parentWidth/2)) * rank);
+            drawingData.yCoordinate += drawingData.parentYCoordinate + (drawingData.parentHeight / 2) + verNodeSpacing + (drawingData.height / 2) ;
             seq = new DrawableSequence(drawingData);
             drawnSequencesMap.put(aNode.getNodeId(), seq);
         }
@@ -93,84 +93,30 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
         super.addedSequences.add(seq);
     }
 
-    private void createAlleleBubble(Node aNode, int rank, NodeDrawingData drawingData) {
-        drawingData.height = determineBubbleHeight((Bubble) aNode, drawingData.scale);
-        drawingData.width = DEFAULT_SINGLE_NODE_WIDTH * Math.exp(drawingData.scale);
-        drawingData.id = aNode.getNodeId();
-        DrawableAlleleBubble bubble;
-        if (drawnSequencesMap.containsKey(aNode.getNodeId())) {
-            bubble = (DrawableAlleleBubble) drawnSequencesMap.get(aNode.getNodeId());
-            // determine initial offset
-            if (drawingData.parentXCoordinate == 0.0) {
-                drawingData.xCoordinate = bubble.getLayoutX() + (((drawingData.parentWidth / 2) + HOR_NODE_SPACING + (drawingData.width / 2)) * rank);
-            } else {
-                drawingData.xCoordinate = drawingData.parentXCoordinate + (((drawingData.parentWidth / 2) + HOR_NODE_SPACING + (drawingData.width / 2)) * rank);
-            }
-            // determine location based on node spacing, width or radius of
-            // parent node and of itself multiplied by the ranking of the node
-//            drawingData.xCoordinate += ((Math.max(drawingData.parentWidth / 2, drawingData.radius) + HOR_NODE_SPACING + (drawingData.width / 2)) * rank);
-            drawingData.yCoordinate = drawingData.yCoordinate + drawingData.parentYCoordinate + Math.max(drawingData.parentHeight / 2, drawingData.radius) + (VER_NODE_SPACING) + (drawingData.height / 2);
-
-            bubble.setWidth(drawingData.width);
-            bubble.setHeight(drawingData.height);
-            bubble.setLayoutX(drawingData.xCoordinate);
-            bubble.setLayoutY(drawingData.yCoordinate);
-        } else {
-            drawingData.xCoordinate = drawingData.xCoordinate + drawingData.parentXCoordinate + (HOR_NODE_SPACING * rank);
-            drawingData.yCoordinate = drawingData.yCoordinate + drawingData.parentYCoordinate + VER_NODE_SPACING + ((drawingData.height / 2));
-            bubble = new DrawableAlleleBubble(drawingData);
-            drawnSequencesMap.put(aNode.getNodeId(), bubble);
-        }
-        setDrawingDataToNode(aNode, drawingData);
-        addSubGraphSequences((Bubble) aNode, rank, drawingData);
-        super.addedSequences.add(bubble);
-    }
-
-    private void addSubGraphSequences(Bubble bubble, int rank, NodeDrawingData drawingData) {
-        NodeDrawingData bubbleDrawingData = drawingData;
+    private void createAlleleBubble(Node aBubbleNode, int rank, NodeDrawingData drawingData) {
+        Bubble bubble = (Bubble) aBubbleNode;
+        //Setting Width and XCoordinate
+        double minX = Double.MAX_VALUE; 
+        double maxX = Double.MIN_VALUE;
         for (Node node : bubble.getNestedNodes()) {
-            addSequence(node, rank, bubbleDrawingData);
-            bubbleDrawingData.parentXCoordinate = bubbleDrawingData.xCoordinate;
-            bubbleDrawingData.parentYCoordinate = bubbleDrawingData.yCoordinate;
-            bubbleDrawingData.parentWidth = bubbleDrawingData.width;
-            bubbleDrawingData.parentHeight = bubbleDrawingData.height;
-            bubbleDrawingData.parentRadius = bubbleDrawingData.radius;
-            drawnSubGraphNodeIds.add(node.getNodeId());
-        }
-    }
-
-    /**
-     * //#(scale, nestedsize) = radius 
-     * //higher nestedSize, low scale = viewable radius 
-     * //higher nestedSize, high scale = bubble vanishes 
-     * //lower nestedSize, low scale = not viewable 
-     * //lower nestedSize, high scale = viewable radius
-     * We need some sort of staffel mechanism?
-     * 
-     * @param aNode
-     * @param scale
-     * @return
-     */
-    int MINUMUM_NODE_SIZE = 10;
-    private double determineBubbleHeight(Bubble bubble, double scale) {
-        double width = bubble.getNestedNodes().size() * scale;
-        if (bubble.getNestedNodes().size() < MINUMUM_NODE_SIZE && width < DEFAULT_SINGLE_NODE_WIDTH) {
-            width = MINUMUM_NODE_SIZE * scale;
-            if (width > DEFAULT_SINGLE_NODE_WIDTH) {
-                return DEFAULT_SINGLE_NODE_WIDTH;
+            if (drawnSequencesMap.containsKey(node.getNodeId())) {
+                Shape shape = drawnSequencesMap.get(node.getNodeId());
+                minX = Math.min(minX, shape.getBoundsInParent().getMinX());
+                maxX = Math.max(maxX, shape.getBoundsInParent().getMaxX());
             }
         }
-        return width;
-//        if (isBetween(scale, 1, 5)) {
-//            if (bubble.getNestedNodes().size() > 100) return DEFAULT_SINGLE_NODE_RADIUS * scale;
-//            else return 0;
-//        }
-//        else if (isBetween(scale, 5, 7)) {
-//            if (bubble.getNestedNodes().size() > 100) return DEFAULT_SINGLE_NODE_RADIUS * Math.exp(scale);
-//            else if (bubble.getNestedNodes().size() > 50) return DEFAULT_SINGLE_NODE_RADIUS * scale;
-//            else if (bubble.getNestedNodes().size() > 0) return DEFAULT_SINGLE_NODE_RADIUS;
-//        }
-//        return 0;
+        drawingData.width = (maxX - minX);
+        drawingData.xCoordinate = minX;
+        //Setting height and yCoordinate
+        if (drawnSequencesMap.containsKey(bubble.getStart().getNodeId()) && drawnSequencesMap.containsKey(bubble.getStop().getNodeId())) {
+            DrawableSequence startSequence = (DrawableSequence) drawnSequencesMap.get(bubble.getStart().getNodeId());
+            DrawableSequence stopSequence = (DrawableSequence) drawnSequencesMap.get(bubble.getStop().getNodeId());
+            drawingData.height = stopSequence.getBoundsInParent().getMaxY() - startSequence.getBoundsInParent().getMinY();        
+            drawingData.yCoordinate = startSequence.getBoundsInParent().getMinY();
+        }
+        DrawableAlleleBubble drawableBubble = new DrawableAlleleBubble(drawingData);
+        setDrawingDataToNode(aBubbleNode, drawingData);
+        super.addedSequences.add(drawableBubble);
     }
 
     private void setDrawingDataToNode(Node aNode, NodeDrawingData data) {
@@ -262,7 +208,6 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
         allEdges = new HashSet<>();
         removedEdges = new ArrayList<>();
         addedEdges = new HashSet<>();
-        drawnSubGraphNodeIds = new HashSet<>();
     }
 
     @Override

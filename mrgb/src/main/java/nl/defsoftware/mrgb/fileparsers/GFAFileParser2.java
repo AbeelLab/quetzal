@@ -86,7 +86,7 @@ public class GFAFileParser2 implements FileParser {
     
     @Override
     public boolean isParsed() {
-        return sequencesMap.size() > 0 && genomeNamesMap.size() > 0;
+        return !sequencesMap.isEmpty() && !genomeNamesMap.isEmpty();
     }
     
     @Override
@@ -113,7 +113,7 @@ public class GFAFileParser2 implements FileParser {
                 processGenomeNames(aLine[GFA_GENOME_NAMES]);
             }
         }
-        log.info("Finished parsing graph data");
+        log.info("Parsing data... DONE");
         scanner.close();
     }
 

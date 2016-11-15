@@ -13,6 +13,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Paint;
 import javafx.scene.transform.Scale;
+import nl.defsoftware.mrgb.Constants;
 import nl.defsoftware.mrgb.services.GraphHandler;
 import nl.defsoftware.mrgb.view.controllers.GraphController;
 
@@ -31,15 +32,15 @@ public class GraphScrollPane extends ScrollPane {
     
 	private Group zoomGroup;
 	private Scale scaleTransform;
-	private double scaleValue = 1.0;
-	private double delta = .5;
+	private double scaleValue = Constants.MAX_ZOOM_VALUE;
+	private double delta = 5;
 	
 	//should be interface for listener object so different things can listen to changes
 	private GraphHandler graphHandler;
 	private GraphController graphController;
 	
 	public GraphScrollPane(Node content) {
-	    scaleTransform = new Scale(scaleValue, scaleValue, 0, 0);
+	    scaleTransform = new Scale(scaleValue, scaleValue);
 		zoomGroup = new Group(content);
 //		zoomGroup.getTransforms().add(scaleTransform);
 		zoomGroup.setOnScroll(new ZoomHandler());
@@ -121,9 +122,9 @@ public class GraphScrollPane extends ScrollPane {
 		public void handle(ScrollEvent scrollEvent) {
 			if (scrollEvent.isControlDown()) {
 				if (scrollEvent.getDeltaY() < 0) {
-					scaleValue -= delta;
+				    scaleValue = Math.min(scaleValue + delta, Constants.MAX_ZOOM_VALUE);
 				} else {
-					scaleValue += delta;
+					scaleValue = Math.max(scaleValue - delta, Constants.MIN_ZOOM_VALUE);
 				}
 				zoomTo(scaleValue);
 				scrollEvent.consume();
