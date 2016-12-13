@@ -1,9 +1,7 @@
 package nl.defsoftware.mrgb.view.models;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.shape.Shape;
+import nl.defsoftware.mrgb.Constants;
 import nl.defsoftware.mrgb.models.graph.Bubble;
 import nl.defsoftware.mrgb.models.graph.Node;
 
@@ -32,7 +31,7 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
 
     private Set<Shape> allEdges;
     private Set<Shape> addedEdges;
-    private List<Shape> removedEdges;
+    private Set<Shape> removedEdges;
     private Map<Integer, Shape> drawnSequencesMap;
 
     public RibbonGraphModel() {
@@ -94,29 +93,37 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
     }
 
     private void createAlleleBubble(Node aBubbleNode, int rank, NodeDrawingData drawingData) {
-        Bubble bubble = (Bubble) aBubbleNode;
-        //Setting Width and XCoordinate
-        double minX = Double.MAX_VALUE; 
-        double maxX = Double.MIN_VALUE;
-        for (Node node : bubble.getNestedNodes()) {
-            if (drawnSequencesMap.containsKey(node.getNodeId())) {
-                Shape shape = drawnSequencesMap.get(node.getNodeId());
-                minX = Math.min(minX, shape.getBoundsInParent().getMinX());
-                maxX = Math.max(maxX, shape.getBoundsInParent().getMaxX());
+        if ((drawingData.scale * drawingData.scale) / (Constants.MAX_ZOOM_VALUE / 2) > 0.2) {
+            Bubble bubble = (Bubble) aBubbleNode;
+            //Setting Width and XCoordinate
+            double minX = Double.MAX_VALUE; 
+            double maxX = Double.MIN_VALUE;
+            for (Node node : bubble.getNestedNodes()) {
+                if (drawnSequencesMap.containsKey(node.getNodeId())) {
+                    Shape shape = drawnSequencesMap.get(node.getNodeId());
+                    minX = Math.min(minX, shape.getBoundsInParent().getMinX());
+                    maxX = Math.max(maxX, shape.getBoundsInParent().getMaxX());
+                }
             }
+            drawingData.width = (maxX - minX);
+            drawingData.xCoordinate = minX;
+            //Setting height and yCoordinate
+            if (drawnSequencesMap.containsKey(bubble.getStart().getNodeId()) && drawnSequencesMap.containsKey(bubble.getStop().getNodeId())) {
+                DrawableSequence startSequence = (DrawableSequence) drawnSequencesMap.get(bubble.getStart().getNodeId());
+                DrawableSequence stopSequence = (DrawableSequence) drawnSequencesMap.get(bubble.getStop().getNodeId());
+                drawingData.height = stopSequence.getBoundsInParent().getMaxY() - startSequence.getBoundsInParent().getMinY();        
+                drawingData.yCoordinate = startSequence.getBoundsInParent().getMinY();
+            }
+            DrawableAlleleBubble drawableBubble = new DrawableAlleleBubble(drawingData);
+            setDrawingDataToNode(aBubbleNode, drawingData);
+            super.addedSequences.add(drawableBubble);
+            
+            for (Node nestedNode : bubble.getNestedNodes()) {
+                super.removedSequences.add(drawnSequencesMap.get(nestedNode.getNodeId()));
+            }
+            super.removedSequences.add(drawnSequencesMap.get(bubble.getStart().getNodeId()));
+            super.removedSequences.add(drawnSequencesMap.get(bubble.getStop().getNodeId()));
         }
-        drawingData.width = (maxX - minX);
-        drawingData.xCoordinate = minX;
-        //Setting height and yCoordinate
-        if (drawnSequencesMap.containsKey(bubble.getStart().getNodeId()) && drawnSequencesMap.containsKey(bubble.getStop().getNodeId())) {
-            DrawableSequence startSequence = (DrawableSequence) drawnSequencesMap.get(bubble.getStart().getNodeId());
-            DrawableSequence stopSequence = (DrawableSequence) drawnSequencesMap.get(bubble.getStop().getNodeId());
-            drawingData.height = stopSequence.getBoundsInParent().getMaxY() - startSequence.getBoundsInParent().getMinY();        
-            drawingData.yCoordinate = startSequence.getBoundsInParent().getMinY();
-        }
-        DrawableAlleleBubble drawableBubble = new DrawableAlleleBubble(drawingData);
-        setDrawingDataToNode(aBubbleNode, drawingData);
-        super.addedSequences.add(drawableBubble);
     }
 
     private void setDrawingDataToNode(Node aNode, NodeDrawingData data) {
@@ -206,7 +213,7 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
         super.clear();
         drawnSequencesMap = new HashMap<>();
         allEdges = new HashSet<>();
-        removedEdges = new ArrayList<>();
+        removedEdges = new HashSet<>();
         addedEdges = new HashSet<>();
     }
 
@@ -232,7 +239,7 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
     }
 
     @Override
-    public List<Shape> getRemovedEdges() {
+    public Set<Shape> getRemovedEdges() {
         return removedEdges;
     }
 }

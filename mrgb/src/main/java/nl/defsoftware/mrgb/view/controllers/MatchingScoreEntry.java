@@ -7,7 +7,7 @@ import nl.defsoftware.mrgb.models.graph.Node;
  * @author D.L. Ettema
  *
  */
-public class MatchingScoreEntry implements Comparable<MatchingScoreEntry>{
+public class MatchingScoreEntry implements Comparable<MatchingScoreEntry> {
     
     private int score;
     private Node parentNode;

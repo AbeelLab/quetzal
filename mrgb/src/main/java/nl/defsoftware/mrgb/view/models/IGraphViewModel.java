@@ -45,7 +45,7 @@ public interface IGraphViewModel<V> {
     
     public Set<V> getAddedEdges();
 
-    public List<V> getRemovedEdges();
+    public Set<V> getRemovedEdges();
     
     public List<Label> getAllLabels();
 }

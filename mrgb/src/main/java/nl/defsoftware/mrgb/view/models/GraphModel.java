@@ -23,7 +23,7 @@ public class GraphModel extends AbstractGraphViewModel<Edge> {
 
     private Set<Edge> allEdges;
     private Set<Edge> addedEdges;
-    private List<Edge> removedEdges;
+    private Set<Edge> removedEdges;
     
     Map<Integer, Sequence> sequenceMap; // <id,Sequence>
     Map<Integer, List<Integer>> xCoordinateMap; // <xCoordinate, ids[]>
@@ -38,7 +38,7 @@ public class GraphModel extends AbstractGraphViewModel<Edge> {
         super.clear();
         allEdges = new HashSet<>();
         addedEdges = new HashSet<>();
-        removedEdges = new ArrayList<>();
+        removedEdges = new HashSet<>();
         
         sequenceMap = new HashMap<Integer, Sequence>(); // <id,Sequence>
         xCoordinateMap = new HashMap<Integer, List<Integer>>();
@@ -118,7 +118,7 @@ public class GraphModel extends AbstractGraphViewModel<Edge> {
         return addedEdges;
     }
 
-    public List<Edge> getRemovedEdges() {
+    public Set<Edge> getRemovedEdges() {
         return removedEdges;
     }
 }

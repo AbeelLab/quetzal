@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javafx.scene.control.Label;
 import javafx.scene.paint.Paint;
@@ -14,6 +16,7 @@ public abstract class AbstractGraphViewModel<V> implements IGraphViewModel<V> {
     protected Sequence graphParent;
     protected Set<Shape> allSequences;
     protected Set<Shape> addedSequences;
+    protected SortedSet<Shape> allSortedSequences;
     protected List<Shape> removedSequences;
     protected List<Label> allLabels;
     
@@ -27,6 +30,7 @@ public abstract class AbstractGraphViewModel<V> implements IGraphViewModel<V> {
     	addedSequences = new HashSet<>();
     	removedSequences = new ArrayList<>();
     	allLabels = new ArrayList<>();
+    	allSortedSequences = new TreeSet<>();
     }
 
     @Override

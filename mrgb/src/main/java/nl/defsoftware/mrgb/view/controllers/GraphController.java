@@ -26,7 +26,10 @@ import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.services.GraphHandler;
@@ -84,16 +87,15 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     public GraphController() {
         graphService = new GraphService();
         model = new RibbonGraphModel();
-        
+        Background background = new Background(new BackgroundFill(Paint.valueOf("white"), null, null));
         nodePane = new Pane();
-        nodePane.setPrefWidth(300.0);
-        nodePane.setPrefHeight(500.0);
-        nodePane.setStyle("-fx-back-ground-color: white;");
+        nodePane.setPrefWidth(1024.0);
+        nodePane.setPrefHeight(900.0);
+//        nodePane.setBackground(background);
         
         edgeCanvas = new Canvas();
-        edgeCanvas.setWidth(300.0);
-        edgeCanvas.setHeight(600.0);
-        edgeCanvas.setStyle("-fx-back-ground-color: white;");
+        edgeCanvas.setWidth(500.0);
+        edgeCanvas.setHeight(900.0);
         
         groupedNodes = new Group();
         groupedNodes.getChildren().add(nodePane);
@@ -107,6 +109,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
         scrollPane.setController(this);
         scrollPane.setChangeListener(graphHandler);
+//        scrollPane.setBackground(background);
 
         mainPane = new AnchorPane();
         scrollbar = new ScrollBar();
@@ -132,9 +135,9 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         }
 //        double viewRange = (mainPane.getHeight() / zoomFactor.get()) + 1;
 //        double viewingStart = Math.max(amountOfLevels.multiply(scrollbar.getValue()).doubleValue(), 0.0);
-        int dummyRange = graphService.getParsedSequences().size();
-//        int dummyRange = 300;
-        int dummyViewingStartCoordinate = 1;//270;
+//        int dummyRange = graphService.getParsedSequences().size();
+        int dummyRange = 500;
+        int dummyViewingStartCoordinate = 270;
         clear();
         zoomFactor.bind(scrollPane.getScaleYProperty());
         graphHandler.loadGraphViewModel(
