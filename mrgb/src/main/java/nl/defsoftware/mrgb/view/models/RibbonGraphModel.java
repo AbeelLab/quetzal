@@ -15,6 +15,9 @@ import nl.defsoftware.mrgb.models.graph.Bubble;
 import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
+ * 
+ * This model draws the nodes on the actual coordinates
+ * 
  * @author D.L. Ettema
  * @date: 27 September 2016
  *
@@ -58,6 +61,18 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
         }
     }
     
+    /**
+     * Sets the location of the <code>aNode</code> and takes into account the following:</br>
+     * - size between the previous node </br>
+     * - adds some spacing between nodes </br> 
+     * - scales the default node size </br>
+     * - scales the vertical node spacing </br> 
+     * 
+     *  
+     * @param aNode
+     * @param rank
+     * @param drawingData
+     */
     private void createSingleSequence(Node aNode, int rank, NodeDrawingData drawingData) {
         DrawableSequence seq;
         drawingData.width = DEFAULT_SINGLE_NODE_WIDTH / drawingData.scale;
@@ -82,7 +97,7 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
             seq.setLayoutX(drawingData.xCoordinate);
             seq.setLayoutY(drawingData.yCoordinate);
 
-        } else {
+        } else { //if it is the first node
             drawingData.xCoordinate += drawingData.parentXCoordinate + ((horNodeSpacing + (drawingData.width/2) + (drawingData.parentWidth/2)) * rank);
             drawingData.yCoordinate += drawingData.parentYCoordinate + (drawingData.parentHeight / 2) + verNodeSpacing + (drawingData.height / 2) ;
             seq = new DrawableSequence(drawingData);
