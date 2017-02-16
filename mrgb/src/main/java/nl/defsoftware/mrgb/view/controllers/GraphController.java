@@ -135,11 +135,14 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         }
 //        double viewRange = (mainPane.getHeight() / zoomFactor.get()) + 1;
 //        double viewingStart = Math.max(amountOfLevels.multiply(scrollbar.getValue()).doubleValue(), 0.0);
-//        int dummyRange = graphService.getParsedSequences().size();
-        int dummyRange = 500;
+        int dummyRange = graphService.getParsedSequences().size();
+//        int dummyRange = 500;
         int dummyViewingStartCoordinate = 270;
         clear();
         zoomFactor.bind(scrollPane.getScaleYProperty());
+        /*******INSERT calculation of longest path algorithm here *********/
+//        graphService.calculateLongestPath(sequenceMapWithRangeOfNodesThatNeedsToBeDrawn);
+        
         graphHandler.loadGraphViewModel(
                 model, 
                 dummyViewingStartCoordinate, 

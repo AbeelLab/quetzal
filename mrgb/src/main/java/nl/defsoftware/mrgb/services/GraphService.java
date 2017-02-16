@@ -22,6 +22,7 @@ public class GraphService {
 
     private FileParserService parserService;
     private SuperBubbleDetectionAlgorithm sbAlgorithm;
+    private LongestPathAlgorithm lpAlgorithm;
 
     public GraphService() {
         parserService = new FileParserServiceImpl();
@@ -53,5 +54,9 @@ public class GraphService {
         return sbAlgorithm.getDetectedBubbles();
     }
     
+    public void calculateLongestPath() {
+        Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap = parserService.getParsedSequences();
+        int [] pathIds = lpAlgorithm.findLongestPath(sequencesDataMap);
+    }
 }
  
