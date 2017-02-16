@@ -14,4 +14,7 @@ public enum NodeType {
     
     ALLELE_BUBBLE;
     
+    public static boolean isSame(NodeType a, NodeType b) {
+        return a != null && b != null && a.equals(b);
+    }
 }

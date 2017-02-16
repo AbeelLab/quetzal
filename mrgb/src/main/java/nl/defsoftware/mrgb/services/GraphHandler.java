@@ -3,6 +3,8 @@
  */
 package nl.defsoftware.mrgb.services;
 
+import static nl.defsoftware.mrgb.models.graph.NodeType.isSame;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -93,11 +95,23 @@ public class GraphHandler {
             if (graphData.containsKey(i)) {
                 Node aNode = getNodeOrBubble(i);
 //                Node aNode = graphData.get(i);
-                GraphHandlerUtil.mapEdges(edgeMapping, aNode.getNodeId(), getConnectedEdges(aNode));
+                GraphHandlerUtil.catalogEdgesForDrawing(edgeMapping, aNode.getNodeId(), getConnectedEdges(aNode));
                 drawGreedy(model, aNode);
                 drawBubble(model, aNode);
             }
         }
+    }
+    
+    private Node getNodeOrBubble(int sourceNode) {
+        if (bubbles.containsKey(sourceNode)) {
+            Bubble bubble = bubbles.get(sourceNode);
+            GraphHandlerUtil.catalogEdgesForDrawing(bubbleMapping, sourceNode, new int[] { bubble.getStop().getNodeId() });
+        } 
+        return graphData.get(sourceNode);
+    }
+    
+    private int[] getConnectedEdges(Node node) {
+        return isSame(NodeType.SINGLE_NODE , node.getNodeType()) ? node.getConnectedEdges() : getConnectedEdges(((Bubble)node).getStop());
     }
     
     private void drawBubble(IGraphViewModel model, Node bubbleEndNode) {
@@ -130,7 +144,7 @@ public class GraphHandler {
     private int drawSourceNode(IGraphViewModel model, DoubleProperty zoomFactor) {
         Node firstNode = getNodeOrBubble(drawingStartCoordinate);
 
-        GraphHandlerUtil.mapEdges(edgeMapping, firstNode.getNodeId(), getConnectedEdges(firstNode));
+        GraphHandlerUtil.catalogEdgesForDrawing(edgeMapping, firstNode.getNodeId(), getConnectedEdges(firstNode));
         NodeDrawingData drawingData = new NodeDrawingData();
         drawingData.xCoordinate = BACKBONE_X_BASELINE;
         drawingData.yCoordinate = BACKBONE_Y_BASELINE;
@@ -141,22 +155,6 @@ public class GraphHandler {
         return firstNode.getNodeId();
     }
     
-    private int[] getConnectedEdges(Node node) {
-        if (NodeType.SINGLE_NODE.equals(node.getNodeType())) {
-            return node.getConnectedEdges();
-        } else {
-            Node stop = ((Bubble)node).getStop();
-            return getConnectedEdges(stop);
-        }
-    }
-
-    private Node getNodeOrBubble(int sourceNode) {
-        if (bubbles.containsKey(sourceNode)) {
-            Bubble bubble = bubbles.get(sourceNode);
-            GraphHandlerUtil.mapEdges(bubbleMapping, sourceNode, new int[] { bubble.getStop().getNodeId() });
-        } 
-        return graphData.get(sourceNode);
-    }
 
     /**
      * <p>
@@ -191,8 +189,8 @@ public class GraphHandler {
                 drawingData.parentRadius = parentNode.getRadius();
                 
                 drawSequence(model, aNode, drawingData, rank);
-                model.addEdge(aNode.getNodeId(), parentNode.getNodeId(), rank);
-//                drawEdge(model, aNode, rank, parentNode);
+                drawEdge(model, aNode, rank, parentNode);
+//                model.addEdge(aNode.getNodeId(), parentNode.getNodeId(), rank);
             } else {
                 // if the matching produces an equal score, they will end up on
                 // a different rank. We must determine the true rank based on:
@@ -210,7 +208,7 @@ public class GraphHandler {
                     // with this aRib.
                     //TODO: Since we using a greedy algo, we have a drawing bug where the 
                     //graph gently moves towards the right, due to the structural complexity of the graph.
-                    if (entry.getChildNodeId() == aNode.getNodeId() && xCoord == 0) {
+                    if (entry.getChildNodeId() == aNode.getNodeId() && Double.compare(xCoord, 0.0) == 0) {
                         xCoord = entry.getParentNode().getXCoordinate();
                         nodeRank = rank;
                         drawingData.parentWidth = entry.getParentNode().getWidth();
@@ -233,15 +231,15 @@ public class GraphHandler {
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     if (entry.getChildNodeId() == aNode.getNodeId()) {
-                        model.addEdge(aNode.getNodeId(), entry.getParentNode().getNodeId(), rank);
-//                        drawEdge(model, aNode, rank, entry.getParentNode());
+                        drawEdge(model, aNode, rank, entry.getParentNode());
+//                        model.addEdge(aNode.getNodeId(), entry.getParentNode().getNodeId(), rank);
                     }
                 }
                 matchedGenomeRanking = null;
             }
 
         } else {
-            log.info("Rib({}) has no parent edges, new parent", aNode.getNodeId());
+            log.info("Rib({}) has no parent edges, new parent (DIDNT DRAW NODE, PLEASE IMPLEMENT)", aNode.getNodeId());
             // contains a node with no parent which means it is a strain that
             // starts at this position.
             // TODO: not yet implemented
@@ -262,6 +260,15 @@ public class GraphHandler {
         model.addSequence(aNode, rank, drawingData);
     }
 
+    /**
+     * @deprecated 
+     * 
+     * @param model
+     * @param aRib
+     * @param parentXCoordinate
+     * @param parentYCoordinate
+     * @param rank
+     */
     private void drawEdge(IGraphViewModel model, Node aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
         int startX = parentXCoordinate;
         int startY = parentYCoordinate + Y_CORRECTION;

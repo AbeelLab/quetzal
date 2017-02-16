@@ -182,7 +182,7 @@ public class GraphHandlerUtil {
      * @param fromId
      * @param toId
      */
-    public static void mapEdges(Int2ObjectOpenHashMap<int[]> edgeMapping, int fromId, int[] toId) {
+    public static void catalogEdgesForDrawing(Int2ObjectOpenHashMap<int[]> edgeMapping, int fromId, int[] toId) {
         for (int i = 0; i < toId.length; i++) {
 //            if (toId[i] >= 285) {
 //                log.info("edgesToQueue to: {} fromId: {}", toId[i], fromId);
