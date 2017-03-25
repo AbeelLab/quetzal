@@ -29,7 +29,7 @@ import nl.defsoftware.mrgb.models.graph.Node;
  * @author D.L. Ettema
  *
  */
-public class SuperBubbleDetectionAlgorithmTest {
+public class SuperBubbleDetectionAlgorithmTest extends AlgorithmUtilTest {
 
     private static final Logger log = LoggerFactory.getLogger(SuperBubbleDetectionAlgorithmTest.class);
     
@@ -77,8 +77,8 @@ public class SuperBubbleDetectionAlgorithmTest {
         String[] aLine = pattern.split(scanner.nextLine(), 0);//skipping the first entry.
         while (scanner.hasNextLine()) {
             aLine = pattern.split(scanner.nextLine(), 0);
-            Node from = findOrCreateRib(graph, Integer.parseInt(aLine[0]));
-            Node to = findOrCreateRib(graph, Integer.parseInt(aLine[1]));
+            Node from = super.findOrCreateNode(graph, Integer.parseInt(aLine[0]));
+            Node to = super.findOrCreateNode(graph, Integer.parseInt(aLine[1]));
             from.addOutEdge(to);
             to.addInEdge(from);
         }
@@ -86,11 +86,6 @@ public class SuperBubbleDetectionAlgorithmTest {
         reader.close();
     }
 
-    private Node findOrCreateRib(Map<Integer, Node> graph, Integer id) {
-        if (!graph.containsKey(id)) 
-            graph.put(id, new Rib(id));
-        return graph.get(id);
-    }
     /**
      * This graph is the example presented in the paper with 15 nodes (15n)
      */
