@@ -74,7 +74,7 @@ public class SuperBubbleDetectionAlgorithmTest {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(sampleFile), "UTF-8"));
         Scanner scanner = new Scanner(reader);
         Pattern pattern = Pattern.compile(" ");
-        String[] aLine = pattern.split(scanner.nextLine(), 0);
+        String[] aLine = pattern.split(scanner.nextLine(), 0);//skipping the first entry.
         while (scanner.hasNextLine()) {
             aLine = pattern.split(scanner.nextLine(), 0);
             Node from = findOrCreateRib(graph, Integer.parseInt(aLine[0]));
