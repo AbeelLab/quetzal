@@ -68,7 +68,7 @@ public class SuperBubbleDetectionAlgorithm {
 
         /* Main algorithm */
         superBubble();
-        log.info("Bubble detection... DONE");
+        log.info("Bubble detection ... DONE");
     }
 
     /**
