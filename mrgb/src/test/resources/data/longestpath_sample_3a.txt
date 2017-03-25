@@ -1,0 +1,18 @@
+S 0 --Source node
+T 5 --Target node
+N 2 --Number of expected hops
+P 0 3 5 --a Path through the graph from S to T
+-- Copy from here to import into Gephi as spreadsheet as edges table
+-- Source Target
+L 0 1
+L 0 2
+L 0 3
+L 1 4
+L 2 4
+L 3 5
+L 3 6
+L 4 7
+L 5 8
+L 6 8
+L 7 9
+L 8 9 

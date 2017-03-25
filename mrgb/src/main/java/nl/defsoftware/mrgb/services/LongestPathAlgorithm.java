@@ -2,11 +2,15 @@ package nl.defsoftware.mrgb.services;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +103,7 @@ public class LongestPathAlgorithm {
      * 
      * @param sequencesDataMap
      */
-    public void findLongestPathBFS(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId, final int targetNodeId) {
+    public int findLongestPathBFS(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId, final int targetNodeId) {
         log.info("Calculating longest path from {} to {}", sourceNodeId, targetNodeId);
         int lastId = 0;
         initForSourceNode(sourceNodeId);
@@ -111,6 +115,7 @@ public class LongestPathAlgorithm {
         }
         printOutDistancesToThisNode(lastId);
         log.info("Calculating longest path ... DONE");
+        return getMaxDistanceToThisNode(lastId);
     }
 
     private boolean calcBFSLongestPathNumberOfSteps(final Node fromNode, final int targetNodeId) {
@@ -122,7 +127,7 @@ public class LongestPathAlgorithm {
                 if (!distanceToMap.containsKey(outNode.getNodeId())) {
                     distanceToMap.put(outNode.getNodeId(), new ArrayList<DistanceNodeTupel>()); // init list
                 }
-                int distanceToThisOutNode = dist + 1;
+                int distanceToThisOutNode = dist + 1;//cumulative distance
                 distanceToMap.get(outNode.getNodeId()).add(new DistanceNodeTupel(fromNode.getNodeId(), distanceToThisOutNode));
                 stack.add(outNode.getNodeId());
             }
@@ -154,13 +159,13 @@ public class LongestPathAlgorithm {
         return max;
     }
 
-    private void printOutDistancesToThisNode(final int fromId) {
-        log.info("To node ID: {} ", fromId);
-        for (DistanceNodeTupel t : distanceToMap.get(fromId)) {
+    private void printOutDistancesToThisNode(final int toId) {
+        log.info("To node ID: {} ", toId);
+        for (DistanceNodeTupel t : distanceToMap.get(toId)) {
             log.info("From: {}, dist: {}", t.nodeId, t.distance);
         }
     }
-
+    
     private class DistanceNodeTupel {
         public int nodeId;
         public int distance;
