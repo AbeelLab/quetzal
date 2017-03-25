@@ -11,6 +11,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
@@ -32,6 +33,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import nl.defsoftware.mrgb.models.graph.Node;
 import nl.defsoftware.mrgb.services.GraphHandler;
 import nl.defsoftware.mrgb.services.GraphService;
 import nl.defsoftware.mrgb.view.GraphScrollPane;
@@ -122,7 +124,8 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        graphHandler = new GraphHandler(graphService.getParsedSequences(), graphService.getGenomeNames(), graphService.getDetectedBubbles());
+        Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap = graphService.getParsedSequences();
+        graphHandler = new GraphHandler(sequencesDataMap, graphService.getGenomeNames(), graphService.getDetectedBubbles(sequencesDataMap));
     }
 
     public void updateView() {
@@ -141,7 +144,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         clear();
         zoomFactor.bind(scrollPane.getScaleYProperty());
         /*******INSERT calculation of longest path algorithm here *********/
-//        graphService.calculateLongestPath(sequenceMapWithRangeOfNodesThatNeedsToBeDrawn);
+        graphService.calculateLongestPath(graphService.getParsedSequences(), 1, 50);
         
         graphHandler.loadGraphViewModel(
                 model, 
