@@ -69,21 +69,24 @@ public class LongestPathAlgorithmTest extends AlgorithmUtilTest {
                 from.addOutEdge(to);
                 to.addInEdge(from);
                 break;
-            case "--": //comment line
+            case "--": // comment line
                 break;
             default:
                 break;
             }
         }
-        //sanity check
-        assertEquals("Sanity check sourcenode", graphTester.getSourceNodeId(), sequencesDataMap.get(graphTester.getSourceNodeId()).getNodeId());
-        assertEquals("Sanity check sourcenode type", NodeType.SINGLE_NODE, sequencesDataMap.get(graphTester.getSourceNodeId()).getNodeType());
-        
-        assertEquals("Sanity check targetnode", graphTester.getTargetNodeId(), sequencesDataMap.get(graphTester.getTargetNodeId()).getNodeId());
-        assertEquals("Sanity check targetnode type", NodeType.SINGLE_NODE, sequencesDataMap.get(graphTester.getTargetNodeId()).getNodeType());
-        //Creating the graph
-        graphTester
-        .setGraph(new Graph(null, sequencesDataMap, sequencesDataMap.get(graphTester.getSourceNodeId()),
+        // sanity check
+        assertEquals("Sanity check sourcenode", graphTester.getSourceNodeId(),
+                sequencesDataMap.get(graphTester.getSourceNodeId()).getNodeId());
+        assertEquals("Sanity check sourcenode type", NodeType.SINGLE_NODE,
+                sequencesDataMap.get(graphTester.getSourceNodeId()).getNodeType());
+
+        assertEquals("Sanity check targetnode", graphTester.getTargetNodeId(),
+                sequencesDataMap.get(graphTester.getTargetNodeId()).getNodeId());
+        assertEquals("Sanity check targetnode type", NodeType.SINGLE_NODE,
+                sequencesDataMap.get(graphTester.getTargetNodeId()).getNodeType());
+        // Creating the graph
+        graphTester.setGraph(new Graph(null, sequencesDataMap, sequencesDataMap.get(graphTester.getSourceNodeId()),
                 sequencesDataMap.get(graphTester.getTargetNodeId())));
         scanner.close();
         reader.close();
@@ -101,40 +104,50 @@ public class LongestPathAlgorithmTest extends AlgorithmUtilTest {
     @Test
     public void testFindLongestPathBFS_SampleDistance1() throws IOException {
         loadTestSampleGraphs(new File("src/test/resources/data/longestpath_sample_1.txt"));
-        
+
         int numberOfSteps = lpAlgorithm.findLongestPathBFS(graphTester.getGraph().getMap(),
                 graphTester.getGraph().getSource().getNodeId(), graphTester.getGraph().getSink().getNodeId());
-        
+
         assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
     }
-    
+
     @Test
     public void testFindLongestPathBFS_SampleDistance2() throws IOException {
         loadTestSampleGraphs(new File("src/test/resources/data/longestpath_sample_2.txt"));
-        
+
         int numberOfSteps = lpAlgorithm.findLongestPathBFS(graphTester.getGraph().getMap(),
                 graphTester.getGraph().getSource().getNodeId(), graphTester.getGraph().getSink().getNodeId());
-        
+
         assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
     }
-    
+
     @Test
     public void testFindLongestPathBFS_SampleDistance3() throws IOException {
         loadTestSampleGraphs(new File("src/test/resources/data/longestpath_sample_3.txt"));
-        
+
         int numberOfSteps = lpAlgorithm.findLongestPathBFS(graphTester.getGraph().getMap(),
                 graphTester.getGraph().getSource().getNodeId(), graphTester.getGraph().getSink().getNodeId());
-        
+
         assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
     }
-    
+
     @Test
     public void testFindLongestPathBFS_SampleDistance3a() throws IOException {
         loadTestSampleGraphs(new File("src/test/resources/data/longestpath_sample_3a.txt"));
-        
+
         int numberOfSteps = lpAlgorithm.findLongestPathBFS(graphTester.getGraph().getMap(),
                 graphTester.getGraph().getSource().getNodeId(), graphTester.getGraph().getSink().getNodeId());
-        
+
+        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
+    }
+
+    @Test
+    public void testFindLongestPathBFS_SampleDistance3b() throws IOException {
+        loadTestSampleGraphs(new File("src/test/resources/data/longestpath_sample_3b.txt"));
+
+        int numberOfSteps = lpAlgorithm.findLongestPathBFS(graphTester.getGraph().getMap(),
+                graphTester.getGraph().getSource().getNodeId(), graphTester.getGraph().getSink().getNodeId());
+
         assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
     }
 
