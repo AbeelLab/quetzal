@@ -27,6 +27,7 @@ public class GraphService {
     public GraphService() {
         parserService = new FileParserServiceImpl();
         sbAlgorithm = new SuperBubbleDetectionAlgorithm();
+        lpAlgorithm = new LongestPathAlgorithm();
     }
     
     public void loadDataAndParse() {
@@ -48,15 +49,13 @@ public class GraphService {
         return parserService.getParsedGenomeNames();
     }
     
-    public Int2ObjectLinkedOpenHashMap<Bubble> getDetectedBubbles() {
-        Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap = parserService.getParsedSequences();
+    public Int2ObjectLinkedOpenHashMap<Bubble> getDetectedBubbles(Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap) {
         sbAlgorithm.detectSuperBubbles(sequencesDataMap.values().toArray(new Node[sequencesDataMap.values().size()]));
         return sbAlgorithm.getDetectedBubbles();
     }
     
-    public void calculateLongestPath() {
-        Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap = parserService.getParsedSequences();
-        int [] pathIds = lpAlgorithm.findLongestPath(sequencesDataMap);
+    public void calculateLongestPath(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId, final int targetNodeId) {
+        lpAlgorithm.findLongestPathBFS(sequencesDataMap, sourceNodeId, targetNodeId);
     }
 }
  
