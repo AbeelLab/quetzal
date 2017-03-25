@@ -68,57 +68,70 @@ public class LongestPathAlgorithm {
         return scores.get(highestIndex);
     }
 
-    // --------------------------------- BFS implementation
-    // --------------------------------
+    // --------------------------- BFS implementation --------------------------
 
-    private Map<Integer, List<DistanceNodeTupel>> connectionFromMap = new HashMap<>();
+    /**
+     * This <code>Map</code> contains the cumulative distances. Key value is the node ID to which the distance applies.
+     * Each value contains a <code>DistanceNodeTupel</code> with the parent node ID of the key node ID with its
+     * cumulative distance. In essence, this is a reverse lookup distance map: given a node ID, you can lookup the
+     * distances <strong>TO</strong> this node <strong>FROM</strong> all its parents in the list of
+     * <code>DistanceNodeTupel</code>s.
+     */
+    private Map<Integer, List<DistanceNodeTupel>> distanceToMap = new HashMap<>();
     private Deque<Integer> stack = new LinkedList<>();
-    
+
     /**
      * This uses an iterative algorithm to determine the longest path in a given graph map (sequencesDataMap) and uses a
-     * Breadth First Search. The algorithm puts the node ID's on a queue (<code>Deque</code>). From the queue it
-     * retrieves the node from the given <code>Int2ObjectLinkedOpenHashMap</code> and finds all the children of this
-     * node and puts their ID's on the queue. The algorithm maintains a <code>Map</code> with on each entry a
-     * <code>List</code> of <code>DistanceNodeTupel</code>. Each entry in the list has node ID and the distance TO this
-     * node id from the source node.
+     * Breadth First Search. It bootstraps a queue and from this it retrieves the node from the given
+     * <code>Int2ObjectLinkedOpenHashMap</code> and finds all the children of this node and puts their ID's on the
+     * queue. The algorithm maintains a <code>Map</code> with on each entry a <code>List</code> of
+     * <code>DistanceNodeTupel</code>. Each entry in the list has node ID and the distance TO this node ID from the
+     * source node. It finds for each node ID it encounters 5
      * 
      * 
      * @param sequencesDataMap
      */
-    public void findLongestPathBFS(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap) {
+    public void findLongestPathBFS(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, int sourceNode, int targetNode) {
         int lastFromId = 0;
-        stack.add(0);//start with source node
-        int targetNodeId = 100;//find the targetnode id
+        stack.add(sourceNode);// start with source node
         while (!stack.isEmpty()) {
             lastFromId = stack.pop();
             Node fromNode = sequencesDataMap.get(lastFromId);
-            if (calcBFSLongestPathNumberOfSteps(fromNode, targetNodeId)) {
+            if (calcBFSLongestPathNumberOfSteps(fromNode, targetNode)) {
                 stack.clear();
             }
         }
         System.out.println("max steps: " + getMaxDistanceToThisNode(lastFromId));
-
     }
 
     private boolean calcBFSLongestPathNumberOfSteps(final Node fromNode, final int targetNodeId) {
         if (fromNode.getNodeId() == targetNodeId) {
             return true;
         } else {
-            int dist = getMaxDistanceToThisNode(fromNode.getNodeId()) + 1;
+            int dist = getMaxDistanceToThisNode(fromNode.getNodeId());
             for (Node outNode : fromNode.getOutEdges()) {
-                if (connectionFromMap.containsKey(outNode.getNodeId())) {
-                    connectionFromMap.put(outNode.getNodeId(), new ArrayList<DistanceNodeTupel>());//adding a list instance so we can add it
+                if (distanceToMap.containsKey(outNode.getNodeId())) {
+                    distanceToMap.put(outNode.getNodeId(), new ArrayList<DistanceNodeTupel>()); // init list
                 }
-                connectionFromMap.get(outNode.getNodeId()).add(new DistanceNodeTupel(fromNode.getNodeId(), dist));
+                int distanceToThisOutNode = dist + 1;
+                distanceToMap.get(outNode.getNodeId())
+                        .add(new DistanceNodeTupel(fromNode.getNodeId(), distanceToThisOutNode));
                 stack.add(outNode.getNodeId());
             }
             return false;
         }
     }
 
+    /**
+     * Draft version of method Finding an entry ONLY based on the highest distance since we are seeking the largest
+     * number of steps of the longest path and not the path itself.
+     * 
+     * @param fromId
+     * @return
+     */
     private int getMaxDistanceToThisNode(final int fromId) {
         int max = 0;
-        for (DistanceNodeTupel t : connectionFromMap.get(fromId)) {
+        for (DistanceNodeTupel t : distanceToMap.get(fromId)) {
             if (t.distance > max)
                 max = t.distance;
         }
