@@ -61,12 +61,12 @@ public class SuperBubbleDetectionAlgorithmTest {
     }
 
     private void setupTestCase8Nodes() throws Exception{
-        File sample8nFile = new File("src/test/resources/data/sample.txt");
+        File sample8nFile = new File("src/test/resources/data/superbubble_sample_1.txt");
         loadTestSampleGraphs(sample8nFile, graph8n);
     }
     
     private void setupTestCase4Nodes() throws Exception {
-        File file = new File("src/test/resources/data/sample2.txt");
+        File file = new File("src/test/resources/data/superbubble_sample_2.txt");
         loadTestSampleGraphs(file, graph4n);
     }
 
