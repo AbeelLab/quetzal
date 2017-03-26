@@ -150,5 +150,15 @@ public class LongestPathAlgorithmTest extends AlgorithmUtilTest {
 
         assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
     }
+    
+    @Test
+    public void testFindLongestPathBFS_SampleDistance4() throws IOException {
+        loadTestSampleGraphs(new File("src/test/resources/data/longestpath_sample_4.txt"));
+
+        int numberOfSteps = lpAlgorithm.findLongestPathBFS(graphTester.getGraph().getMap(),
+                graphTester.getGraph().getSource().getNodeId(), graphTester.getGraph().getSink().getNodeId());
+
+        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
+    }
 
 }
