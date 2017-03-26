@@ -5,10 +5,10 @@ P 1 2 5 6 --a Path through the graph from S to T
 P 1 3 5 6 --a Path through the graph from S to T
 -- Copy from here to import into Gephi as spreadsheet as edges table
 -- Source Target
-L 1 2 --Link
-L 1 3 --Link
-L 1 4 --Link
-L 2 5 --Link
-L 3 5 --Link
-L 4 6 --Link
-L 5 6 --Link
+L 1 2
+L 1 3
+L 1 4
+L 2 5
+L 3 5
+L 4 6
+L 5 6
