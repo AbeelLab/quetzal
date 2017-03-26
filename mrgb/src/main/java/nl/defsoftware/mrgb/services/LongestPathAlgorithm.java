@@ -23,7 +23,7 @@ import nl.defsoftware.mrgb.models.graph.Node;
 public class LongestPathAlgorithm {
 
     private static final Logger log = LoggerFactory.getLogger(LongestPathAlgorithm.class);
-    
+
     /**
      * Given a graph stored in a {@link Int2ObjectLinkedOpenHashMap} with <code><ID,Node></code> we determine the
      * longest possible path(s). We return a array of int IDs that correspond to the IDs in the provided Map.
@@ -99,9 +99,10 @@ public class LongestPathAlgorithm {
      * 
      * @param sequencesDataMap
      */
-    public int findLongestPathBFS(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId, final int targetNodeId) {
+    public int findLongestPathBFS(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId,
+            final int targetNodeId) {
         log.info("Calculating longest path from {} to {}", sourceNodeId, targetNodeId);
-        int lastId = 0;
+        int lastId = sourceNodeId;
         initForSourceNode(sourceNodeId);
         while (!stack.isEmpty()) {
             lastId = stack.pop();
@@ -110,6 +111,7 @@ public class LongestPathAlgorithm {
             }
         }
         printOutDistancesToThisNode(lastId);
+        log.info(printLongestPath(lastId));
         log.info("Calculating longest path ... DONE");
         return getMaxDistanceToThisNode(lastId);
     }
@@ -123,8 +125,9 @@ public class LongestPathAlgorithm {
                 if (!distanceToMap.containsKey(outNode.getNodeId())) {
                     distanceToMap.put(outNode.getNodeId(), new ArrayList<DistanceNodeTupel>()); // init list
                 }
-                int distanceToThisOutNode = dist + 1;//cumulative distance
-                distanceToMap.get(outNode.getNodeId()).add(new DistanceNodeTupel(fromNode.getNodeId(), distanceToThisOutNode));
+                int distanceToThisOutNode = dist + 1;// cumulative distance
+                distanceToMap.get(outNode.getNodeId())
+                        .add(new DistanceNodeTupel(fromNode.getNodeId(), distanceToThisOutNode));
                 stack.add(outNode.getNodeId());
             }
             return false;
@@ -133,8 +136,10 @@ public class LongestPathAlgorithm {
 
     private void initForSourceNode(final int sourceNodeId) {
         stack.add(sourceNodeId);// start with source node
-        distanceToMap.put(sourceNodeId, Arrays.asList(new DistanceNodeTupel(sourceNodeId, 0))); // init map to zero for
-                                                                                            // sourcenode
+        distanceToMap.put(sourceNodeId, Arrays.asList());
+//        distanceToMap.put(sourceNodeId, Arrays.asList(new DistanceNodeTupel(sourceNodeId, 0))); // init map to zero
+        // for
+        // sourcenode
     }
 
     /**
@@ -161,10 +166,27 @@ public class LongestPathAlgorithm {
             log.info("From: {}, dist: {}", t.nodeId, t.distance);
         }
     }
-    
+
+    private String printLongestPath(final int toId) {
+        String pathString = "";
+        int max = getMaxDistanceToThisNode(toId);
+        for (DistanceNodeTupel t : distanceToMap.get(toId)) {
+            if (t.distance == max) {
+                pathString = pathString
+                        .concat("[")
+                        .concat(Integer.toString(t.distance))
+                        .concat(" ")
+                        .concat(printLongestPath(t.nodeId)
+                        .concat("]"));
+            }
+        }
+        return pathString;
+    }
+
     private class DistanceNodeTupel {
         public int nodeId;
         public int distance;
+
         public DistanceNodeTupel(int nodeId, int distance) {
             this.nodeId = nodeId;
             this.distance = distance;
