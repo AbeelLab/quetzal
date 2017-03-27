@@ -53,21 +53,10 @@ public class LongestPathAlgorithmTest extends AlgorithmUtilTest {
                 graphTester.setNumberOfHopsInLongestPath(Integer.parseInt(aLine[1]));
                 break;
             case "P":
-                List<Integer> pathList = new ArrayList<>();
-                for (int i = 1; i < aLine.length; i++) {
-                    if (aLine[i].startsWith(COMMENT_LINE)) {
-                        break;
-                    }
-                    pathList.add(Integer.parseInt(aLine[i]));
-                }
-                int pathNumber = graphTester.getPossibleLongestPaths().size() + 1;
-                graphTester.getPossibleLongestPaths().put(pathNumber, pathList);
+                readPath(aLine);
                 break;
             case "L":
-                Node from = super.findOrCreateNode(sequencesDataMap, Integer.parseInt(aLine[1]));
-                Node to = super.findOrCreateNode(sequencesDataMap, Integer.parseInt(aLine[2]));
-                from.addOutEdge(to);
-                to.addInEdge(from);
+                createNodesAndEdges(sequencesDataMap, aLine);
                 break;
             case "--": // comment line
                 break;
@@ -90,6 +79,32 @@ public class LongestPathAlgorithmTest extends AlgorithmUtilTest {
                 sequencesDataMap.get(graphTester.getTargetNodeId())));
         scanner.close();
         reader.close();
+    }
+
+    /**
+     * @param sequencesDataMap
+     * @param aLine
+     */
+    private void createNodesAndEdges(Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, String[] aLine) {
+        Node from = super.findOrCreateNode(sequencesDataMap, Integer.parseInt(aLine[1]));
+        Node to = super.findOrCreateNode(sequencesDataMap, Integer.parseInt(aLine[2]));
+        from.addOutEdge(to);
+        to.addInEdge(from);
+    }
+
+    /**
+     * @param aLine
+     */
+    private void readPath(String[] aLine) {
+        List<Integer> pathList = new ArrayList<>();
+        for (int i = 1; i < aLine.length; i++) {
+            if (aLine[i].startsWith(COMMENT_LINE)) {
+                break;
+            }
+            pathList.add(Integer.parseInt(aLine[i]));
+        }
+        int pathNumber = graphTester.getPossibleLongestPaths().size() + 1;
+        graphTester.getPossibleLongestPaths().put(pathNumber, pathList);
     }
 
     @After
