@@ -10,6 +10,7 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import nl.defsoftware.mrgb.models.graph.Node;
 
@@ -82,7 +83,7 @@ public class LongestPathAlgorithm {
      * distances <strong>TO</strong> this node <strong>FROM</strong> all its parents in the list of
      * <code>DistanceNodeTupel</code>s.
      */
-    private Int2ObjectLinkedOpenHashMap<List<DistanceNodeTupel>> distanceToMap = new Int2ObjectLinkedOpenHashMap<>();
+    private Int2ObjectAVLTreeMap<List<DistanceNodeTupel>> distanceToMap = new Int2ObjectAVLTreeMap<>();
 
     /* A queue that contains the IDs which it performs its BFS. */
     private Deque<Integer> stack = new LinkedList<>();
@@ -107,11 +108,11 @@ public class LongestPathAlgorithm {
             int id = stack.pop();
             calcBFSLongestPathNumberOfSteps(sequencesDataMap.get(id), targetNodeId);
         }
-        // log.info("Size of distanceToMap: {}", distanceToMap.size());
-        // printMemoryUsage();
-        // printOutDistancesToThisNode(targetNodeId);
-        // log.info(printLongestPath(targetNodeId));
-        // log.info("Calculating longest path ... DONE");
+        log.info("Size of distanceToMap: {}", distanceToMap.size());
+        printMemoryUsage();
+        printOutDistancesToThisNode(targetNodeId);
+        log.info(printLongestPath(targetNodeId));
+        log.info("Calculating longest path ... DONE");
         return getMaxDistanceToThisNode(targetNodeId);
     }
 
@@ -123,8 +124,7 @@ public class LongestPathAlgorithm {
             int cumulativeDistanceToThisFromNode = distFromNode + 1;// cumulative distance
             for (Node outNode : fromNode.getOutEdges()) {
                 if (distanceToMap.containsKey(outNode.getNodeId())) {
-                    updateOrAddTupel(distanceToMap.get(outNode.getNodeId()), fromNode,
-                            cumulativeDistanceToThisFromNode);
+                    updateOrAddTupel(distanceToMap.get(outNode.getNodeId()), fromNode, cumulativeDistanceToThisFromNode);
                 } else {
                     distanceToMap.put(outNode.getNodeId(), new ArrayList<>(Arrays
                             .asList(new DistanceNodeTupel(fromNode.getNodeId(), cumulativeDistanceToThisFromNode)))); // init
@@ -132,7 +132,6 @@ public class LongestPathAlgorithm {
                 }
                 stack.add(outNode.getNodeId());
             }
-            printMemoryUsage();
             return false;
         }
     }
