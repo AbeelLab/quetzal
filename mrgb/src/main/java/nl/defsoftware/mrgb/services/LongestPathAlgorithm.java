@@ -122,33 +122,51 @@ public class LongestPathAlgorithm {
         } else {
             final int distFromNode = getMaxDistanceToThisNode(fromNode.getNodeId());
             int cumulativeDistanceToThisFromNode = distFromNode + 1;// cumulative distance
-            for (Node outNode : fromNode.getOutEdges()) {
-                if (distanceToMap.containsKey(outNode.getNodeId())) {
-                    updateOrAddTupel(distanceToMap.get(outNode.getNodeId()), fromNode, cumulativeDistanceToThisFromNode);
-                } else {
-                    distanceToMap.put(outNode.getNodeId(), new ArrayList<>(Arrays
-                            .asList(new DistanceNodeTupel(fromNode.getNodeId(), cumulativeDistanceToThisFromNode)))); // init
-                                                                                                                      // list
-                }
-                stack.add(outNode.getNodeId());
+            for (Node childNode : fromNode.getOutEdges()) {
+//                updateOrAddTupel(childNode, fromNode, cumulativeDistanceToThisFromNode);
+                updateTupel(childNode, fromNode, cumulativeDistanceToThisFromNode);
+                stack.add(childNode.getNodeId());
             }
             return false;
         }
     }
 
-    private void updateOrAddTupel(List<DistanceNodeTupel> tupelList, final Node fromNode,
-            final int distanceToThisOutNode) {
-        boolean isTupelExists = false;
-        for (DistanceNodeTupel t : tupelList) {
-            if (t.nodeId == fromNode.getNodeId()) {
-                isTupelExists = true;
-                if (t.distance < distanceToThisOutNode) {
-                    t.distance = distanceToThisOutNode;
+    /**
+     * This method only provides one longest path and does not record multiple longest paths, but only the first one it encouters.
+     * 
+     * @param childNode
+     * @param fromNode
+     * @param distanceToThisChildNode
+     */
+    private void updateTupel(final Node childNode, final Node fromNode, final int distanceToThisChildNode) {
+        if (distanceToMap.containsKey(childNode.getNodeId())) {
+            for (DistanceNodeTupel t : distanceToMap.get(childNode.getNodeId())) {
+                if (t.distance < distanceToThisChildNode) {
+                    t.distance = distanceToThisChildNode;
+                    t.nodeId = fromNode.getNodeId();
                 }
             }
+        } else {
+            distanceToMap.put(childNode.getNodeId(), new ArrayList<>(Arrays.asList(new DistanceNodeTupel(fromNode.getNodeId(), distanceToThisChildNode)))); // init
         }
-        if (!isTupelExists) {
-            tupelList.add(new DistanceNodeTupel(fromNode.getNodeId(), distanceToThisOutNode));
+    }
+    
+    private void updateOrAddTupel(final Node childNode, final Node fromNode, final int distanceToThisChildNode) {
+        if (distanceToMap.containsKey(childNode.getNodeId())) {
+            boolean isTupelExists = false;
+            for (DistanceNodeTupel t : distanceToMap.get(childNode.getNodeId())) {
+                if (t.nodeId == fromNode.getNodeId()) {
+                    isTupelExists = true;
+                    if (t.distance < distanceToThisChildNode) {
+                        t.distance = distanceToThisChildNode;
+                    }
+                }
+            }
+            if (!isTupelExists) {
+                distanceToMap.get(childNode.getNodeId()).add(new DistanceNodeTupel(fromNode.getNodeId(), distanceToThisChildNode));
+            }
+        } else {
+            distanceToMap.put(childNode.getNodeId(), new ArrayList<>(Arrays.asList(new DistanceNodeTupel(fromNode.getNodeId(), distanceToThisChildNode)))); // init
         }
     }
 
