@@ -11,7 +11,7 @@ public class AlgorithmUtilTest {
         super();
     }
 
-    protected Node findOrCreateNode(Map<Integer, Node> mapping, Integer id) {
+    protected Node findOrCreateNodeInMapping(Map<Integer, Node> mapping, Integer id) {
         if (!mapping.containsKey(id)) 
             mapping.put(id, new Rib(id));
         return mapping.get(id);

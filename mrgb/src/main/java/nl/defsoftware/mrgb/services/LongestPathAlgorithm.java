@@ -2,10 +2,13 @@ package nl.defsoftware.mrgb.services;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,9 +87,12 @@ public class LongestPathAlgorithm {
      * <code>DistanceNodeTupel</code>s.
      */
     private Int2ObjectAVLTreeMap<List<DistanceNodeTupel>> distanceToMap = new Int2ObjectAVLTreeMap<>();
+    private Map<Integer, DistanceNodeTupel> distanceToNodeMap = new HashMap<>();
 
     /* A queue that contains the IDs which it performs its BFS. */
     private Deque<Integer> stack = new LinkedList<>();
+    
+    private int distances[];
 
     /**
      * This uses an iterative algorithm to determine the longest path in a given graph map (sequencesDataMap) and uses a
@@ -99,23 +105,49 @@ public class LongestPathAlgorithm {
      * 
      * @param sequencesDataMap
      */
-    public int findLongestPathBFS(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId,
+    public List<Integer> findLongestPathBFS(List<Integer> path, final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId,
             final int targetNodeId) {
         log.info("Calculating longest path from {} to {}", sourceNodeId, targetNodeId);
         initForSourceNode(sourceNodeId);
         printMemoryUsage();
-        while (!stack.isEmpty()) {
-            int id = stack.pop();
-            calcBFSLongestPathNumberOfSteps(sequencesDataMap.get(id), targetNodeId);
-        }
-        log.info("Size of distanceToMap: {}", distanceToMap.size());
+        distances = new int[sequencesDataMap.size() + 1];
+        calcBFSLongestPath(sequencesDataMap, sourceNodeId, targetNodeId);
         printMemoryUsage();
-        printOutDistancesToThisNode(targetNodeId);
-        log.info(printLongestPath(targetNodeId));
+        log.info("Distance to nodeID({}) is {} steps", distanceToNodeMap.get(targetNodeId).nodeId, distanceToNodeMap.get(targetNodeId).distance);
         log.info("Calculating longest path ... DONE");
-        return getMaxDistanceToThisNode(targetNodeId);
+        return findLongestPath(path, targetNodeId);
     }
 
+    private List<Integer> findLongestPath(List<Integer> path, final int targetNodeId) {
+        path.add(targetNodeId);
+        DistanceNodeTupel t = distanceToNodeMap.get(targetNodeId);
+        for (int i = 0; i < distanceToNodeMap.size(); i++) {
+            path.add(t.nodeId);
+            t = distanceToNodeMap.get(t.nodeId);
+            if (t == null) {
+                break;
+            }
+        }
+        return path;
+    }
+
+    private void calcBFSLongestPath(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId,
+            final int targetNodeId) {
+        List<Integer> sortedList = new ArrayList(sequencesDataMap.keySet());
+        Collections.sort(sortedList);
+        for (int key : sortedList) {
+            Node parentNode = sequencesDataMap.get(key);
+            if (parentNode.getNodeId() >= sourceNodeId && parentNode.getNodeId() <= targetNodeId) { //limiting scope
+                for (Node childNode : parentNode.getOutEdges()) {
+                    if (distances[childNode.getNodeId()] < distances[parentNode.getNodeId()] + 1) {
+                        distances[childNode.getNodeId()] = distances[parentNode.getNodeId()] + 1;
+                        distanceToNodeMap.put(childNode.getNodeId(), new DistanceNodeTupel(parentNode.getNodeId(), distances[parentNode.getNodeId()] + 1));
+                    }
+                }
+            }
+        }
+    }
+    
     private boolean calcBFSLongestPathNumberOfSteps(final Node fromNode, final int targetNodeId) {
         if (fromNode.getNodeId() == targetNodeId) {
             return true;
@@ -198,16 +230,16 @@ public class LongestPathAlgorithm {
         }
     }
 
-    private String printLongestPath(final int toId) {
-        String pathString = toId + " ";
-        int max = getMaxDistanceToThisNode(toId);
-        for (DistanceNodeTupel t : distanceToMap.get(toId)) {
-            if (t.distance == max) {
-                pathString = pathString.concat(printLongestPath(t.nodeId));
-            }
-        }
-        return pathString.concat("]");
-    }
+//    private String printLongestPath(final int toId) {
+//        String pathString = toId + " ";
+//        int max = getMaxDistanceToThisNode(toId);
+//        for (DistanceNodeTupel t : distanceToMap.get(toId)) {
+//            if (t.distance == max) {
+//                pathString = pathString.concat(printLongestPath(t.nodeId));
+//            }
+//        }
+//        return pathString.concat("]");
+//    }
 
     private class DistanceNodeTupel {
         public int nodeId;

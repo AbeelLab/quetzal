@@ -1,6 +1,7 @@
 package nl.defsoftware.mrgb.services;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
@@ -86,8 +87,8 @@ public class LongestPathAlgorithmTest extends AlgorithmUtilTest {
      * @param aLine
      */
     private void createNodesAndEdges(Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, String[] aLine) {
-        Node from = super.findOrCreateNode(sequencesDataMap, Integer.parseInt(aLine[1]));
-        Node to = super.findOrCreateNode(sequencesDataMap, Integer.parseInt(aLine[2]));
+        Node from = super.findOrCreateNodeInMapping(sequencesDataMap, Integer.parseInt(aLine[1]));
+        Node to = super.findOrCreateNodeInMapping(sequencesDataMap, Integer.parseInt(aLine[2]));
         from.addOutEdge(to);
         to.addInEdge(from);
     }
@@ -119,61 +120,109 @@ public class LongestPathAlgorithmTest extends AlgorithmUtilTest {
     @Test
     public void testFindLongestPathBFS_SampleDistance1() throws IOException {
         loadTestSampleGraphs(new File("src/test/resources/data/longestpath_sample_1.txt"));
-
-        int numberOfSteps = lpAlgorithm.findLongestPathBFS(graphTester.getGraph().getMap(),
+        
+        List<Integer> longestPath = new ArrayList<>();
+        longestPath = lpAlgorithm.findLongestPathBFS(longestPath, graphTester.getGraph().getMap(),
                 graphTester.getGraph().getSource().getNodeId(), graphTester.getGraph().getSink().getNodeId());
 
-        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
+        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), longestPath.size() - 1);
+        boolean containedLongestPath = false;
+        for (List<Integer> anExpectedPath : graphTester.getPossibleLongestPaths().values()) {
+            if (anExpectedPath.containsAll(longestPath)) {
+                containedLongestPath = true;
+            }
+        }
+        assertTrue("Paths did not match", containedLongestPath);
     }
 
     @Test
     public void testFindLongestPathBFS_SampleDistance2() throws IOException {
         loadTestSampleGraphs(new File("src/test/resources/data/longestpath_sample_2.txt"));
 
-        int numberOfSteps = lpAlgorithm.findLongestPathBFS(graphTester.getGraph().getMap(),
+        List<Integer> longestPath = new ArrayList<>();
+        longestPath = lpAlgorithm.findLongestPathBFS(longestPath, graphTester.getGraph().getMap(),
                 graphTester.getGraph().getSource().getNodeId(), graphTester.getGraph().getSink().getNodeId());
 
-        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
+        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), longestPath.size() - 1);
+        boolean containedLongestPath = false;
+        for (List<Integer> anExpectedPath : graphTester.getPossibleLongestPaths().values()) {
+            if (anExpectedPath.containsAll(longestPath)) {
+                containedLongestPath = true;
+            }
+        }
+        assertTrue("Paths did not match", containedLongestPath);
     }
 
     @Test
     public void testFindLongestPathBFS_SampleDistance3() throws IOException {
         loadTestSampleGraphs(new File("src/test/resources/data/longestpath_sample_3.txt"));
 
-        int numberOfSteps = lpAlgorithm.findLongestPathBFS(graphTester.getGraph().getMap(),
+        List<Integer> longestPath = new ArrayList<>();
+        longestPath = lpAlgorithm.findLongestPathBFS(longestPath, graphTester.getGraph().getMap(),
                 graphTester.getGraph().getSource().getNodeId(), graphTester.getGraph().getSink().getNodeId());
 
-        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
+        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), longestPath.size() - 1);
+        boolean containedLongestPath = false;
+        for (List<Integer> anExpectedPath : graphTester.getPossibleLongestPaths().values()) {
+            if (anExpectedPath.containsAll(longestPath)) {
+                containedLongestPath = true;
+            }
+        }
+        assertTrue("Paths did not match", containedLongestPath);
     }
 
     @Test
     public void testFindLongestPathBFS_SampleDistance3a() throws IOException {
         loadTestSampleGraphs(new File("src/test/resources/data/longestpath_sample_3a.txt"));
 
-        int numberOfSteps = lpAlgorithm.findLongestPathBFS(graphTester.getGraph().getMap(),
+        List<Integer> longestPath = new ArrayList<>();
+        longestPath = lpAlgorithm.findLongestPathBFS(longestPath, graphTester.getGraph().getMap(),
                 graphTester.getGraph().getSource().getNodeId(), graphTester.getGraph().getSink().getNodeId());
 
-        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
+        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), longestPath.size() - 1);
+        boolean containedLongestPath = false;
+        for (List<Integer> anExpectedPath : graphTester.getPossibleLongestPaths().values()) {
+            if (anExpectedPath.containsAll(longestPath)) {
+                containedLongestPath = true;
+            }
+        }
+        assertTrue("Paths did not match", containedLongestPath);
     }
 
     @Test
     public void testFindLongestPathBFS_SampleDistance3b() throws IOException {
         loadTestSampleGraphs(new File("src/test/resources/data/longestpath_sample_3b.txt"));
 
-        int numberOfSteps = lpAlgorithm.findLongestPathBFS(graphTester.getGraph().getMap(),
+        List<Integer> longestPath = new ArrayList<>();
+        longestPath = lpAlgorithm.findLongestPathBFS(longestPath, graphTester.getGraph().getMap(),
                 graphTester.getGraph().getSource().getNodeId(), graphTester.getGraph().getSink().getNodeId());
 
-        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
+        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), longestPath.size() - 1);
+        boolean containedLongestPath = false;
+        for (List<Integer> anExpectedPath : graphTester.getPossibleLongestPaths().values()) {
+            if (anExpectedPath.containsAll(longestPath)) {
+                containedLongestPath = true;
+            }
+        }
+        assertTrue("Paths did not match", containedLongestPath);
     }
     
     @Test
     public void testFindLongestPathBFS_SampleDistance4() throws IOException {
         loadTestSampleGraphs(new File("src/test/resources/data/longestpath_sample_4.txt"));
 
-        int numberOfSteps = lpAlgorithm.findLongestPathBFS(graphTester.getGraph().getMap(),
+        List<Integer> longestPath = new ArrayList<>();
+        longestPath = lpAlgorithm.findLongestPathBFS(longestPath, graphTester.getGraph().getMap(),
                 graphTester.getGraph().getSource().getNodeId(), graphTester.getGraph().getSink().getNodeId());
 
-        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), numberOfSteps);
+        assertEquals("Distance did not match", graphTester.getNumberOfHopsInLongestPath(), longestPath.size() - 1);
+        boolean containedLongestPath = false;
+        for (List<Integer> anExpectedPath : graphTester.getPossibleLongestPaths().values()) {
+            if (anExpectedPath.containsAll(longestPath)) {
+                containedLongestPath = true;
+            }
+        }
+        assertTrue("Paths did not match", containedLongestPath);
     }
 
 }

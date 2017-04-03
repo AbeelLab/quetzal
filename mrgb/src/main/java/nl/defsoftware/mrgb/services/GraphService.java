@@ -3,6 +3,8 @@
  */
 package nl.defsoftware.mrgb.services;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
@@ -54,8 +56,8 @@ public class GraphService {
         return sbAlgorithm.getDetectedBubbles();
     }
     
-    public void calculateLongestPath(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId, final int targetNodeId) {
-        lpAlgorithm.findLongestPathBFS(sequencesDataMap, sourceNodeId, targetNodeId);
+    public void calculateLongestPath(List<Integer> longestPath, final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId, final int targetNodeId) {
+        lpAlgorithm.findLongestPathBFS(longestPath, sequencesDataMap, sourceNodeId, targetNodeId);
     }
 }
  

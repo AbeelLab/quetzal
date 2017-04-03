@@ -77,8 +77,8 @@ public class SuperBubbleDetectionAlgorithmTest extends AlgorithmUtilTest {
         String[] aLine = pattern.split(scanner.nextLine(), 0);//skipping the first entry.
         while (scanner.hasNextLine()) {
             aLine = pattern.split(scanner.nextLine(), 0);
-            Node from = super.findOrCreateNode(graph, Integer.parseInt(aLine[0]));
-            Node to = super.findOrCreateNode(graph, Integer.parseInt(aLine[1]));
+            Node from = super.findOrCreateNodeInMapping(graph, Integer.parseInt(aLine[0]));
+            Node to = super.findOrCreateNodeInMapping(graph, Integer.parseInt(aLine[1]));
             from.addOutEdge(to);
             to.addInEdge(from);
         }

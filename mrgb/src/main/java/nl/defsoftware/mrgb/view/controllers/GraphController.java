@@ -4,6 +4,8 @@
 package nl.defsoftware.mrgb.view.controllers;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -143,8 +145,8 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         int dummyViewingStartCoordinate = 270;
         clear();
         zoomFactor.bind(scrollPane.getScaleYProperty());
-        /*******INSERT calculation of longest path algorithm here *********/
-        graphService.calculateLongestPath(graphService.getParsedSequences(), 1, 50);
+        List<Integer> longestPath = new ArrayList<>();
+        graphService.calculateLongestPath(longestPath, graphService.getParsedSequences(), 1, 5000);
         
         graphHandler.loadGraphViewModel(
                 model, 
@@ -153,7 +155,6 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
                 zoomFactor);
         endUpdate();
         log.info("VIEW GRAPH");
-        
     }
 
     private void clear() {
