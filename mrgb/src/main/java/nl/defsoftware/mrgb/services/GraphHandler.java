@@ -25,8 +25,8 @@ import nl.defsoftware.mrgb.view.models.IGraphViewModel;
 import nl.defsoftware.mrgb.view.models.NodeDrawingData;
 
 /**
- * This GraphHandler object is responsible for filling the graph model from
- * parsed data with the nodes and placing them in a local coordinate system.
+ * This GraphHandler object is responsible for filling the graph model from parsed data with the nodes and placing them
+ * in a local coordinate system.
  * 
  * @author D.L. Ettema
  *
@@ -57,13 +57,14 @@ public class GraphHandler {
     private int drawingRange = 0;
 
     /**
-     * Given the two data-structures this Handler will input these into the
-     * model and the model will determine the layout
+     * Given the two data-structures this Handler will input these into the model and the model will determine the
+     * layout
      * 
      * @param graphMap
      * @param genomeNamesMap
      */
-    public GraphHandler(Int2ObjectLinkedOpenHashMap<Node> graphData, Short2ObjectOpenHashMap<String> genomeNamesMap, Int2ObjectLinkedOpenHashMap<Bubble> bubbles) {
+    public GraphHandler(Int2ObjectLinkedOpenHashMap<Node> graphData, Short2ObjectOpenHashMap<String> genomeNamesMap,
+            Int2ObjectLinkedOpenHashMap<Bubble> bubbles) {
         this.graphData = graphData;
         this.genomeNamesMap = genomeNamesMap;
         this.bubbles = bubbles;
@@ -77,11 +78,14 @@ public class GraphHandler {
      * 
      * @param edgeCanvas
      * @param model
-     * @param drawingStartCoordinate: where to start drawing.
-     * @param drawingRange: the range of drawing in total which can be bigger then the actual window view
+     * @param drawingStartCoordinate:
+     *            where to start drawing.
+     * @param drawingRange:
+     *            the range of drawing in total which can be bigger then the actual window view
      * @param zoomFactor
      */
-    public void loadGraphViewModel(IGraphViewModel model, int drawingStartCoordinate, int drawingRange, DoubleProperty zoomFactor) {
+    public void loadGraphViewModel(IGraphViewModel model, int drawingStartCoordinate, int drawingRange,
+            DoubleProperty zoomFactor) {
         log.info("Zoomfactor: " + zoomFactor.get());
         this.zoomFactor = zoomFactor;
         this.drawingStartCoordinate = drawingStartCoordinate;
@@ -90,57 +94,17 @@ public class GraphHandler {
         bubbleMapping.clear();
         int sourceNodeId = drawSourceNode(model, zoomFactor);
 
-         for (int i = (sourceNodeId + 1); i < drawingRange; i++) { //testing purposes
-//        for (int i = (sourceNodeId  + 1); i < graphData.size(); i++) {
+        for (int i = (sourceNodeId + 1); i < drawingRange; i++) { // testing purposes
             if (graphData.containsKey(i)) {
                 Node aNode = getNodeOrBubble(i);
-//                Node aNode = graphData.get(i);
+                // Node aNode = graphData.get(i);
                 GraphHandlerUtil.catalogEdgesForDrawing(edgeMapping, aNode.getNodeId(), getConnectedEdges(aNode));
                 drawGreedy(model, aNode);
                 drawBubble(model, aNode);
             }
         }
     }
-    
-    private Node getNodeOrBubble(int sourceNode) {
-        if (bubbles.containsKey(sourceNode)) {
-            Bubble bubble = bubbles.get(sourceNode);
-            GraphHandlerUtil.catalogEdgesForDrawing(bubbleMapping, sourceNode, new int[] { bubble.getStop().getNodeId() });
-        } 
-        return graphData.get(sourceNode);
-    }
-    
-    private int[] getConnectedEdges(Node node) {
-        return isSame(NodeType.SINGLE_NODE , node.getNodeType()) ? node.getConnectedEdges() : getConnectedEdges(((Bubble)node).getStop());
-    }
-    
-    private void drawBubble(IGraphViewModel model, Node bubbleEndNode) {
-        if (bubbleMapping.containsKey(bubbleEndNode.getNodeId())) {
-            int [] bubbleStartIds = bubbleMapping.get(bubbleEndNode.getNodeId());
-            NodeDrawingData drawingData = new NodeDrawingData();
-            drawingData.id = bubbleStartIds[0];
-            
-            int[] parentNodes = edgeMapping.get(drawingData.id);
-            Node startNode = graphData.get(drawingData.id);
-            List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(startNode, parentNodes, graphData);
-            int rank = 0;
-            Node parentNode = matchedGenomeRanking.get(rank).getParentNode();
-            
-            drawingData.parentXCoordinate = parentNode.getXCoordinate();
-            drawingData.parentYCoordinate = parentNode.getYCoordinate();
-            drawingData.parentHeight = parentNode.getHeight();
-            drawingData.parentWidth = parentNode.getWidth();
-            drawingData.parentRadius = parentNode.getRadius();
-            drawingData.scale = zoomFactor.get();
-            drawSequence(model, bubbles.get(drawingData.id), drawingData, rank);
-        }
-    }
 
-    /**
-     * @param model
-     * @param zoomFactor
-     * @return
-     */
     private int drawSourceNode(IGraphViewModel model, DoubleProperty zoomFactor) {
         Node firstNode = getNodeOrBubble(drawingStartCoordinate);
 
@@ -154,13 +118,25 @@ public class GraphHandler {
         drawSequence(model, firstNode, drawingData, 0);
         return firstNode.getNodeId();
     }
-    
+
+    private Node getNodeOrBubble(int sourceNode) {
+        if (bubbles.containsKey(sourceNode)) {
+            Bubble bubble = bubbles.get(sourceNode);
+            GraphHandlerUtil.catalogEdgesForDrawing(bubbleMapping, sourceNode,
+                    new int[] { bubble.getStop().getNodeId() });
+        }
+        return graphData.get(sourceNode);
+    }
+
+    private int[] getConnectedEdges(Node node) {
+        return isSame(NodeType.SINGLE_NODE, node.getNodeType()) ? node.getConnectedEdges()
+                : getConnectedEdges(((Bubble) node).getStop());
+    }
 
     /**
      * <p>
-     * This method will determine any parent nodes previously stored in the
-     * 'addEdgesToQueue' in a previous iteration and draw these edges with
-     * respect to the location of the parent node and current node
+     * This method will determine any parent nodes previously stored in the 'addEdgesToQueue' in a previous iteration
+     * and draw these edges with respect to the location of the parent node and current node
      * 
      * insertion: 5-6 = 4; 5-7 = 5 ; 6-7 = 4;
      * </p>
@@ -175,7 +151,8 @@ public class GraphHandler {
     private void drawGreedy(IGraphViewModel model, Node aNode) {
         if (edgeMapping.containsKey(aNode.getNodeId())) {
             int[] parentNodes = edgeMapping.get(aNode.getNodeId());
-            List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aNode, parentNodes, graphData);
+            List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aNode,
+                    parentNodes, graphData);
 
             NodeDrawingData drawingData = new NodeDrawingData();
             drawingData.scale = zoomFactor.get();
@@ -187,10 +164,9 @@ public class GraphHandler {
                 drawingData.parentHeight = parentNode.getHeight();
                 drawingData.parentWidth = parentNode.getWidth();
                 drawingData.parentRadius = parentNode.getRadius();
-                
+
                 drawSequence(model, aNode, drawingData, rank);
                 drawEdge(model, aNode, rank, parentNode);
-//                model.addEdge(aNode.getNodeId(), parentNode.getNodeId(), rank);
             } else {
                 // if the matching produces an equal score, they will end up on
                 // a different rank. We must determine the true rank based on:
@@ -206,8 +182,8 @@ public class GraphHandler {
                     // Find the first occurrence of aRib on its main axis by
                     // aligning it up with the parent that has the highest rank
                     // with this aRib.
-                    //TODO: Since we using a greedy algo, we have a drawing bug where the 
-                    //graph gently moves towards the right, due to the structural complexity of the graph.
+                    // TODO: Since we using a greedy algo, we have a drawing bug where the
+                    // graph gently moves towards the right, due to the structural complexity of the graph.
                     if (entry.getChildNodeId() == aNode.getNodeId() && Double.compare(xCoord, 0.0) == 0) {
                         xCoord = entry.getParentNode().getXCoordinate();
                         nodeRank = rank;
@@ -221,7 +197,7 @@ public class GraphHandler {
                         drawingData.parentHeight = entry.getParentNode().getHeight();
                     }
                 }
-                
+
                 drawingData.parentXCoordinate = xCoord;
                 drawingData.parentYCoordinate = highestYCoord;
                 drawSequence(model, aNode, drawingData, nodeRank);
@@ -232,7 +208,6 @@ public class GraphHandler {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     if (entry.getChildNodeId() == aNode.getNodeId()) {
                         drawEdge(model, aNode, rank, entry.getParentNode());
-//                        model.addEdge(aNode.getNodeId(), entry.getParentNode().getNodeId(), rank);
                     }
                 }
                 matchedGenomeRanking = null;
@@ -260,8 +235,31 @@ public class GraphHandler {
         model.addSequence(aNode, rank, drawingData);
     }
 
+    private void drawBubble(IGraphViewModel model, Node bubbleEndNode) {
+        if (bubbleMapping.containsKey(bubbleEndNode.getNodeId())) {
+            int[] bubbleStartIds = bubbleMapping.get(bubbleEndNode.getNodeId());
+            NodeDrawingData drawingData = new NodeDrawingData();
+            drawingData.id = bubbleStartIds[0];
+
+            int[] parentNodes = edgeMapping.get(drawingData.id);
+            Node startNode = graphData.get(drawingData.id);
+            List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(startNode,
+                    parentNodes, graphData);
+            int rank = 0;
+            Node parentNode = matchedGenomeRanking.get(rank).getParentNode();
+
+            drawingData.parentXCoordinate = parentNode.getXCoordinate();
+            drawingData.parentYCoordinate = parentNode.getYCoordinate();
+            drawingData.parentHeight = parentNode.getHeight();
+            drawingData.parentWidth = parentNode.getWidth();
+            drawingData.parentRadius = parentNode.getRadius();
+            drawingData.scale = zoomFactor.get();
+            drawSequence(model, bubbles.get(drawingData.id), drawingData, rank);
+        }
+    }
+
     /**
-     * @deprecated 
+     * @deprecated
      * 
      * @param model
      * @param aRib
@@ -273,8 +271,8 @@ public class GraphHandler {
         int startX = parentXCoordinate;
         int startY = parentYCoordinate + Y_CORRECTION;
 
-        int endX = (int)Math.round(aRib.getXCoordinate());
-        int endY = (int)Math.round(aRib.getYCoordinate()) + Y_CORRECTION;
+        int endX = (int) Math.round(aRib.getXCoordinate());
+        int endY = (int) Math.round(aRib.getYCoordinate()) + Y_CORRECTION;
 
         model.addEdge(aRib.getNodeId(), startX, startY, endX, endY, rank);
         model.addLabel(Integer.toString(aRib.getNodeId()), endX, endY, 2);
