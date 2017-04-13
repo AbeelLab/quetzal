@@ -11,23 +11,23 @@ import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
  * 
- * Start by initialising this GridHandler with method {@code initializeCoordinatesInGrid()}. Use this also to reset the
+ * Start by initialising this {@ Grid} with method {@code initializeCoordinatesInGrid()}. Use this also to reset the
  * grid to a new coordinate system and leaving the nodes presently unchanged.
  * 
  * @author D.L. Ettema
  *
  */
-public class GridHandler {
+public class Grid {
 
-    private static final Logger log = LoggerFactory.getLogger(GridHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(Grid.class);
     public final short BACKBONE_NODE = 0;
     public final short NON_BACKBONE_NODE = 1;
-    
+
     private NodeCoordinate[][] grid;
     private BigDecimal spacingX;
     private BigDecimal spacingY;
 
-    public GridHandler(int sizeX, int sizeY) {
+    public Grid(int sizeX, int sizeY) {
         grid = new NodeCoordinate[sizeX][sizeY];
         grid[0][0] = new NodeCoordinate();
     }
@@ -59,8 +59,8 @@ public class GridHandler {
             this.initializeCoordinatesInGrid(startX, startY, spacingX, spacingY - 1.0);
         }
     }
-    
-    public void addOrUpdateNodeInGrid(Node node, int row, short col) {
+
+    public void addOrUpdateNodeInGrid(Node node, int row, int col) {
         ensureValidGridElement(row, col);
         List<Node> nodes = grid[row][col].attachedNodes;
         if (nodes.contains(node)) {
@@ -69,12 +69,12 @@ public class GridHandler {
             nodes.add(node);
         }
     }
-    
+
     public boolean hasNodeInGrid(int row, int col) {
         ensureValidGridElement(row, col);
         return !grid[row][col].attachedNodes.isEmpty();
     }
-    
+
     private void ensureValidGridElement(int row, int col) {
         if (spacingX == null || spacingY == null) {
             throw new RuntimeException(
@@ -82,20 +82,20 @@ public class GridHandler {
         }
         if (grid[row][col] == null) {
             grid[row][col] = new NodeCoordinate();
-            //the X coordinate expands along the columns and the Y coordinate expands along the rows
+            // the X coordinate expands along the columns and the Y coordinate expands along the rows
             grid[row][col].x = grid[0][0].x + spacingX.multiply(BigDecimal.valueOf((long) col)).doubleValue();
             grid[row][col].y = grid[0][0].y + spacingY.multiply(BigDecimal.valueOf((long) row)).doubleValue();
         }
     }
-    
+
     public void scaleCoordinates(int scale) {
         throw new RuntimeException("Not yet implemented");
     }
-    
+
     public void clearAllNodes() {
         throw new RuntimeException("Not yet implemented");
     }
-    
+
     public void clearNodesInRange(int startRow, int endInclusiveRow) {
         throw new RuntimeException("Not yet implemented");
     }

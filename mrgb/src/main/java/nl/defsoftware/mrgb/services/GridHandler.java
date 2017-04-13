@@ -15,9 +15,9 @@ import nl.defsoftware.mrgb.models.graph.Node;
  * @author D.L. Ettema
  *
  */
-public class GraphDrawerToGrid {
+public class GridHandler {
     
-    private GridHandler gridHandler;
+    private Grid grid;
     
     private Int2ObjectLinkedOpenHashMap<Node> graphData;
     private Int2ObjectLinkedOpenHashMap<Bubble> bubbles;
@@ -27,8 +27,8 @@ public class GraphDrawerToGrid {
     private Int2ObjectOpenHashMap<int[]> bubbleMapping;
     private List<Integer> backbone = new ArrayList<>();
     
-    public GraphDrawerToGrid(GridHandler gridHandler) {
-        this.gridHandler = gridHandler;
+    public GridHandler(Grid grid) {
+        this.grid = grid;
         this.drawnSubGraphNodeIds = new HashSet<>();
         this.edgeMapping = new Int2ObjectOpenHashMap<>();
         this.bubbleMapping = new Int2ObjectOpenHashMap<>();
@@ -39,7 +39,7 @@ public class GraphDrawerToGrid {
         this.bubbles = bubbles;
         int [] keys = graphData.keySet().toIntArray();
         Node sourceNode = graphData.get(keys[0]);
-        gridHandler.addOrUpdateNodeInGrid(sourceNode, 0, 0);//first node
+        grid.addOrUpdateNodeInGrid(sourceNode, 0, 0);//first node
         int count = countChildren(sourceNode);
         //which node is on longest path
         //draw main path node
@@ -49,12 +49,12 @@ public class GraphDrawerToGrid {
         for (int i = 1; i < keys.length; i++) {
             Node node = graphData.get(keys[i]);
             countChildren((Node[]) node.getOutEdges().toArray());
-            gridHandler.addOrUpdateNodeInGrid(node, levelCursor, isBackbone(node));
+            grid.addOrUpdateNodeInGrid(node, levelCursor, isBackbone(node));
         }
     }
     
     private short isBackbone(Node node) {
-        return backbone.contains(Integer.valueOf(node.getNodeId())) ? gridHandler.BACKBONE_NODE : gridHandler.NON_BACKBONE_NODE;
+        return backbone.contains(Integer.valueOf(node.getNodeId())) ? grid.BACKBONE_NODE : grid.NON_BACKBONE_NODE;
     }
     
     private int countChildren(Node ... nodes) {

@@ -6,7 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GridHandlerTest {
+public class GridTest {
 
     @Before
     public void setUp() throws Exception {
