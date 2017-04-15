@@ -1,67 +1,107 @@
 package nl.defsoftware.mrgb.services;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntSortedSet;
-import nl.defsoftware.mrgb.models.graph.Bubble;
 import nl.defsoftware.mrgb.models.graph.Node;
 
 /**
+ * This class occupies with the abstractified logic of placing the nodes into the grid and the spacing between the grid
+ * elements. Finding out if a gridlocation is empty to be able to place an node in it, or move it to the next column. We
+ * assume we are drawing in a vertical direction.
+ * 
  * @author D.L. Ettema
  *
  */
 public class GridHandler {
-    
+
+    /**
+     * Enumeration of AxisType, telling this GridHandler if a node should be placed along the main axis. 
+     */
+    public enum AxisType {
+        BACKBONE, NON_BACKBONE
+    };
+
+    /** The actual grid */
     private Grid grid;
-    
-    private Int2ObjectLinkedOpenHashMap<Node> graphData;
-    private Int2ObjectLinkedOpenHashMap<Bubble> bubbles;
-    private Set<Integer> drawnSubGraphNodeIds;
-    
-    private Int2ObjectOpenHashMap<int[]> edgeMapping;
-    private Int2ObjectOpenHashMap<int[]> bubbleMapping;
-    private List<Integer> backbone = new ArrayList<>();
-    
+    /** Registers each placed node in the grid with their ID as key and the grid location as a GridIndex class */
+    private Int2ObjectLinkedOpenHashMap<GridIndex> gridIndex;
+    private int LEVEL_CURSOR = 0;
+
     public GridHandler(Grid grid) {
         this.grid = grid;
-        this.drawnSubGraphNodeIds = new HashSet<>();
-        this.edgeMapping = new Int2ObjectOpenHashMap<>();
-        this.bubbleMapping = new Int2ObjectOpenHashMap<>();
     }
-    
-    public void mapGraphToGrid(Int2ObjectLinkedOpenHashMap<Node> graphData, Int2ObjectLinkedOpenHashMap<Bubble> bubbles) {
-        this.graphData = graphData;
-        this.bubbles = bubbles;
-        int [] keys = graphData.keySet().toIntArray();
-        Node sourceNode = graphData.get(keys[0]);
-        grid.addOrUpdateNodeInGrid(sourceNode, 0, 0);//first node
-        int count = countChildren(sourceNode);
-        //which node is on longest path
-        //draw main path node
-        //draw other nodes with spacing according to the amount of children they have 
-        int levelCursor = 1;
-        //topological order
-        for (int i = 1; i < keys.length; i++) {
-            Node node = graphData.get(keys[i]);
-            countChildren((Node[]) node.getOutEdges().toArray());
-            grid.addOrUpdateNodeInGrid(node, levelCursor, isBackbone(node));
+
+    /**
+     * TODO: add garbage collection to cleanup the old grid, before using new keyword and orphaning the old grid.
+     *
+     * @param sizeX
+     * @param sizeY
+     */
+    public void resetGrid(int sizeX, int sizeY) {
+        grid = new Grid(sizeX, sizeY);
+    }
+
+    /**
+     * Will put the level cursor one step back. If cursor is at maximum of the grid, it will return -1, otherwise the
+     * new level of the cursor.
+     * 
+     * @return The value of the new level of this cursor. Returns -1 if max level of grid has been reached.
+     */
+    public int moveGridLevelCursorNext() {
+        return (LEVEL_CURSOR + 1 >= grid.height()) ? -1 : ++LEVEL_CURSOR;
+    }
+
+    /**
+     * Will put the level cursor one step back. If cursor is at 0, it will return -1, otherwise the new level of the
+     * cursor.
+     * 
+     * @return The value of the new level of this cursor. Returns -1 if level 0 has been reached.
+     */
+    public int moveGridLevelCursorPrevious() {
+        return (LEVEL_CURSOR - 1 <= 0) ? -1 : --LEVEL_CURSOR;
+    }
+
+    /**
+     * Add the given node to the grid according to the {@code AxisType}.
+     * 
+     * @param node
+     *            The {@code Node} to be added.
+     * @param isBackBone
+     *            AxisType enum public accessible in this class
+     */
+    public void addNode(Node node, AxisType isBackBone) {
+        int column = determineEmptyColumnIndex(isBackBone);
+        registerNode(node, LEVEL_CURSOR, column);
+    }
+
+    /**
+     * Finds an empty spot on the column axis of the grid and returns that index.
+     * 
+     * @param isBackBone 
+     * @return The first column index that is empty
+     */
+    private int determineEmptyColumnIndex(AxisType isBackBone) {
+        if (isBackBone == AxisType.NON_BACKBONE) {
+            for (int col = 1; col < grid.width(); col++) {
+                if (grid.isEmptyInGridLocation(LEVEL_CURSOR, col)) {
+                    return col;
+                }
+            }
         }
+        return 0;
     }
-    
-    private short isBackbone(Node node) {
-        return backbone.contains(Integer.valueOf(node.getNodeId())) ? grid.BACKBONE_NODE : grid.NON_BACKBONE_NODE;
+
+    private void registerNode(Node node, int row, int col) {
+        grid.addOrUpdateNodeInGrid(node, row, col);
+        gridIndex.put(node.getNodeId(), new GridIndex(row, col));
     }
-    
-    private int countChildren(Node ... nodes) {
-        int total = 0;
-        for (Node node : nodes) {
-            total += node.getOutEdges().size();
-        }
-        return total;
+}
+
+class GridIndex {
+    public int row;
+    public int col;
+
+    public GridIndex(int row, int col) {
+        this.row = row;
+        this.col = col;
     }
 }

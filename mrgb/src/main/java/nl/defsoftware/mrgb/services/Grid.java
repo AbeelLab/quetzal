@@ -20,14 +20,16 @@ import nl.defsoftware.mrgb.models.graph.Node;
 public class Grid {
 
     private static final Logger log = LoggerFactory.getLogger(Grid.class);
-    public final short BACKBONE_NODE = 0;
-    public final short NON_BACKBONE_NODE = 1;
 
     private NodeCoordinate[][] grid;
     private BigDecimal spacingX;
     private BigDecimal spacingY;
 
     public Grid(int sizeX, int sizeY) {
+        if (sizeX < 1 || sizeY < 1) {
+            throw new RuntimeException(
+                    "Grid initialisation variables sizeX or sizeY are too small. Should be higher then 0.");
+        }
         grid = new NodeCoordinate[sizeX][sizeY];
         grid[0][0] = new NodeCoordinate();
     }
@@ -61,24 +63,32 @@ public class Grid {
     }
 
     public void addOrUpdateNodeInGrid(Node node, int row, int col) {
-        ensureValidGridElement(row, col);
+        checkGridIndexElement(row, col);
         List<Node> nodes = grid[row][col].attachedNodes;
         if (nodes.contains(node)) {
-            nodes.set(nodes.indexOf(node), node);
+            nodes.set(nodes.indexOf(node), node);//replace current
         } else {
             nodes.add(node);
         }
     }
 
-    public boolean hasNodeInGrid(int row, int col) {
-        ensureValidGridElement(row, col);
+    public boolean hasNodeInGridLocation(int row, int col) {
+        checkGridIndexElement(row, col);
         return !grid[row][col].attachedNodes.isEmpty();
     }
 
-    private void ensureValidGridElement(int row, int col) {
+    public boolean isEmptyInGridLocation(int row, int col) {
+        checkGridIndexElement(row, col);
+        return grid[row][col].attachedNodes.isEmpty();
+    }
+
+    private void checkGridIndexElement(int row, int col) {
         if (spacingX == null || spacingY == null) {
             throw new RuntimeException(
-                    "GridHandler variables not initialised, please call initializeCoordinatesInGrid() method first");
+                    "Grid variables not initialised, please call initializeCoordinatesInGrid() method first");
+        }
+        if (row >= grid.length || col >= grid[0].length) {
+            throw new RuntimeException("Row or column variables exceed limit of allocated grid");
         }
         if (grid[row][col] == null) {
             grid[row][col] = new NodeCoordinate();
@@ -98,6 +108,14 @@ public class Grid {
 
     public void clearNodesInRange(int startRow, int endInclusiveRow) {
         throw new RuntimeException("Not yet implemented");
+    }
+
+    public int width() {
+        return grid[0].length;
+    }
+
+    public int height() {
+        return grid.length;
     }
 }
 
