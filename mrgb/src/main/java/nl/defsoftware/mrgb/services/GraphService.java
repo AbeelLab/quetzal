@@ -3,6 +3,7 @@
  */
 package nl.defsoftware.mrgb.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -55,8 +56,8 @@ public class GraphService {
         return sbAlgorithm.getDetectedBubbles();
     }
     
-    public void calculateLongestPath(List<Integer> longestPath, final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId, final int targetNodeId) {
-        lpAlgorithm.findLongestPathBFS(longestPath, sequencesDataMap, sourceNodeId, targetNodeId);
+    public List<Integer> calculateLongestPath(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId, final int targetNodeId) {
+        return lpAlgorithm.findLongestPathBFS(new ArrayList<Integer>(), sequencesDataMap, sourceNodeId, targetNodeId);
     }
 }
  
