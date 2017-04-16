@@ -24,6 +24,9 @@ public class Grid {
     private NodeCoordinate[][] grid;
     private BigDecimal spacingX;
     private BigDecimal spacingY;
+    
+    public static int NO_MORE_WIDTH_SPACE = -1;
+    public static int NO_MORE_HEIGHT_SPACE = -1;
 
     public Grid(int sizeX, int sizeY) {
         if (sizeX < 1 || sizeY < 1) {
@@ -66,10 +69,16 @@ public class Grid {
         checkGridIndexElement(row, col);
         List<Node> nodes = grid[row][col].attachedNodes;
         if (nodes.contains(node)) {
-            nodes.set(nodes.indexOf(node), node);//replace current
+            nodes.set(nodes.indexOf(node), node);// replace current
         } else {
             nodes.add(node);
         }
+    }
+
+    public boolean removeNodeInGrid(Node nodeToBeRemoved, int row, int col) {
+        checkGridIndexElement(row, col);
+        List<Node> nodes = grid[row][col].attachedNodes;
+        return nodes.remove(nodeToBeRemoved);
     }
 
     public boolean hasNodeInGridLocation(int row, int col) {
@@ -87,8 +96,12 @@ public class Grid {
             throw new RuntimeException(
                     "Grid variables not initialised, please call initializeCoordinatesInGrid() method first");
         }
-        if (row >= grid.length || col >= grid[0].length) {
+        if (row >= this.height() || col >= this.width()) {
             throw new RuntimeException("Row or column variables exceed limit of allocated grid");
+        }
+        if (row <= NO_MORE_HEIGHT_SPACE || col <= NO_MORE_WIDTH_SPACE) {
+            throw new RuntimeException(
+                    "Row or clumn variables were negative indexes. Probably no more space on grid to draw.");
         }
         if (grid[row][col] == null) {
             grid[row][col] = new NodeCoordinate();

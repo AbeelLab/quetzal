@@ -14,7 +14,7 @@ import nl.defsoftware.mrgb.models.graph.Node;
 public class GridHandler {
 
     /**
-     * Enumeration of AxisType, telling this GridHandler if a node should be placed along the main axis. 
+     * Enumeration of AxisType, telling this GridHandler if a node should be placed along the main axis.
      */
     public enum AxisType {
         BACKBONE, NON_BACKBONE
@@ -28,6 +28,8 @@ public class GridHandler {
 
     public GridHandler(Grid grid) {
         this.grid = grid;
+        gridIndex = new Int2ObjectLinkedOpenHashMap<>();
+        gridIndex.defaultReturnValue(GridIndex.INVALID_GRID_INDEX);
     }
 
     /**
@@ -61,31 +63,70 @@ public class GridHandler {
     }
 
     /**
+     * Will return the level of the given node id in the {@code Grid}
+     * 
+     * @param id
+     *            The {@code Node} ID.
+     * @return The level of given node ID. Will return -1 if node ID is not found.
+     */
+    public int findLevelOfNode(int id) {
+        return gridIndex.get(id).row;
+    }
+
+    /**
+     * Will return the column of the given {@code Node} ID in the {@code Grid}
+     * 
+     * @param id
+     *            The {@code Node} ID.
+     * @return The column of given node ID. Will return -1 if node ID is not found.
+     */
+    public int findColumnOfNode(int id) {
+        return gridIndex.get(id).col;
+    }
+
+    /**
      * Add the given node to the grid according to the {@code AxisType}.
      * 
      * @param node
      *            The {@code Node} to be added.
-     * @param isBackBone
+     * @param isBackbone
      *            AxisType enum public accessible in this class
      */
-    public void addNode(Node node, AxisType isBackBone) {
-        int column = determineEmptyColumnIndex(isBackBone);
+    public void addNode(Node node, AxisType isBackbone) {
+        int column = determineEmptyColumnIndex(isBackbone, 0);
+        registerNode(node, LEVEL_CURSOR, column);
+    }
+
+    /**
+     * Add the given node to the grid according to the {@code AxisType}.
+     * 
+     * @param node
+     *            The {@code Node} to be added.
+     * @param isBackbone
+     *            AxisType enum public accessible in this class
+     * @param hasParentOnColumnIndex
+     *            The given {@code Node} has a parent node on a higher column index and must be placed relative to that
+     *            index.
+     */
+    public void addNode(Node node, AxisType isBackbone, int hasParentOnColumnIndex) {
+        int column = determineEmptyColumnIndex(isBackbone, hasParentOnColumnIndex);
         registerNode(node, LEVEL_CURSOR, column);
     }
 
     /**
      * Finds an empty spot on the column axis of the grid and returns that index.
      * 
-     * @param isBackBone 
+     * @param isBackbone
      * @return The first column index that is empty
      */
-    private int determineEmptyColumnIndex(AxisType isBackBone) {
-        if (isBackBone == AxisType.NON_BACKBONE) {
-            for (int col = 1; col < grid.width(); col++) {
+    private int determineEmptyColumnIndex(AxisType isBackbone, int hasParentOnColumnIndex) {
+        if (isBackbone == AxisType.NON_BACKBONE) {
+            for (int col = hasParentOnColumnIndex; col < grid.width(); col++) {
                 if (grid.isEmptyInGridLocation(LEVEL_CURSOR, col)) {
                     return col;
                 }
             }
+            return Grid.NO_MORE_WIDTH_SPACE;
         }
         return 0;
     }
@@ -104,4 +145,6 @@ class GridIndex {
         this.row = row;
         this.col = col;
     }
+
+    public static GridIndex INVALID_GRID_INDEX = new GridIndex(-1, -1);
 }
