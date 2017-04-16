@@ -76,7 +76,7 @@ public class LongestPathAlgorithm {
 
     private void calcBFSLongestPath(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId,
             final int targetNodeId) {
-        List<Integer> sortedList = new ArrayList(sequencesDataMap.keySet());
+        List<Integer> sortedList = new ArrayList<>(sequencesDataMap.keySet());
         Collections.sort(sortedList);
         for (int key : sortedList) {
             Node parentNode = sequencesDataMap.get(key);
