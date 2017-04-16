@@ -55,6 +55,7 @@ public class GraphHandler {
     private DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
     private int drawingStartCoordinate = 0;
     private int drawingRange = 0;
+    private List<Integer> longestPath;
 
     /**
      * Given the two data-structures this Handler will input these into the model and the model will determine the
@@ -85,11 +86,12 @@ public class GraphHandler {
      * @param zoomFactor
      */
     public void loadGraphViewModel(IGraphViewModel model, int drawingStartCoordinate, int drawingRange,
-            DoubleProperty zoomFactor) {
+            DoubleProperty zoomFactor, List<Integer> longestPath) {
         log.info("Zoomfactor: " + zoomFactor.get());
         this.zoomFactor = zoomFactor;
         this.drawingStartCoordinate = drawingStartCoordinate;
         this.drawingRange = drawingRange;
+        this.longestPath = longestPath;
         edgeMapping.clear();
         bubbleMapping.clear();
         int sourceNodeId = drawSourceNode(model, zoomFactor);
@@ -137,8 +139,6 @@ public class GraphHandler {
      * <p>
      * This method will determine any parent nodes previously stored in the 'addEdgesToQueue' in a previous iteration
      * and draw these edges with respect to the location of the parent node and current node
-     * 
-     * insertion: 5-6 = 4; 5-7 = 5 ; 6-7 = 4;
      * </p>
      * 
      * @param model
@@ -174,22 +174,23 @@ public class GraphHandler {
                 // 2. find the one with the highest node id closest to the
                 // aRib.nodeId and draw from those coordinates
 
-                double highestYCoord = 0;
-                double xCoord = 0;
+                double highestYCoord = 0.0;
+                double xCoord = 0.0;
                 int nodeRank = 0;
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     // Find the first occurrence of aRib on its main axis by
                     // aligning it up with the parent that has the highest rank
                     // with this aRib.
-                    // TODO: Since we using a greedy algo, we have a drawing bug where the
-                    // graph gently moves towards the right, due to the structural complexity of the graph.
-                    if (entry.getChildNodeId() == aNode.getNodeId() && Double.compare(xCoord, 0.0) == 0) {
-                        xCoord = entry.getParentNode().getXCoordinate();
-                        nodeRank = rank;
-                        drawingData.parentWidth = entry.getParentNode().getWidth();
+                    if (Double.compare(xCoord, 0.0) == 0) {
+                        if (longestPath.contains(aNode.getNodeId())) {
+                            xCoord = BACKBONE_X_BASELINE;
+                        } else if (entry.getChildNodeId() == aNode.getNodeId()) {
+                            xCoord = entry.getParentNode().getXCoordinate();
+                            nodeRank = rank;
+                            drawingData.parentWidth = entry.getParentNode().getWidth();
+                        }
                     }
-
                     // Find highest y coordinate from this child's parents so
                     // its drawn at an adequate Y distance. (to alleviate the problem of InDel nodes)
                     if (highestYCoord < entry.getParentNode().getYCoordinate()) {

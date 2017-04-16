@@ -141,18 +141,20 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
 //        double viewRange = (mainPane.getHeight() / zoomFactor.get()) + 1;
 //        double viewingStart = Math.max(amountOfLevels.multiply(scrollbar.getValue()).doubleValue(), 0.0);
         int dummyRange = graphService.getParsedSequences().size();
+        Node targetNode = graphService.getParsedSequences().get(dummyRange - 1);
 //        int dummyRange = 500;
         int dummyViewingStartCoordinate = 270;
         clear();
         zoomFactor.bind(scrollPane.getScaleYProperty());
-        List<Integer> longestPath = new ArrayList<>();
-        graphService.calculateLongestPath(longestPath, graphService.getParsedSequences(), 1, 5000);
+        
+        List<Integer> longestPath = graphService.calculateLongestPath(graphService.getParsedSequences(), 0, targetNode.getNodeId());
         
         graphHandler.loadGraphViewModel(
                 model, 
                 dummyViewingStartCoordinate, 
                 dummyRange, 
-                zoomFactor);
+                zoomFactor, 
+                longestPath);
         endUpdate();
         log.info("VIEW GRAPH");
     }
