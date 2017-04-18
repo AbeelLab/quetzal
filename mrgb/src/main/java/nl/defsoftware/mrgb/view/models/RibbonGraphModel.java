@@ -210,9 +210,9 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
         Shape from = drawnSequencesMap.get(parentId);
         Shape to = drawnSequencesMap.get(childId);
         if (from == null ) {
-            System.out.println("Trying to add edge from null parentID: " + parentId + ". With childId: " + childId);
+            log.info("Trying to add edge from null parentID: {}. With childId: {}", parentId, childId);
         } else if (to == null) {
-            System.out.println("Trying to add edge from null childID: " + childId);
+            log.info("Trying to add edge from null childID: {}", childId);
         } else {
             addedEdges.add(new DrawableEdge(from, to));
         }
