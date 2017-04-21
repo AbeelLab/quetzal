@@ -25,6 +25,9 @@ public class ToolBarController extends HBox implements Initializable {
 	private ActionStates<ActionStateEnums, Boolean> actionStates;
 
 	@FXML
+    GraphController graphController;
+	
+	@FXML
 	private ToolBar toolbar;
 	
 	@FXML

@@ -31,13 +31,9 @@ import nl.defsoftware.mrgb.view.models.NodeDrawingData;
  * @author D.L. Ettema
  *
  */
-public class GraphHandler {
+public class GraphHandler<T> {
 
     private static final Logger log = LoggerFactory.getLogger(GraphHandler.class);
-
-    private static final int HOR_NODE_SPACING = 20;
-    private static final int VER_NODE_SPACING = 25;
-    private static final int VER_NODE_BASELINE = 200;
 
     private static final int BACKBONE_X_BASELINE = 100;
     private static final int BACKBONE_Y_BASELINE = 25;
@@ -85,7 +81,7 @@ public class GraphHandler {
      *            the range of drawing in total which can be bigger then the actual window view
      * @param zoomFactor
      */
-    public void loadGraphViewModel(IGraphViewModel model, int drawingStartCoordinate, int drawingRange,
+    public void loadGraphViewModel(IGraphViewModel<T> model, int drawingStartCoordinate, int drawingRange,
             DoubleProperty zoomFactor, List<Integer> longestPath) {
         log.info("Zoomfactor: " + zoomFactor.get());
         this.zoomFactor = zoomFactor;
@@ -107,7 +103,7 @@ public class GraphHandler {
         }
     }
 
-    private int drawSourceNode(IGraphViewModel model, DoubleProperty zoomFactor) {
+    private int drawSourceNode(IGraphViewModel<T> model, DoubleProperty zoomFactor) {
         Node firstNode = getNodeOrBubble(drawingStartCoordinate);
 
         GraphHandlerUtil.catalogEdgesForDrawing(edgeMapping, firstNode.getNodeId(), getConnectedEdges(firstNode));
@@ -148,7 +144,7 @@ public class GraphHandler {
      * @param aNode
      *            current node
      */
-    private void drawGreedy(IGraphViewModel model, Node aNode) {
+    private void drawGreedy(IGraphViewModel<T> model, Node aNode) {
         if (edgeMapping.containsKey(aNode.getNodeId())) {
             int[] parentNodes = edgeMapping.get(aNode.getNodeId());
             List<MatchingScoreEntry> matchedGenomeRanking = GraphHandlerUtil.determineSortedNodeRanking(aNode,
@@ -185,7 +181,8 @@ public class GraphHandler {
                     if (Double.compare(xCoord, 0.0) == 0) {
                         if (longestPath.contains(aNode.getNodeId())) {
                             xCoord = BACKBONE_X_BASELINE;
-                        } else if (entry.getChildNodeId() == aNode.getNodeId()) {
+                        } else 
+                        if (entry.getChildNodeId() == aNode.getNodeId()) {
                             xCoord = entry.getParentNode().getXCoordinate();
                             nodeRank = rank;
                             drawingData.parentWidth = entry.getParentNode().getWidth();
@@ -228,15 +225,15 @@ public class GraphHandler {
      * @param rank
      * @param parentNode
      */
-    private void drawEdge(IGraphViewModel model, Node aNode, int rank, Node parentNode) {
+    private void drawEdge(IGraphViewModel<T> model, Node aNode, int rank, Node parentNode) {
         model.addEdge(aNode.getNodeId(), parentNode.getNodeId(), rank);
     }
 
-    private void drawSequence(IGraphViewModel model, Node aNode, NodeDrawingData drawingData, int rank) {
+    private void drawSequence(IGraphViewModel<T> model, Node aNode, NodeDrawingData drawingData, int rank) {
         model.addSequence(aNode, rank, drawingData);
     }
 
-    private void drawBubble(IGraphViewModel model, Node bubbleEndNode) {
+    private void drawBubble(IGraphViewModel<T> model, Node bubbleEndNode) {
         if (bubbleMapping.containsKey(bubbleEndNode.getNodeId())) {
             int[] bubbleStartIds = bubbleMapping.get(bubbleEndNode.getNodeId());
             NodeDrawingData drawingData = new NodeDrawingData();
@@ -268,7 +265,7 @@ public class GraphHandler {
      * @param parentYCoordinate
      * @param rank
      */
-    private void drawEdge(IGraphViewModel model, Node aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
+    private void drawEdge(IGraphViewModel<T> model, Node aRib, int parentXCoordinate, int parentYCoordinate, int rank) {
         int startX = parentXCoordinate;
         int startY = parentYCoordinate + Y_CORRECTION;
 

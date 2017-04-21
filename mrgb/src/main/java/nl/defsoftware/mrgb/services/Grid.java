@@ -14,6 +14,10 @@ import nl.defsoftware.mrgb.models.graph.Node;
  * Start by initialising this {@ Grid} with method {@code initializeCoordinatesInGrid()}. Use this also to reset the
  * grid to a new coordinate system and leaving the nodes presently unchanged.
  * 
+ * ATK hashmap2D
+ * 
+ * 
+ * 
  * @author D.L. Ettema
  *
  */

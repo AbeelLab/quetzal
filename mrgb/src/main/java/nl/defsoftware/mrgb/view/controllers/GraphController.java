@@ -4,7 +4,6 @@
 package nl.defsoftware.mrgb.view.controllers;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -39,6 +38,7 @@ import nl.defsoftware.mrgb.models.graph.Node;
 import nl.defsoftware.mrgb.services.GraphHandler;
 import nl.defsoftware.mrgb.services.GraphService;
 import nl.defsoftware.mrgb.view.GraphScrollPane;
+import nl.defsoftware.mrgb.view.ScrollAndZoomHandler;
 import nl.defsoftware.mrgb.view.actions.ActionStateEnums;
 import nl.defsoftware.mrgb.view.models.IGraphViewModel;
 import nl.defsoftware.mrgb.view.models.RibbonGraphModel;
@@ -57,15 +57,19 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
 
     private GraphService graphService;
 
+    @FXML
     private Group groupedNodes;
 
     private MouseGestures mouseGestures;
 
-    private GraphHandler graphHandler;
+    private GraphHandler<Shape> graphHandler;
 
+    @FXML
     private GraphScrollPane scrollPane;
 
     private IGraphViewModel<Shape> model;
+    
+    private ScrollAndZoomHandler scrollAndZoomHandler;
     
     private static final double SCROLL_ZOOM_FACTOR = 0.0025;
 
@@ -74,9 +78,6 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
 
     @FXML
     private Pane nodePane;
-
-    @FXML
-    private ScrollBar scrollbar;
 
     @FXML
     private Canvas edgeCanvas;
@@ -89,13 +90,17 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     private boolean needsUpdate = false;
 
     public GraphController() {
+//        this.setPrefSize(1024.0, 900.0);
+//        this.setBackground(new Background(new BackgroundFill(Paint.valueOf("yellow"), null, null)));
         graphService = new GraphService();
         model = new RibbonGraphModel();
-        Background background = new Background(new BackgroundFill(Paint.valueOf("white"), null, null));
+//        Background background = new Background(new BackgroundFill(Paint.valueOf("white"), null, null));
         nodePane = new Pane();
+//        nodePane.prefHeightProperty().bind(this.prefHeightProperty());
+//        nodePane.prefWidthProperty().bind(this.prefWidthProperty());
         nodePane.setPrefWidth(1024.0);
         nodePane.setPrefHeight(900.0);
-//        nodePane.setBackground(background);
+//        nodePane.setBackground(new Background(new BackgroundFill(Paint.valueOf("pink"), null, null)));
         
         edgeCanvas = new Canvas();
         edgeCanvas.setWidth(500.0);
@@ -109,17 +114,18 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         scrollPane = new GraphScrollPane(groupedNodes);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
+//        scrollPane.prefHeightProperty().bind(this.prefHeightProperty());
+//        scrollPane.prefWidthProperty().bind(this.prefWidthProperty());
+//        scrollPane.setBackground(new Background(new BackgroundFill(Paint.valueOf("red"), null, null)));
         scrollPane.setHbarPolicy(ScrollBarPolicy.ALWAYS);
         scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
-        scrollPane.setController(this);
-        scrollPane.setChangeListener(graphHandler);
-//        scrollPane.setBackground(background);
+        
+        scrollAndZoomHandler = new ScrollAndZoomHandler(scrollPane, this);
+        scrollPane.setOnScrollEventHandler(scrollAndZoomHandler);
+//        nodePane.setOnScroll(scrollAndZoomHandler);
 
-        mainPane = new AnchorPane();
-        scrollbar = new ScrollBar();
-//        mainPane.getChildren().add(scrollPane);
-//        mainPane.getChildren().add(groupedNodes);
-
+//        this.getChildren().add(scrollPane);
+//        this.getChildren().add(nodePane);
         GraphAnimationTimer timer = new GraphAnimationTimer();
         timer.start();
     }
@@ -127,10 +133,10 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap = graphService.getParsedSequences();
-        graphHandler = new GraphHandler(sequencesDataMap, graphService.getGenomeNames(), graphService.getDetectedBubbles(sequencesDataMap));
+        graphHandler = new GraphHandler<Shape>(sequencesDataMap, graphService.getGenomeNames(), graphService.getDetectedBubbles(sequencesDataMap));
     }
 
-    public void updateView() {
+    public void notifyUpdateView() {
         needsUpdate = true;
     }
     
@@ -140,12 +146,12 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         }
 //        double viewRange = (mainPane.getHeight() / zoomFactor.get()) + 1;
 //        double viewingStart = Math.max(amountOfLevels.multiply(scrollbar.getValue()).doubleValue(), 0.0);
-        int dummyRange = graphService.getParsedSequences().size();
+//        int dummyRange = graphService.getParsedSequences().size();
+        int dummyRange = 500;
         Node targetNode = graphService.getParsedSequences().get(dummyRange - 1);
-//        int dummyRange = 500;
-        int dummyViewingStartCoordinate = 270;
+        int dummyViewingStartCoordinate = 1;
         clear();
-        zoomFactor.bind(scrollPane.getScaleYProperty());
+        zoomFactor.bind(scrollAndZoomHandler.getScaleYProperty());
         
         List<Integer> longestPath = graphService.calculateLongestPath(graphService.getParsedSequences(), 0, targetNode.getNodeId());
         
@@ -158,7 +164,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         endUpdate();
         log.info("VIEW GRAPH");
     }
-
+    
     private void clear() {
         nodePane.getChildren().clear();
         edgeCanvas.getGraphicsContext2D().clearRect(0, 0, edgeCanvas.getWidth(), edgeCanvas.getHeight());
@@ -246,7 +252,7 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     }
 
     public double getScale() {
-        return this.scrollPane.getScaleValue();
+        return this.scrollAndZoomHandler.getScaleValue();
     }
     
     private class GraphAnimationTimer extends AnimationTimer {

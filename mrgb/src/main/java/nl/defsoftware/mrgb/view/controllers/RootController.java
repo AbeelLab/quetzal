@@ -11,7 +11,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.MenuBar;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
 
 public class RootController extends VBox implements Initializable {
 	private static final Logger log = LoggerFactory.getLogger(RootController.class);
@@ -22,8 +25,7 @@ public class RootController extends VBox implements Initializable {
 	@FXML
 	private ToolBarController toolbar;
 	
-	@FXML
-	private GraphController graphController;
+	private GraphController graph;
 
 	public RootController() {
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("mrgb.fxml"));
@@ -41,12 +43,13 @@ public class RootController extends VBox implements Initializable {
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		graphController = new GraphController();
-        graphController.getScrollPane().prefWidthProperty().bind(this.widthProperty());
-        graphController.getScrollPane().prefHeightProperty().bind(this.heightProperty());
-        this.getChildren().add(graphController.getScrollPane());
+		graph = new GraphController();
+	    graph.getScrollPane().prefWidthProperty().bind(this.widthProperty());
+	    graph.getScrollPane().prefHeightProperty().bind(this.heightProperty());
+        this.getChildren().add(graph.getScrollPane());
+//	    this.setBackground(new Background(new BackgroundFill(Paint.valueOf("blue"), null, null)));
         
 		toolbar.setRootController(this);
-		toolbar.addObserver(graphController);
+		toolbar.addObserver(graph);
 	}
 }

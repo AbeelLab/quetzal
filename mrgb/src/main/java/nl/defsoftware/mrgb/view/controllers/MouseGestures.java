@@ -62,7 +62,7 @@ public class MouseGestures {
 		public void handle(MouseEvent event) {
 		}
 	};
-
+	
 	class DragContext {
 		double x;
 		double y;

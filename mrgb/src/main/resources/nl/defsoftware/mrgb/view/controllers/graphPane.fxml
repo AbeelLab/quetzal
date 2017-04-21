@@ -5,5 +5,7 @@
 <?import javafx.scene.layout.*?>
 
 
-<fx:root fx:id="mainPane" type="javafx.scene.layout.AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml" >
+<fx:root type="javafx.scene.layout.AnchorPane" minWidth="1024.0" minHeight="900.0" prefHeight="900.0" prefWidth="1024.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+      <ScrollPane fx:id="scrollPane" minWidth="1024.0" minHeight="900.0" prefHeight="900.0" prefWidth="1024.0" />
+      <Group fx:id="groupedNodes" minWidth="1024.0" minHeight="900.0" prefHeight="900.0" prefWidth="1024.0" />
 </fx:root>
