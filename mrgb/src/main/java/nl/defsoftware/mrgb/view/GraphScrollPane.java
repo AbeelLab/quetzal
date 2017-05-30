@@ -44,16 +44,23 @@ public class GraphScrollPane extends ScrollPane {
     public GraphScrollPane(Group content) {
         scaleTransform = new Scale(scaleValue, scaleValue);
         zoomGroup = content;
-        // zoomGroup.getTransforms().add(scaleTransform);
+//        zoomGroup.getTransforms().add(scaleTransform);
         scrollbar = new ScrollBar();
     //        scrollbar.prefHeightProperty().bind(this.heightProperty());
     //        scrollbar.prefWidthProperty().bind(this.widthProperty());
+
         setContent(zoomGroup);
         setManaged(true);
+        setPannable(true);
+        setHbarPolicy(ScrollBarPolicy.ALWAYS);
+        setVbarPolicy(ScrollBarPolicy.ALWAYS);
+        setFitToWidth(true);
+        setFitToHeight(true);
     }
     
     public void setOnScrollEventHandler(EventHandler<ScrollEvent> handler) {
         zoomGroup.setOnScroll(handler);
+        this.setOnScroll(handler);
     }
 
     public DoubleProperty getScaleYProperty() {

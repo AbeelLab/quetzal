@@ -5,7 +5,6 @@ package nl.defsoftware.mrgb.view.controllers;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -24,29 +23,31 @@ import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollBar;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import nl.defsoftware.mrgb.Util;
 import nl.defsoftware.mrgb.models.graph.Node;
 import nl.defsoftware.mrgb.services.GraphHandler;
 import nl.defsoftware.mrgb.services.GraphService;
 import nl.defsoftware.mrgb.view.GraphScrollPane;
+import nl.defsoftware.mrgb.view.GraphToFxScenePainter;
 import nl.defsoftware.mrgb.view.ScrollAndZoomHandler;
 import nl.defsoftware.mrgb.view.actions.ActionStateEnums;
 import nl.defsoftware.mrgb.view.models.IGraphViewModel;
 import nl.defsoftware.mrgb.view.models.RibbonGraphModel;
 
 /**
- * This controller ensures that the layers are set for interacting with the
- * graph. A graphHandler class will ensure the loading of the graph model and is
- * responsible for the layout algorithm.
+ * This controller ensures that the layers are set for interacting with the graph. A graphHandler class will ensure the
+ * loading of the graph model and is responsible for the layout algorithm.
  *
  * @author D.L. Ettema
  * @date 7 Jun 2016
@@ -55,77 +56,59 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
 
     private static final Logger log = LoggerFactory.getLogger(GraphController.class);
 
-    private GraphService graphService;
+    private static final double SCROLL_ZOOM_FACTOR = 0.0025;
+
+    private GraphScrollPane scrollPane;
+
+    private Pane nodePane;
+
+    private Canvas edgeCanvas;
 
     @FXML
-    private Group groupedNodes;
+    private Label showingRange;
+
+    private GraphService graphService;
+
+    private GraphToFxScenePainter graphToFxScenePainter;
 
     private MouseGestures mouseGestures;
 
     private GraphHandler<Shape> graphHandler;
 
-    @FXML
-    private GraphScrollPane scrollPane;
+    private ScrollAndZoomHandler scrollAndZoomHandler;
 
     private IGraphViewModel<Shape> model;
-    
-    private ScrollAndZoomHandler scrollAndZoomHandler;
-    
-    private static final double SCROLL_ZOOM_FACTOR = 0.0025;
-
-    @FXML
-    private AnchorPane mainPane;
-
-    @FXML
-    private Pane nodePane;
-
-    @FXML
-    private Canvas edgeCanvas;
-
-    @FXML
-    private Label showingRange;
 
     private final IntegerProperty amountOfLevels = new SimpleIntegerProperty(0);
     private final DoubleProperty zoomFactor = new SimpleDoubleProperty(1.0);
     private boolean needsUpdate = false;
 
     public GraphController() {
-//        this.setPrefSize(1024.0, 900.0);
 //        this.setBackground(new Background(new BackgroundFill(Paint.valueOf("yellow"), null, null)));
         graphService = new GraphService();
         model = new RibbonGraphModel();
-//        Background background = new Background(new BackgroundFill(Paint.valueOf("white"), null, null));
+
         nodePane = new Pane();
-//        nodePane.prefHeightProperty().bind(this.prefHeightProperty());
-//        nodePane.prefWidthProperty().bind(this.prefWidthProperty());
-        nodePane.setPrefWidth(1024.0);
-        nodePane.setPrefHeight(900.0);
-//        nodePane.setBackground(new Background(new BackgroundFill(Paint.valueOf("pink"), null, null)));
+        nodePane.setPickOnBounds(false);//needed to capture scrollevent on the underlying scrollpane.
+        nodePane.setBackground(new Background(new BackgroundFill(Paint.valueOf("white"), null, null)));
+        nodePane.setBorder(new Border(new BorderStroke(Paint.valueOf("green"), BorderStrokeStyle.SOLID, null, new BorderWidths(5.0))));
         
         edgeCanvas = new Canvas();
-        edgeCanvas.setWidth(500.0);
-        edgeCanvas.setHeight(900.0);
-        
-        groupedNodes = new Group();
-        groupedNodes.getChildren().add(nodePane);
-//        groupedNodes.getChildren().add(edgeCanvas);
-        
+        edgeCanvas.setPickOnBounds(false);//needed to capture scrollevent on the underlying scrollpane.
+
         mouseGestures = new MouseGestures(this);
-        scrollPane = new GraphScrollPane(groupedNodes);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-//        scrollPane.prefHeightProperty().bind(this.prefHeightProperty());
-//        scrollPane.prefWidthProperty().bind(this.prefWidthProperty());
-//        scrollPane.setBackground(new Background(new BackgroundFill(Paint.valueOf("red"), null, null)));
-        scrollPane.setHbarPolicy(ScrollBarPolicy.ALWAYS);
-        scrollPane.setVbarPolicy(ScrollBarPolicy.ALWAYS);
+
+        scrollPane = new GraphScrollPane(new Group(nodePane/*, edgeCanvas*/));
+        scrollPane.setBorder(new Border(new BorderStroke(Paint.valueOf("red"), BorderStrokeStyle.SOLID, null, new BorderWidths(5.0))));
+        
+//        nodePane.prefHeightProperty().bind(scrollPane.heightProperty());
+        nodePane.prefWidthProperty().bind(scrollPane.widthProperty());
+//        edgeCanvas.heightProperty().bind(scrollPane.heightProperty());
+        edgeCanvas.widthProperty().bind(scrollPane.widthProperty());
         
         scrollAndZoomHandler = new ScrollAndZoomHandler(scrollPane, this);
         scrollPane.setOnScrollEventHandler(scrollAndZoomHandler);
-//        nodePane.setOnScroll(scrollAndZoomHandler);
 
-//        this.getChildren().add(scrollPane);
-//        this.getChildren().add(nodePane);
         GraphAnimationTimer timer = new GraphAnimationTimer();
         timer.start();
     }
@@ -134,29 +117,27 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     public void initialize(URL location, ResourceBundle resources) {
         Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap = graphService.getParsedSequences();
         graphHandler = new GraphHandler<Shape>(sequencesDataMap, graphService.getGenomeNames(), graphService.getDetectedBubbles(sequencesDataMap));
+        graphToFxScenePainter = new GraphToFxScenePainter(nodePane, edgeCanvas, scrollPane, graphHandler, graphService.getGridHandler());
+
     }
 
-    public void notifyUpdateView() {
-        needsUpdate = true;
-    }
-    
     public void updateGraph() {
         if (graphHandler == null) {
             initialize(null, null);
         }
-//        double viewRange = (mainPane.getHeight() / zoomFactor.get()) + 1;
-//        double viewingStart = Math.max(amountOfLevels.multiply(scrollbar.getValue()).doubleValue(), 0.0);
-//        int dummyRange = graphService.getParsedSequences().size();
+        // double viewRange = (mainPane.getHeight() / zoomFactor.get()) + 1;
+        // double viewingStart = Math.max(amountOfLevels.multiply(scrollbar.getValue()).doubleValue(), 0.0);
+        // int dummyRange = graphService.getParsedSequences().size();
         int dummyRange = 500;
         Node targetNode = graphService.getParsedSequences().get(dummyRange - 1);
         int dummyViewingStartCoordinate = 1;
         clear();
         zoomFactor.bind(scrollAndZoomHandler.getScaleYProperty());
-        
-        List<Integer> longestPath = graphService.calculateLongestPath(graphService.getParsedSequences(), 0, targetNode.getNodeId());
-        
-        graphHandler.loadGraphViewModel(
-                model, 
+
+        List<Integer> longestPath = graphService.calculateLongestPath(graphService.getParsedSequences(), 0,
+                targetNode.getNodeId());
+
+        graphHandler.loadGraphViewModel(model, 
                 dummyViewingStartCoordinate, 
                 dummyRange, 
                 zoomFactor, 
@@ -164,15 +145,19 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         endUpdate();
         log.info("VIEW GRAPH");
     }
+
+    public void notifyUpdateView() {
+        needsUpdate = true;
+    }
     
     private void clear() {
         nodePane.getChildren().clear();
         edgeCanvas.getGraphicsContext2D().clearRect(0, 0, edgeCanvas.getWidth(), edgeCanvas.getHeight());
     }
-    
+
     @Override
     public void onChanged(MapChangeListener.Change<? extends ActionStateEnums, ? extends Boolean> change) {
-        printMemoryUsage();
+        Util.printMemoryUsage();
         if (change.getKey() instanceof ActionStateEnums) {
             if (ActionStateEnums.LOAD_DATA_AND_PARSE == change.getKey()) {
                 // @TODO do this work in another thread.
@@ -198,40 +183,29 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
                 nodePane.getChildren().add(r3);
             }
         }
-        printMemoryUsage();
+        Util.printMemoryUsage();
     }
 
-    private void printMemoryUsage() {
-        Runtime runtime = Runtime.getRuntime();
-        long bytes = (runtime.totalMemory() - runtime.freeMemory());
-        double megabytes = bytes / 1024.0 / 1024.0;
-        log.info("memory = " + String.format(Locale.US, "%.3f", megabytes) + " MB");
-    }
-
-    public ScrollPane getScrollPane() {
+    public Region getContent() {
         return this.scrollPane;
     }
 
-    public Pane getMainPane() {
-        return mainPane;
-    }
-    
     private void endUpdate() {
 
         // add components to graph pane
-//        drawLinesOnCanvas(model.getAddedEdges());
+        // drawLinesOnCanvas(model.getAddedEdges());
         nodePane.getChildren().addAll(model.getAddedEdges());
         nodePane.getChildren().addAll(model.getAddedSequences());
         nodePane.getChildren().addAll(model.getAllLabels());
 
         // remove components from graph pane
-         nodePane.getChildren().removeAll(model.getRemovedSequences());
-         nodePane.getChildren().removeAll(model.getRemovedEdges());
+        nodePane.getChildren().removeAll(model.getRemovedSequences());
+        nodePane.getChildren().removeAll(model.getRemovedEdges());
 
         // enable dragging of cells
-//        for (Node node : model.getAddedSequences()) {
-//            mouseGestures.makeDraggable(node);
-//        }
+        // for (Node node : model.getAddedSequences()) {
+        // mouseGestures.makeDraggable(node);
+        // }
 
         // every cell must have a parent, if it doesn't, then the graphParent is
         // the parent
@@ -245,25 +219,27 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     }
 
     private void drawLinesOnCanvas(Set<Shape> addedEdges) {
-        edgeCanvas.getGraphicsContext2D().clearRect(0,  0,  edgeCanvas.getWidth(), edgeCanvas.getHeight());     
+        edgeCanvas.getGraphicsContext2D().clearRect(0, 0, edgeCanvas.getWidth(), edgeCanvas.getHeight());
         for (Shape shape : addedEdges) {
-            edgeCanvas.getGraphicsContext2D().strokeLine(shape.getLayoutBounds().getMinX(), shape.getLayoutBounds().getMinY(), shape.getLayoutBounds().getMaxX(), shape.getLayoutBounds().getMaxY());        
+            edgeCanvas.getGraphicsContext2D().strokeLine(shape.getLayoutBounds().getMinX(),
+                    shape.getLayoutBounds().getMinY(), shape.getLayoutBounds().getMaxX(),
+                    shape.getLayoutBounds().getMaxY());
         }
     }
 
     public double getScale() {
         return this.scrollAndZoomHandler.getScaleValue();
     }
-    
+
     private class GraphAnimationTimer extends AnimationTimer {
 
         @Override
         public void handle(long now) {
-          if (needsUpdate) {
-            log.info("Updating graph");
-            needsUpdate = false;
-            updateGraph();
-          }
+            if (needsUpdate) {
+                log.info("Updating graph");
+                needsUpdate = false;
+                updateGraph();
+            }
         }
     }
 }

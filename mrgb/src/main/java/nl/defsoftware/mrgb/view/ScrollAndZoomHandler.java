@@ -31,9 +31,15 @@ public class ScrollAndZoomHandler implements EventHandler<ScrollEvent> {
     private DoubleProperty scrollDeltaProperty = new SimpleDoubleProperty(0.0);
 
     //zooming to point
-//    private double xMouseSource;
-//    private double yMouseSource;
+    private double xMouseSource;
+    private double yMouseSource;
 
+    /** TODO this should only accept listeners for the different actions that it handles. 
+     * Thus only a zoom listener, scroll listener and maybe zoom to point listener
+     * 
+     * @param scrollPane
+     * @param graphController
+     */
     public ScrollAndZoomHandler(ScrollPane scrollPane, GraphController graphController) {
         this.scrollPane = scrollPane;
         this.graphController = graphController;
@@ -43,8 +49,6 @@ public class ScrollAndZoomHandler implements EventHandler<ScrollEvent> {
     
     @Override
     public void handle(ScrollEvent event) {
-        System.out.println("scrollpane.prefHeight:    " + scrollPane.getPrefHeight());
-        System.out.println("content.BIL.height:       " + scrollPane.getContent().getBoundsInLocal().getHeight());
         if (event.isControlDown()) {
             //zooming
             if (event.getDeltaY() < 0) {
@@ -53,28 +57,27 @@ public class ScrollAndZoomHandler implements EventHandler<ScrollEvent> {
                 scaleValue = Math.max(scaleValue - zoomDelta, Constants.MIN_ZOOM_VALUE);
             }
             zoomTo(scaleValue);
-//            scrollPane.setPrefSize(1000.0, 20000.0);
-//            zoomEventSource(event.getSceneX(), event.getSceneY());
-            System.out.println("scrollpane.prefHeight:    " + scrollPane.getPrefHeight());
-            System.out.println("content.BIL.height:       " + scrollPane.getContent().getBoundsInLocal().getHeight());
+            zoomEventSource(event.getSceneX(), event.getSceneY());
+            System.out.println("window.height:    " + scrollPane.getHeight());
+            System.out.println("nodePane.height:    " + scrollPane.getContent().getBoundsInLocal().getHeight()); 
             event.consume();
         } else {
             //scrolling
             scrollTo(event.getDeltaY());
+//            System.out.println("viewportBounds.height: " + scrollPane.getViewportBounds().getHeight());
             System.out.println("content.BIL.height:    " + scrollPane.getContent().getBoundsInLocal().getHeight());
-            System.out.println("viewportBounds.height: " + scrollPane.getViewportBounds().getHeight());
             System.out.println("VValue: " + scrollPane.getVvalue());
-            System.out.println("VMax:   " + scrollPane.getVmax());
-            System.out.println("VMin:   " + scrollPane.getVmin());
             System.out.println("scrollEvent.getDeltaY():    " + event.getDeltaY());
-            System.out.println("MousePointer.inScene(x,y): (" + event.getSceneX() + "," + event.getSceneY() + ")");
-            System.out.println("-----------------------");
+//            System.out.println("VMax:   " + scrollPane.getVmax());
+//            System.out.println("VMin:   " + scrollPane.getVmin());
+//            System.out.println("MousePointer.inScene(x,y): (" + event.getSceneX() + "," + event.getSceneY() + ")");
         }
     }
     
     public void zoomTo(double scaleValue) {
         this.scaleValue = scaleValue;
         scaleTransform.setY(scaleValue);
+        //should be listener notifier system
         graphController.notifyUpdateView();
     }
 
@@ -90,10 +93,10 @@ public class ScrollAndZoomHandler implements EventHandler<ScrollEvent> {
         return scaleValue;
     }
     
-//    public void zoomEventSource(double xMouseCoordinate, double yMouseCoordinate) {
-//        xMouseSource = xMouseCoordinate;
-//        yMouseSource = yMouseCoordinate;
-//    }
+    public void zoomEventSource(double xMouseCoordinate, double yMouseCoordinate) {
+        xMouseSource = xMouseCoordinate;
+        yMouseSource = yMouseCoordinate;
+    }
 
     /**
      * 

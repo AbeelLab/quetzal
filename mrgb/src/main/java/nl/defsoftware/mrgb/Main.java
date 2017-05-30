@@ -30,10 +30,12 @@ public class Main extends Application {
 	}
 
 	private void createStage(Stage mainWindow, Pane root) {
-		Scene container = new Scene(root, 1024, 1000, Paint.valueOf("white"));
-		root.prefWidthProperty().bind(container.widthProperty());
-		root.prefHeightProperty().bind(container.heightProperty());
+		Scene container = new Scene(root, Paint.valueOf("white"));
+//		root.prefWidthProperty().bind(container.widthProperty());
+//		root.prefHeightProperty().bind(container.heightProperty());
 		container.getStylesheets().add(getClass().getResource("/css/application.css").toExternalForm());
+		mainWindow.setHeight(768.0);
+		mainWindow.setWidth(1024.0);
 		mainWindow.setScene(container);
 		mainWindow.setTitle("Multi-reference comparative genome browser");
 		mainWindow.show();

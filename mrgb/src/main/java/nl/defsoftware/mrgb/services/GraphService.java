@@ -25,6 +25,7 @@ public class GraphService {
     private FileParserService parserService;
     private SuperBubbleDetectionAlgorithm sbAlgorithm;
     private LongestPathAlgorithm lpAlgorithm;
+    private GridHandler gridHandler;
 
     public GraphService() {
         parserService = new FileParserServiceImpl();
@@ -44,7 +45,11 @@ public class GraphService {
     }
     
     public Int2ObjectLinkedOpenHashMap<Node> getParsedSequences() {
-        return parserService.getParsedSequences();
+        Int2ObjectLinkedOpenHashMap<Node> nodeMap = parserService.getParsedSequences();
+        gridHandler = new GridHandler(new Grid(10, nodeMap.size()));//new Grid should come from storage
+        //todo hashmap should be dumped into gridhandler so it can draw on its grid. 
+        //the grid and gridhandler with the backing nodes should become the model that serves as the intermediate between backend and frontend
+        return nodeMap;
     }
     
     public Short2ObjectOpenHashMap<String> getGenomeNames() {
@@ -58,6 +63,10 @@ public class GraphService {
     
     public List<Integer> calculateLongestPath(final Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap, final int sourceNodeId, final int targetNodeId) {
         return lpAlgorithm.findLongestPathBFS(new ArrayList<Integer>(), sequencesDataMap, sourceNodeId, targetNodeId);
+    }
+
+    public GridHandler getGridHandler() {
+        return gridHandler;
     }
 }
  
