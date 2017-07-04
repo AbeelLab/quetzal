@@ -10,9 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
-import nl.defsoftware.mrgb.models.graph.Bubble;
-import nl.defsoftware.mrgb.models.graph.Node;
-import nl.defsoftware.mrgb.models.graph.NodeType;
+import nl.defsoftware.mrgb.graphs.models.Bubble;
+import nl.defsoftware.mrgb.graphs.models.Node;
+import nl.defsoftware.mrgb.graphs.models.NodeType;
 
 /**
  * Implementation of algorithm proposed by Brankovic, L et al. in 2016. Titled:

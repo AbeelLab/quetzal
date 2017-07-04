@@ -1,4 +1,4 @@
-package nl.defsoftware.mrgb.services;
+package nl.defsoftware.mrgb.graphs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import nl.defsoftware.mrgb.models.Rib;
-import nl.defsoftware.mrgb.models.graph.Bubble;
-import nl.defsoftware.mrgb.models.graph.Node;
-import nl.defsoftware.mrgb.models.graph.NodeType;
+import nl.defsoftware.mrgb.graphs.models.Bubble;
+import nl.defsoftware.mrgb.graphs.models.Node;
+import nl.defsoftware.mrgb.graphs.models.NodeType;
+import nl.defsoftware.mrgb.graphs.models.Rib;
 import nl.defsoftware.mrgb.view.controllers.MatchingScoreEntry;
 
 /**

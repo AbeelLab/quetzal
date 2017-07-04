@@ -21,9 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
-import nl.defsoftware.mrgb.models.Rib;
-import nl.defsoftware.mrgb.models.graph.Bubble;
-import nl.defsoftware.mrgb.models.graph.Node;
+import nl.defsoftware.mrgb.graphs.models.Bubble;
+import nl.defsoftware.mrgb.graphs.models.Node;
+import nl.defsoftware.mrgb.graphs.models.Rib;
 
 /**
  * @author D.L. Ettema

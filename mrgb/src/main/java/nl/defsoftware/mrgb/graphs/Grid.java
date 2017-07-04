@@ -1,13 +1,16 @@
-package nl.defsoftware.mrgb.services;
+package nl.defsoftware.mrgb.graphs;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nl.defsoftware.mrgb.models.graph.Node;
+import javafx.scene.shape.Shape;
+import nl.defsoftware.mrgb.graphs.models.Node;
+import nl.defsoftware.mrgb.view.models.IGraphViewModel;
 
 /**
  * 
@@ -113,6 +116,20 @@ public class Grid {
             grid[row][col].x = grid[0][0].x + spacingX.multiply(BigDecimal.valueOf((long) col)).doubleValue();
             grid[row][col].y = grid[0][0].y + spacingY.multiply(BigDecimal.valueOf((long) row)).doubleValue();
         }
+    }
+    
+    public void getNodesInView(BigDecimal row, BigDecimal range, List<Node> list) {
+        int startPosGrid = getStartPosOrDefault(row, range);
+        for (int i = 0; i < startPosGrid; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                list.addAll(grid[i][j].attachedNodes);
+            }
+        }
+    }
+
+    private int getStartPosOrDefault(BigDecimal row, BigDecimal range) {
+        int startPos = row.intValue() - range.intValue();
+        return (startPos < 0) ? 0 : startPos;
     }
 
     public void scaleCoordinates(int scale) {

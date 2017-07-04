@@ -7,9 +7,9 @@ import java.util.Map;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
-import nl.defsoftware.mrgb.fileparsers.FileParser;
-import nl.defsoftware.mrgb.fileparsers.GFAFileParser2;
-import nl.defsoftware.mrgb.models.graph.Node;
+import nl.defsoftware.mrgb.dao.FileParser;
+import nl.defsoftware.mrgb.dao.GFAFileParser2;
+import nl.defsoftware.mrgb.graphs.models.Node;
 
 /**
  * Generic file parser that is responsible for loading the various data files:

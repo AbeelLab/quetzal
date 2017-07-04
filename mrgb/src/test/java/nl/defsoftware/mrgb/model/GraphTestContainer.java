@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.defsoftware.mrgb.models.graph.Graph;
+import nl.defsoftware.mrgb.graphs.models.Graph;
 
 /**
  * This class can hold some test data for a graph that is in turn utilised to test algorithms.

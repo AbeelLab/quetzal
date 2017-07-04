@@ -1,7 +1,14 @@
-package nl.defsoftware.mrgb.services;
+package nl.defsoftware.mrgb.graphs;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
-import nl.defsoftware.mrgb.models.graph.Node;
+import javafx.scene.shape.Shape;
+import nl.defsoftware.mrgb.graphs.models.Node;
+import nl.defsoftware.mrgb.view.models.IGraphViewModel;
 
 /**
  * This class occupies with the abstractified logic of placing the nodes into the grid and the spacing between the grid
@@ -22,9 +29,13 @@ public class GridHandler {
 
     /** The actual grid */
     private Grid grid;
+    
     /** Registers each placed node in the grid with their ID as key and the grid location as a GridIndex class */
     private Int2ObjectLinkedOpenHashMap<GridIndex> gridIndex;
     private int LEVEL_CURSOR = 0;
+    
+    //a bookmarker object
+    private List<GridIndex> lastKnownViewingLocations = new ArrayList<>();
 
     public GridHandler(Grid grid) {
         this.grid = grid;
@@ -134,6 +145,14 @@ public class GridHandler {
     private void registerNode(Node node, int row, int col) {
         grid.addOrUpdateNodeInGrid(node, row, col);
         gridIndex.put(node.getNodeId(), new GridIndex(row, col));
+    }
+
+    public void getNodesInView(BigDecimal viewPosition, BigDecimal range, List<Node> list) {
+        //viewposition on the height of the grid should give me the center of the grid
+        BigDecimal row = viewPosition.multiply(new BigDecimal(grid.height()));
+        row = row.setScale(1, RoundingMode.HALF_UP);
+        range = range.scaleByPowerOfTen(-10); //power of n=-10
+        grid.getNodesInView(row, range, list);
     }
 }
 

@@ -1,6 +1,6 @@
 package nl.defsoftware.mrgb.view.controllers;
 
-import nl.defsoftware.mrgb.models.graph.Node;
+import nl.defsoftware.mrgb.graphs.models.Node;
 
 /**
  * Utility class to maintain a score and a reference

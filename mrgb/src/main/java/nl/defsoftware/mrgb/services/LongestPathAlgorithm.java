@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
-import nl.defsoftware.mrgb.models.graph.Node;
+import nl.defsoftware.mrgb.graphs.models.Node;
 
 /**
  * This algorithm calculates the longest path in a dynamic programming fashion.

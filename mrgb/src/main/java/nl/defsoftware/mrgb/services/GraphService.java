@@ -9,9 +9,10 @@ import java.util.Map;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
-import nl.defsoftware.mrgb.models.graph.Bubble;
-import nl.defsoftware.mrgb.models.graph.Node;
-import nl.defsoftware.mrgb.view.models.AbstractGraphViewModel;
+import nl.defsoftware.mrgb.graphs.Grid;
+import nl.defsoftware.mrgb.graphs.GridHandler;
+import nl.defsoftware.mrgb.graphs.models.Bubble;
+import nl.defsoftware.mrgb.graphs.models.Node;
 
 /**
  * A service that takes care of retrieving and storing graph data.
@@ -39,9 +40,6 @@ public class GraphService {
 
     public Map<Integer, int[]> getEdges() {
         return parserService.getParsedEdges();
-    }
-    
-    public void loadSequenceModel(AbstractGraphViewModel model) {
     }
     
     public Int2ObjectLinkedOpenHashMap<Node> getParsedSequences() {

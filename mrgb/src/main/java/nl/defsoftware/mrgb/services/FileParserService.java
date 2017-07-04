@@ -7,7 +7,7 @@ import java.util.Map;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
-import nl.defsoftware.mrgb.models.graph.Node;
+import nl.defsoftware.mrgb.graphs.models.Node;
 
 /**
  *

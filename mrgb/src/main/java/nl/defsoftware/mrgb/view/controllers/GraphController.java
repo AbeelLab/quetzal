@@ -35,8 +35,8 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.Util;
-import nl.defsoftware.mrgb.models.graph.Node;
-import nl.defsoftware.mrgb.services.GraphHandler;
+import nl.defsoftware.mrgb.graphs.GraphHandler;
+import nl.defsoftware.mrgb.graphs.models.Node;
 import nl.defsoftware.mrgb.services.GraphService;
 import nl.defsoftware.mrgb.view.GraphScrollPane;
 import nl.defsoftware.mrgb.view.GraphToFxScenePainter;
@@ -63,9 +63,6 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
     private Pane nodePane;
 
     private Canvas edgeCanvas;
-
-    @FXML
-    private Label showingRange;
 
     private GraphService graphService;
 
@@ -118,7 +115,6 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         Int2ObjectLinkedOpenHashMap<Node> sequencesDataMap = graphService.getParsedSequences();
         graphHandler = new GraphHandler<Shape>(sequencesDataMap, graphService.getGenomeNames(), graphService.getDetectedBubbles(sequencesDataMap));
         graphToFxScenePainter = new GraphToFxScenePainter(nodePane, edgeCanvas, scrollPane, graphHandler, graphService.getGridHandler());
-
     }
 
     public void updateGraph() {

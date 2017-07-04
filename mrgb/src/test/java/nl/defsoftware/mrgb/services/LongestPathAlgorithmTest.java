@@ -19,10 +19,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
+import nl.defsoftware.mrgb.graphs.models.Graph;
+import nl.defsoftware.mrgb.graphs.models.Node;
+import nl.defsoftware.mrgb.graphs.models.NodeType;
 import nl.defsoftware.mrgb.model.GraphTestContainer;
-import nl.defsoftware.mrgb.models.graph.Graph;
-import nl.defsoftware.mrgb.models.graph.Node;
-import nl.defsoftware.mrgb.models.graph.NodeType;
 
 public class LongestPathAlgorithmTest extends AlgorithmUtilTest {
 

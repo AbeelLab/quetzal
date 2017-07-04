@@ -1,4 +1,4 @@
-package nl.defsoftware.mrgb.fileparsers;
+package nl.defsoftware.mrgb.dao;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -20,8 +20,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.ShortSet;
 import nl.defsoftware.mrgb.Constants;
-import nl.defsoftware.mrgb.models.Rib;
-import nl.defsoftware.mrgb.models.graph.Node;
+import nl.defsoftware.mrgb.graphs.models.Node;
+import nl.defsoftware.mrgb.graphs.models.Rib;
 
 /**
  * A parser that as a result delivers one data structure that contains the links, nodes, sequences and the strains.

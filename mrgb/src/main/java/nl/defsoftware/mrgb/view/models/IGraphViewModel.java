@@ -6,7 +6,7 @@ import java.util.Set;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.control.Label;
 import javafx.scene.shape.Shape;
-import nl.defsoftware.mrgb.models.graph.Node;
+import nl.defsoftware.mrgb.graphs.models.Node;
 
 /**
  * @author D.L. Ettema

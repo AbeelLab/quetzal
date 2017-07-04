@@ -1,9 +1,9 @@
 /**
  * 
  */
-package nl.defsoftware.mrgb.services;
+package nl.defsoftware.mrgb.graphs;
 
-import static nl.defsoftware.mrgb.models.graph.NodeType.isSame;
+import static nl.defsoftware.mrgb.graphs.models.NodeType.isSame;
 
 import java.util.HashSet;
 import java.util.List;
@@ -17,9 +17,9 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import nl.defsoftware.mrgb.models.graph.Bubble;
-import nl.defsoftware.mrgb.models.graph.Node;
-import nl.defsoftware.mrgb.models.graph.NodeType;
+import nl.defsoftware.mrgb.graphs.models.Bubble;
+import nl.defsoftware.mrgb.graphs.models.Node;
+import nl.defsoftware.mrgb.graphs.models.NodeType;
 import nl.defsoftware.mrgb.view.controllers.MatchingScoreEntry;
 import nl.defsoftware.mrgb.view.models.IGraphViewModel;
 import nl.defsoftware.mrgb.view.models.NodeDrawingData;

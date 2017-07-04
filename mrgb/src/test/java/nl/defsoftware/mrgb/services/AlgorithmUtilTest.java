@@ -2,8 +2,8 @@ package nl.defsoftware.mrgb.services;
 
 import java.util.Map;
 
-import nl.defsoftware.mrgb.models.Rib;
-import nl.defsoftware.mrgb.models.graph.Node;
+import nl.defsoftware.mrgb.graphs.models.Node;
+import nl.defsoftware.mrgb.graphs.models.Rib;
 
 public class AlgorithmUtilTest {
 

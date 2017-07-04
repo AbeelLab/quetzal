@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.Constants;
-import nl.defsoftware.mrgb.models.graph.Bubble;
-import nl.defsoftware.mrgb.models.graph.Node;
+import nl.defsoftware.mrgb.graphs.models.Bubble;
+import nl.defsoftware.mrgb.graphs.models.Node;
 
 /**
  * 

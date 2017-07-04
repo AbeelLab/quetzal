@@ -1,5 +1,7 @@
 package nl.defsoftware.mrgb.view;
 
+import java.util.Observable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +18,7 @@ import nl.defsoftware.mrgb.view.controllers.GraphController;
  * @author D.L. Ettema
  *
  */
-public class ScrollAndZoomHandler implements EventHandler<ScrollEvent> {
+public class ScrollAndZoomHandler extends Observable implements EventHandler<ScrollEvent> {
 
     private static final Logger log = LoggerFactory.getLogger(ScrollAndZoomHandler.class);
     private ScrollPane scrollPane;
@@ -26,6 +28,9 @@ public class ScrollAndZoomHandler implements EventHandler<ScrollEvent> {
     private double scaleValue = Constants.MAX_ZOOM_VALUE;
     private double zoomDelta = 5.0;
     private Scale scaleTransform;
+    
+    private double vValue;
+    private double height;
     
     //scrolling
     private DoubleProperty scrollDeltaProperty = new SimpleDoubleProperty(0.0);
@@ -66,7 +71,9 @@ public class ScrollAndZoomHandler implements EventHandler<ScrollEvent> {
             scrollTo(event.getDeltaY());
 //            System.out.println("viewportBounds.height: " + scrollPane.getViewportBounds().getHeight());
             System.out.println("content.BIL.height:    " + scrollPane.getContent().getBoundsInLocal().getHeight());
+            height = scrollPane.getContent().getBoundsInLocal().getHeight();
             System.out.println("VValue: " + scrollPane.getVvalue());
+            vValue = scrollPane.getVvalue();
             System.out.println("scrollEvent.getDeltaY():    " + event.getDeltaY());
 //            System.out.println("VMax:   " + scrollPane.getVmax());
 //            System.out.println("VMin:   " + scrollPane.getVmin());
@@ -78,6 +85,7 @@ public class ScrollAndZoomHandler implements EventHandler<ScrollEvent> {
         this.scaleValue = scaleValue;
         scaleTransform.setY(scaleValue);
         //should be listener notifier system
+        super.notifyObservers();
         graphController.notifyUpdateView();
     }
 
@@ -91,6 +99,14 @@ public class ScrollAndZoomHandler implements EventHandler<ScrollEvent> {
     
     public double getScaleValue() {
         return scaleValue;
+    }
+    
+    public double getVValue() {
+        return vValue;
+    }
+    
+    public double getHeightOfWindow() {
+        return height;
     }
     
     public void zoomEventSource(double xMouseCoordinate, double yMouseCoordinate) {

@@ -1,9 +1,6 @@
-package nl.defsoftware.mrgb.models;
+package nl.defsoftware.mrgb.graphs.models;
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import nl.defsoftware.mrgb.models.graph.AbstractNode;
-import nl.defsoftware.mrgb.models.graph.Node;
-import nl.defsoftware.mrgb.models.graph.NodeType;
 
 /**
  * @author D.L. Ettema

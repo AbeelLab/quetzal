@@ -1,7 +1,7 @@
 /**
  * 
  */
-package nl.defsoftware.mrgb.models.graph;
+package nl.defsoftware.mrgb.graphs.models;
 
 import java.util.Arrays;
 
