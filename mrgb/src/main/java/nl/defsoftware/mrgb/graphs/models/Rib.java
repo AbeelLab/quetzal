@@ -1,6 +1,9 @@
 package nl.defsoftware.mrgb.graphs.models;
 
+import com.sun.javafx.css.Style;
+
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import nl.defsoftware.mrgb.Styleable;
 
 /**
  * @author D.L. Ettema
@@ -88,5 +91,9 @@ public class Rib extends AbstractNode implements Node {
     @Override
     public NodeType getNodeType() {
         return NodeType.SINGLE_NODE;
+    }
+    
+    public void setStyle(Styleable style) {
+        //nodeCss = 
     }
 }

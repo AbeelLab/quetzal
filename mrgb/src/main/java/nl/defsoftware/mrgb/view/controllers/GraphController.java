@@ -199,16 +199,16 @@ public class GraphController implements Initializable, MapChangeListener<ActionS
         nodePane.getChildren().removeAll(model.getRemovedEdges());
 
         // enable dragging of cells
-        // for (Node node : model.getAddedSequences()) {
-        // mouseGestures.makeDraggable(node);
-        // }
+        for (Shape node : model.getAddedSequences()) {
+            mouseGestures.makeDraggable(node);
+        }
 
         // every cell must have a parent, if it doesn't, then the graphParent is
         // the parent
-        // model.attachOrphansToGraphParent(model.getAddedSequences());
-        //
-        // // remove reference to graphParent
-        // model.disconnectFromGraphParent(model.getRemovedSequences());
+//        model.attachOrphansToGraphParent(model.getAddedSequences());
+        
+        // remove reference to graphParent
+//        model.disconnectFromGraphParent(model.getRemovedSequences());
 
         // merge added & removed cells with all cells
         model.merge();

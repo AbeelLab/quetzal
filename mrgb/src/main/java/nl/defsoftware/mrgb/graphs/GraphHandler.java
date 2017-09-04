@@ -113,7 +113,7 @@ public class GraphHandler<T> {
         drawingData.width = 0;
         drawingData.height = 0;
         drawingData.scale = zoomFactor.get();
-        drawSequence(model, firstNode, drawingData, 0);
+        addSequence(model, firstNode, drawingData, 0);
         return firstNode.getNodeId();
     }
 
@@ -161,8 +161,8 @@ public class GraphHandler<T> {
                 drawingData.parentWidth = parentNode.getWidth();
                 drawingData.parentRadius = parentNode.getRadius();
 
-                drawSequence(model, aNode, drawingData, rank);
-                drawEdge(model, aNode, rank, parentNode);
+                addSequence(model, aNode, drawingData, rank);
+                addEdge(model, aNode, rank, parentNode);
             } else {
                 // if the matching produces an equal score, they will end up on
                 // a different rank. We must determine the true rank based on:
@@ -198,14 +198,14 @@ public class GraphHandler<T> {
 
                 drawingData.parentXCoordinate = xCoord;
                 drawingData.parentYCoordinate = highestYCoord;
-                drawSequence(model, aNode, drawingData, nodeRank);
+                addSequence(model, aNode, drawingData, nodeRank);
 
                 // draw all the edges to this aRib
                 matchedGenomeRanking = GraphHandlerUtil.determineSortedEdgeRanking(aNode, parentNodes, graphData);
                 for (int rank = 0; rank < matchedGenomeRanking.size(); rank++) {
                     MatchingScoreEntry entry = matchedGenomeRanking.get(rank);
                     if (entry.getChildNodeId() == aNode.getNodeId()) {
-                        drawEdge(model, aNode, rank, entry.getParentNode());
+                        addEdge(model, aNode, rank, entry.getParentNode());
                     }
                 }
                 matchedGenomeRanking = null;
@@ -225,11 +225,11 @@ public class GraphHandler<T> {
      * @param rank
      * @param parentNode
      */
-    private void drawEdge(IGraphViewModel<T> model, Node aNode, int rank, Node parentNode) {
+    private void addEdge(IGraphViewModel<T> model, Node aNode, int rank, Node parentNode) {
         model.addEdge(aNode.getNodeId(), parentNode.getNodeId(), rank);
     }
 
-    private void drawSequence(IGraphViewModel<T> model, Node aNode, NodeDrawingData drawingData, int rank) {
+    private void addSequence(IGraphViewModel<T> model, Node aNode, NodeDrawingData drawingData, int rank) {
         model.addSequence(aNode, rank, drawingData);
     }
 
@@ -252,7 +252,7 @@ public class GraphHandler<T> {
             drawingData.parentWidth = parentNode.getWidth();
             drawingData.parentRadius = parentNode.getRadius();
             drawingData.scale = zoomFactor.get();
-            drawSequence(model, bubbles.get(drawingData.id), drawingData, rank);
+            addSequence(model, bubbles.get(drawingData.id), drawingData, rank);
         }
     }
 

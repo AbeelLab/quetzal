@@ -2,6 +2,8 @@ package nl.defsoftware.mrgb.graphs.models;
 
 import java.util.Collection;
 
+import nl.defsoftware.mrgb.Styleable;
+
 /**
  * @author D.L. Ettema
  *
@@ -63,4 +65,5 @@ public interface Node {
     public short[] getGenomeIds();
     
     public void setGenomeIds(short[] genomeIds);
+    
 }

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.shape.Shape;
 import nl.defsoftware.mrgb.Constants;
+import nl.defsoftware.mrgb.Styleable;
 import nl.defsoftware.mrgb.graphs.models.Bubble;
 import nl.defsoftware.mrgb.graphs.models.Node;
 
@@ -41,7 +42,7 @@ public class RibbonGraphModel extends AbstractGraphViewModel<Shape> {
         super();
         this.clear();
     }
-
+    
     @Override
     public void addSequence(Node node, int rank, NodeDrawingData drawingData) {
         switch (node.getNodeType()) {
